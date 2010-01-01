@@ -1,0 +1,171 @@
+20090513 :
+ - Add this file (changes.log) to log changes.
+ - HL7Message.java : 
+   -  Constructors : Clean up HL7Location handling. 
+                     SegmentHash building in parallel with the item tree.
+   -  get() : Handle segment not found error(s)
+   -  remove() :  additional code to handle removal of entire segments.
+   -  census() :  Added this method to gather and return a list of items in the 
+   -  Comprehensive : Modified to create new strings on construction and duplication.
+                      Added a duplication constructor.  
+   -  setVerbose() : Additional code and verbose flag to toggle detail level 
+                     of toString().
+
+ - HL7MsgItem.java :
+   -  parse() : Improved HL7Location handling via new HL7Location methods.
+----------------------------------------------------------------------------
+Released v.1.2: 20090514
+----------------------------------------------------------------------------
+20090519 :
+ - HL7Message.java : Added toXMLString()
+ - HL7MsgItem.java : Added toXMLString()
+                     Fixed some location handling and parsing issues.
+
+20090520 :
+ - HL7MsgItem.java : Added xmlClean, to escape XML special characters (&, <, >, ", ')
+
+20090521 :
+ - HL7MsgItem.java : Modified isComposite() to account for message item polymorphism, 
+                     by assuming that an item is implicitly it's own first subordinate 
+--
+                  subordinate constituent category when there are no subsequent instances of that 
+                  subordinate constiutnet category. ie; sequence[0] is repetition[0], component[0], 
+                  and sub-component[0].
+ - HL7MsgItem.java/toXMLString(): Removed extra newlines (\n).                      
+ - HL7Location.java : Added toXMLString().
+ - HL7Message.java/toXMLString(): Removed extra newlines (\n).
+----------------------------------------------------------------------------
+Checked in svn.54: 20090522
+----------------------------------------------------------------------------
+20090522: Consolidation of sources:
+ - HL7Message <<== HL7Time, HL7SegmentHash, HL7MsgItem, HL7Location, HL7EncodingCharacters, 
+
+ * Revision: 75 
+20090602 : Test, debug, correct.
+ - HL7Message.java : Corrected a null pointer situation in numberOfRepetitionsAt().
+
+ * Revision: 76 
+20090603: More cleanup, documentation
+ - HL7Message.java : Added JavaDoc commentary.
+ 
+ * Revision: 78 
+20090604: it continues...
+ - HL7Message.java : Corrected scoping for hidden class methods.
+                     Added HL7Message.fresh() method to set message date current.
+
+ * Revision: 80 
+20090619:
+ - HL7Message.java : HL7Message class: Added access to encoding characters; collectively as a string, 
+                     and individually as strings and as chars.
+
+ * Revision: 81 
+20090622: 
+ - HL7Message.java : Modified Javadoc documentation.
+ 
+* Revision: 82 
+20090705:
+ - HL7Message.java : Changed HL7Location to HL7Designator. 
+
+* Revision: 86 
+20090728:
+ - HL7Message.java : Minor corrections to census.
+
+* Revision: 87
+20090729:
+ - HL7Message.java : HL7Message.remove modified to handle removal of entire segment(s).
+                     Added IDString() method.
+20090730:
+ - HL7Message.java : Modified HL7Designator parsing, as well as message parsing, to handle MSH indexing idiosyncracies.
+                     Corrected all MSH designators, with idiosyncratic indexing.
+
+* Revision: 92 
+20090730: Release: v.1.3
+Release v.1.3 provides
+ - Code consolidation
+ - XML output/translation of HL7 messages
+ - Modified MSH indexing for compliance with the idiosyncratic HL7 standard MSH indexing.
+
+* Revision: 106
+20090909:
+ - HL7Message.java : Corrected HL7MsgItem.toXMLString() to expose sequence level items as their repetition level constituents, 
+                     in order to delineate the repetition boundaries.
+
+* Revision: 119 
+20090921:
+ - HL7Designator.java : Made HL7Designator a public class, and added javadoc documentation.
+ - HL7Message.java : Pulled out HL7Designator to make it public.
+                     Added handling of NMQ messages to HL7Message.Acknowledgement().
+                     Fixed bugs in HL7MsgItem.pick.
+
+
+* Revision: 132
+20091022:
+ - HL7Designator.java : Updated javadoc.
+
+* Revision: 133 
+20091028:
+ - HL7Designator.java : Updated javadoc.
+ - HL7Message.java : Updated javadoc.
+
+* Revision: 137
+20091031:
+ - HL7Message.java : Minor tweaking of unchecked casts.
+
+* Revision: 139 
+20091101:
+   Added log4j logging.
+   Adjustments for runtime exception handling.
+   Updated javadoc.
+For the following..
+ - HL7Message.java : 
+
+* Revision: 172
+20091110:
+Modifications and corrections to logging and status tracking to allow provision of control and status 
+monitoring, to the following:
+ - HL7Message.java
+--------------------------------------------
+New Repository. 
+New Structure. 
+New Package.
+New Version number series.
+--------------------------------------------
+* Revision: 14
+20091120:
+Tightened up the licensing documentation, and cleaned up warnings, on all modules.
+ - HL7Message.java : Partitioned out HL7EncodingCharacters to its own public class,
+                     and renamed/refactored it to HL7Encoding.
+
+* Revision: 20 
+20091127:
+Provisional check-in after functional verification of new package structure.
+ - HL7Message.java : Replaced IOExceptions with HL7IOExceptions in most public code.
+
+* Revision: 33
+20091207:
+ - HL7Message.java : Fixed segment list handling in set() when adding multiples
+                     of a new segment.
+
+* Revision: 38 
+20091210:
+ - HL7Message.java : Trapped null pointer.
+
+* $Revision: 67 $
+20091230: Modfications to handle BHS and BTS segments as succinct messages.
+ - HL7Encoding.java : Modified to qualifiy encoding characters in accordance
+                      with the following reasonable constraints:
+         - Must not be the same as any other encoding character. Precedence :
+              field Separator,
+              component separator,
+              repetition separator,
+              escape character,
+              subcomponent separator
+         - Must not be a letter, digit or space character.
+      Encoding character components which do not meet these criteria are set to null.
+ - HL7Message.java : Modified to handle BTS as a succinct mesage with no
+        specification of encoding characters.
+     Modified methods HL7Split(), Acknowledge(), IDString(), and
+        other affected methods to handle the above mentioned modifications to encoding
+        character usage.
+     Added handling of BHS and BTS as succinct messages.
+     Added a controlID() method.

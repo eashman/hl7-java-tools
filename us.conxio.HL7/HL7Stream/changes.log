@@ -1,0 +1,83 @@
+* Revision: 30
+20091130:
+Tightening up the polymorphic genericized model. Basically there are 2 imperfect
+paradigms:
+* i/o stream : read, write
+* service dispatch : Register a message handler which dispatches upon receipt.
+  This is a higher level abstraction, and employs the lower level stream
+  abstraction for i/o level operations.
+ - HL7StreamBase.java : Added URI decoding services.
+
+* Revision: 30
+20091207:
+- HL7Delivery.java : A minmally encumbered message delivery class.
+- HL7FileReader.java : Removed description, since the default in HL7StreamBase is better.
+- HL7IOException.java : Added more exception designators;
+                           NULL_STREAM, INAPPROPRIATE_DIRECTIVE, UNINTERPERABLE_URI.
+- HL7Server.java : Modified to implement HL7Stream as well as Runnable.
+- HL7SocketStream.java : pulled open() functionality out of the constructors, but
+                         allow it as an option.
+- HL7StreamBase.java : Added a better default description().
+                       Pulled out URI parsing and handling.
+- HL7StreamURI.java : An interpreter class for HL7Stream URI specifiers.
+         Pulled URI stuff out of HL7StreamBase to make it more generally useful.
+
+* Revision: 33
+20091208:
+- HL7StreamURI.java : Added getHL7StreamWriter().
+
+* Revision: 36
+20091209:
+- HL7Server.java : Added a constructor which takes a single URI argument.
+- HL7Delivery.java : Additional documentation (minor).
+
+* Revision: 39 
+20091210:
+- HL7FileReader.java, HL7FileWriter.java, HL7StreamURI.java : Fixed file reader,
+and file writer qualifying logic.
+
+* Revision: 41 
+20091210:
+- HL7SocketStream.java : Added open() to writeMsg when stream is not open.
+
+* Revision: 42
+20091211:
+- HL7FileReader.java : Removed the finally block in _readMsg(), which was closing
+the stream afer the first message was received, and close the stream properly,
+using the HL7Stream.close(), at the end.
+
+* Revision: 43 
+20091213:
+- HL7SocketStream.java : Corrected a problem in writeMsg(); Overly restrictive
+                         consistency checking.
+
+* Revision: 45 
+20091213:
+- HL7FileWriter.java : corrected open() to set statusValue and mediaType properly.
+
+* Revision: 46 
+20091214:
+- HL7FileReader.java, HL7FileWriter.java, HL7IOException.java, HL7MessageHandler,
+HL7Server, HL7SocketStream, HL7StreamURI : Updated javadocs.
+- HL7Stream.java, HL7StreamBase.java : Added isServer() to HL7Stream interface.
+
+* Revision: 47 
+20091214:
+- HL7Server.java, HL7SocketStream.java, HL7Stream.java, HL7StreamBase.java :
+Added a method, dispatchHandler() to extract a valid HL7MessageHandler, if any
+from the stream object.
+
+* Revision: 49
+20091214:
+- HL7FileReader.java, HL7FileWriter.java, HL7IOException.java, HL7Server.java,
+HL7StreamURI.java : Updated javadocs.
+- HL7Delivery.java : Removed.
+
+* Revision: 66 
+20091217:
+- HL7FileReader.java : fixed a bug: statusValue was not set to OPEN in open().
+
+* $Revision: 68 $
+20091229:
+- HL7FileReader.java, HL7SocketStream.java : Added BHS and BTS handling.
+- HL7IOException.java : Added the NOT_VALID_MSG error type.
