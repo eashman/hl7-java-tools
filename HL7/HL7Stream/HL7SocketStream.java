@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7SocketStream.java 68 2009-12-30 20:17:31Z scott $
+ *  $Id: HL7SocketStream.java 47 2009-12-15 02:47:38Z scott $
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -384,7 +384,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
     */
    @SuppressWarnings("empty-statement")
    public boolean write(HL7Message hl7Msg) throws HL7IOException {
-      String msgCtlID = hl7Msg.controlID();
+      String msgCtlID = hl7Msg.get("MSH.10")[0];
       String traceHeader = "write(" + hl7Msg.IDString() + "):";
       HL7SocketStream.logger.trace(traceHeader + " writing.");
       this.writeMsg(hl7Msg.toString());
@@ -394,7 +394,6 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
       while ( (hl7MsgStr = this.readMsg() ) == null)
          ;
 
-      // * If sent msg has no encoding characters then the ack will have no encoders either.
       HL7Message reply = new HL7Message(hl7MsgStr);
       String ackCode = reply.get("MSA.1")[0];
       String replyCtlID = reply.get("MSA.2")[0];

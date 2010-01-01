@@ -146,26 +146,6 @@ Provisional check-in after functional verification of new package structure.
  - HL7Message.java : Fixed segment list handling in set() when adding multiples
                      of a new segment.
 
-* Revision: 38 
+* $Revision: 38 $
 20091210:
  - HL7Message.java : Trapped null pointer.
-
-* $Revision: 67 $
-20091230: Modfications to handle BHS and BTS segments as succinct messages.
- - HL7Encoding.java : Modified to qualifiy encoding characters in accordance
-                      with the following reasonable constraints:
-         - Must not be the same as any other encoding character. Precedence :
-              field Separator,
-              component separator,
-              repetition separator,
-              escape character,
-              subcomponent separator
-         - Must not be a letter, digit or space character.
-      Encoding character components which do not meet these criteria are set to null.
- - HL7Message.java : Modified to handle BTS as a succinct mesage with no
-        specification of encoding characters.
-     Modified methods HL7Split(), Acknowledge(), IDString(), and
-        other affected methods to handle the above mentioned modifications to encoding
-        character usage.
-     Added handling of BHS and BTS as succinct messages.
-     Added a controlID() method.

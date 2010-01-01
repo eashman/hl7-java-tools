@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7MessageServiceRunner.java 62 2009-12-23 15:05:41Z scott $
+ *  $Id: HL7MessageServiceRunner.java 27 2009-11-30 05:32:18Z scott $
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -114,9 +114,6 @@ public class HL7MessageServiceRunner {
  * Id: HL7MessageServiceRunner.java 14 2009-11-20 22:03:44Z scott
  * Origination. Tested and verified.
  *
- * Id: HL7MessageServiceRunner.java 27 2009-11-30 05:32:18Z scott
+ * $Id: HL7MessageServiceRunner.java 27 2009-11-30 05:32:18Z scott $
  * Added appropriate licensing and annotation.
- *
- * $Id: HL7MessageServiceRunner.java 62 2009-12-23 15:05:41Z scott $
- * Reverted to revision 55.
  */

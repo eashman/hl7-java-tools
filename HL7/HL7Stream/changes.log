@@ -73,11 +73,6 @@ from the stream object.
 HL7StreamURI.java : Updated javadocs.
 - HL7Delivery.java : Removed.
 
-* Revision: 66 
+* $Revision: 55 $
 20091217:
 - HL7FileReader.java : fixed a bug: statusValue was not set to OPEN in open().
-
-* $Revision: 68 $
-20091229:
-- HL7FileReader.java, HL7SocketStream.java : Added BHS and BTS handling.
-- HL7IOException.java : Added the NOT_VALID_MSG error type.

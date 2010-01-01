@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7IOException.java 68 2009-12-30 20:17:31Z scott $
+ *  $Id: HL7IOException.java 49 2009-12-15 03:53:03Z scott $
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -70,10 +70,6 @@ public class HL7IOException extends IOException {
     * An attempt was made to operate on an incorrectly identified HL7 message.
     */
    public static final int    WRONG_CTLID = 507;
-   /**
-    * An operation was attmepted on a message that was not a valid HL7 message.
-    */
-   public static final int    NOT_VALID_MSG = 508;
    /**
     * An attempt was made to operate on a null stream reference.
     */

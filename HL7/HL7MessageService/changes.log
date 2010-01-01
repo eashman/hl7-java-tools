@@ -98,7 +98,7 @@ Tightened up the licensing documentation, and cleaned up warnings, on all module
 20091213:
  - HL7Route.java : Corrected logic in open().
 
-* $Revision: 65 $
+* $Revision: 48 $
 20091214:
 - HL7MessageServiceWorker.java : Removed. Note that the entire HL7MessageStream
 package was also removed.

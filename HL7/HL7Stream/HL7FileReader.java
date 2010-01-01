@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7FileReader.java 68 2009-12-30 20:17:31Z scott $
+ *  $Id: HL7FileReader.java 55 2009-12-18 00:31:07Z scott $
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -200,9 +200,7 @@ public class HL7FileReader extends HL7StreamBase implements HL7Stream {
                String segStr = segStart.toString();
 
                // found beginning of a new message
-               if (segStr.startsWith("MSH")
-               ||  segStr.startsWith("BHS")
-               || segStr.startsWith("BTS")) {
+               if (segStr.startsWith("MSH")) {
                   // Save it off for the next call.
                   this.waiting = new String( segStr );
                   // return the message we already have.
@@ -213,7 +211,7 @@ public class HL7FileReader extends HL7StreamBase implements HL7Stream {
                   } else {
                      // Start a new message.
                      hl7Msg.setLength(0);
-                     hl7Msg.append(segStr.substring(0, 2));
+                     hl7Msg.append("MS");
                   } // if - else
                } // if
             } // if - else

@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Message.java 67 2009-12-30 20:16:52Z scott $
+ *  $Id: HL7Message.java 38 2009-12-11 00:26:34Z scott $
  * 
  *  This code is derived from public domain sources. Commercial use is allowed. 
  *  However, all rights remain permanently assigned to the public domain.
@@ -28,8 +28,8 @@ package us.conxio.HL7.HL7Message;
 
 /**
  *
- * $Revision: 67 $
- * $Date: 2009-12-30 15:16:52 -0500 (Wed, 30 Dec 2009) $
+ * $Revision: 38 $
+ * $Date: 2009-12-10 16:26:34 -0800 (Thu, 10 Dec 2009) $
  * $Author: scott $
  * *
  * 
@@ -133,23 +133,13 @@ class HL7MsgItem {
    
    
    private String[] HL7Split() {
-      if (this.hl7Separator == null) {
-         String[] array = new String[1];
-         array[0] = this.hl7Content;
-         return array;
-      } else {
-         String   regExp = null;
-         if (this.encodingCharacters.escapeChar != null
-         &&  this.encodingCharacters.escapeChar.charAt(0) == 0x5c) {
-            regExp  = "(?<!\\"                             // negative look back for the lack of
-                           + this.encodingCharacters.escapeChar   // an escape character
-                           + ")\\"                                // before the
-                           + this.hl7Separator;                   // item separator
-         } else {
-             regExp  = "\\" + this.hl7Separator;                   // item separator
-         } // if - else
-         return(this.hl7Content.split(regExp, -2) );
-      } // if
+      String  escHexStr = Integer.toHexString(this.encodingCharacters.escapeChar.charAt(0));
+      
+      String regExp  = "(?<!\\"                             // negative look back for the lack of 
+                     + this.encodingCharacters.escapeChar   // an escape character
+                     + ")\\"                                // before the 
+                     + this.hl7Separator;                   // item separator
+      return(this.hl7Content.split(regExp, -2) );
    } // HL7Split
    
    
@@ -620,13 +610,7 @@ public class HL7Message {
       } // if
        
       // Set the encoding characters
-      if (hl7MsgStr.startsWith("MSH") || hl7MsgStr.startsWith("BHS")) {
-         this.encodingCharacters = new HL7Encoding(hl7MsgStr.substring(3, 8));
-      } else if (hl7MsgStr.startsWith("BTS")) {
-         this.encodingCharacters = new HL7Encoding("|^~\\&");
-      } else {
-         throw new HL7IOException("HL7Message: Not a valid message:[" + hl7MsgStr + "].");
-      } // if - else if - else
+      this.encodingCharacters = new HL7Encoding(hl7MsgStr.substring(3, 8));
           
       // split to segments
       String[] segmentStrings = hl7MsgStr.split("\r");
@@ -759,8 +743,8 @@ public class HL7Message {
       
       ArrayList<String> retnItems = new ArrayList<String>();
       
-      // Handle MSH / BHS idiosyncracy
-      if (segKey.equals("MSH") || segKey.equals("BHS") ) {
+      // Handle MSH idiosyncracy
+      if (segKey.equals("MSH") ) {
          int seqIndex = hl7Designator.sequence;
          if (seqIndex == -1) {
             retnItems.add(segKey);
@@ -869,7 +853,7 @@ public class HL7Message {
       String         segKey  = hl7Designator.segID;
       
       // Handle MSH idiosyncracy
-      if (segKey.equals("MSH") || segKey.equals("BHS")) {
+      if (segKey.equals("MSH") ) {
          int seqIndex = hl7Designator.sequence;
          if (seqIndex == -1) {
             return;
@@ -1036,11 +1020,7 @@ public class HL7Message {
    public void fresh() {
       HL7Time tHL7 = new HL7Time();
       String tStr = new String(tHL7.get().toString());
-      if (this.hasSegment("MSH")) {
-         this.set("MSH.7", tStr);
-      } else if (this.hasSegment("BHS")) {
-         this.set("BHS.7", tStr);
-      } // if - else if
+      this.set("MSH.7", tStr);
    } // fresh
    
    /**
@@ -1135,23 +1115,7 @@ public class HL7Message {
       return(xmlStrBuffer.toString());
       
    } // toXMLString
-
-
-   public boolean hasSegment(String segID) {
-      return (this.segmentHash.get(segID) == null) ? false : true;
-   } // hasSegment
    
-
-   public String controlID() {
-      if (this.hasSegment("MSH")) {
-         return this.get("MSH.10")[0];
-      } else if (this.hasSegment("BHS")) {
-         return this.get("BHS.11")[0];
-      } // if - else if
-
-      return "";
-   } // controlID
-
 
    /**
     * Generates a message identification string using items from the MSH.
@@ -1159,50 +1123,23 @@ public class HL7Message {
     */
    public String IDString() {
       StringBuffer idStrBuffer = new StringBuffer();
-
-      if (this.hasSegment("MSH")) {
-         idStrBuffer.append(this.get("MSH.3")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("MSH.4")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("MSH.5")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("MSH.6")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("MSH.7")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("MSH.9.1")[0]);
-
-         String eventType[] = this.get("MSH.9.2");
-         if (eventType != null && eventType.length > 0 && eventType[0] != null) {
-            idStrBuffer.append(".");
-            idStrBuffer.append(eventType[0]);
-         } // if
-
-         String ctlID[] = this.get("MSH.10");
-         if (ctlID != null && ctlID.length > 0 && ctlID[0] != null) {
-            idStrBuffer.append(".");
-            idStrBuffer.append(ctlID[0]);
-         } // if
-      } else if (this.hasSegment("BHS")) {
-         idStrBuffer.append(this.get("BHS.3")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("BHS.4")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("BHS.5")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("BHS.6")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("BHS.7")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("BHS.9")[0]);
-         idStrBuffer.append(".");
-         idStrBuffer.append(this.get("BHS.11")[0]);
-      } else if (this.hasSegment("BHS")) {
-         idStrBuffer.append("BTS");
-      } else {
-         idStrBuffer.append("???");
-      }
+      
+      idStrBuffer.append(this.get("MSH.3")[0]);
+      idStrBuffer.append(".");
+      idStrBuffer.append(this.get("MSH.4")[0]);
+      idStrBuffer.append(".");
+      idStrBuffer.append(this.get("MSH.5")[0]);
+      idStrBuffer.append(".");
+      idStrBuffer.append(this.get("MSH.6")[0]);
+      idStrBuffer.append(".");
+      idStrBuffer.append(this.get("MSH.7")[0]);
+      idStrBuffer.append(".");
+      idStrBuffer.append(this.get("MSH.9.1")[0]);
+      idStrBuffer.append(".");
+      idStrBuffer.append(this.get("MSH.9.2")[0]);
+      idStrBuffer.append(".");
+      idStrBuffer.append(this.get("MSH.10")[0]);
+      
       return(idStrBuffer.toString() );
    } // IDString
    
@@ -1227,46 +1164,17 @@ public class HL7Message {
                                     String         errorCode) 
       throws HL7IOException
    {
-      String   sendingApplication = null,
-               sendingFacility = null,
-               receivingApplication = null,
-               receivingFacility = null,
-               msgCtlID = null;
+      // create new message      
+      String mshArray[] = this.get("MSH");
+      HL7Message ackMsg = new HL7Message(mshArray[0]);
       
-      if (this.hasSegment("MSH")) {
-         sendingApplication = this.get("MSH.3")[0];
-         sendingFacility = this.get("MSH.4")[0];
-         receivingApplication = this.get("MSH.5")[0];
-         receivingFacility = this.get("MSH.6")[0];
-         msgCtlID = this.get("MSH.10")[0];
-      } else if (this.hasSegment("BHS")) {
-         sendingApplication = this.get("BHS.3")[0];
-         sendingFacility = this.get("BHS.4")[0];
-         receivingApplication = this.get("BHS.5")[0];
-         receivingFacility = this.get("BHS.6")[0];
-         msgCtlID = this.get("BHS.11")[0];
-      } else if (this.hasSegment("BTS")) {
-         sendingApplication = "";
-         sendingFacility = "";
-         receivingApplication = "";
-         receivingFacility = "";
-         msgCtlID = "";
-      } else {
-         throw new HL7IOException("Not a valid message.", HL7IOException.NOT_VALID_MSG);
-      } // if - else if - else
+      //create new MSH constituents from the old
+      // Sending Application & Receiving App
+      ackMsg.swap("MSH.3", "MSH.5");
       
-      // create new message for acknowledgement
-      HL7Message ackMsg = new HL7Message("MSH" 
-                                       + this.HL7Encoding()
-                                       + this.encodingCharacters.fieldSeparator
-                                       + receivingApplication
-                                       + this.encodingCharacters.fieldSeparator
-                                       + receivingFacility
-                                       + this.encodingCharacters.fieldSeparator
-                                       + sendingApplication
-                                       + this.encodingCharacters.fieldSeparator
-                                       + sendingFacility
-                                       + this.encodingCharacters.fieldSeparator);
+      // Sending Facility & Receiving facility
+      ackMsg.swap("MSH.4", "MSH.6");
+      
       // Message DateTime
       String now = new HL7Time().get();
       ackMsg.set("MSH.7", now);
@@ -1277,10 +1185,9 @@ public class HL7Message {
       
       // Control ID
       StringBuffer   msgCtlIDStr = new StringBuffer();
-      if (msgCtlID == null) {
-         msgCtlID = "";
-      } // if
-      msgCtlIDStr.append(msgCtlID);
+      String[]       msgCtlID = this.get("MSH.10");
+      if (msgCtlID == null) { return(null); }
+      msgCtlIDStr.append(msgCtlID[0]);
       msgCtlIDStr.append(".AK");
       ackMsg.set("MSH.10", msgCtlIDStr.toString());
       
@@ -1297,7 +1204,7 @@ public class HL7Message {
       msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
       msaSegmentBuffer.append(ackCode);
       msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
-      msaSegmentBuffer.append(msgCtlID);
+      msaSegmentBuffer.append(msgCtlID[0]);
       msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
       msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
       // msaSegmentBuffer.append("\r");
