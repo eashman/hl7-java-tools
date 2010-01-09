@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Message.java 67 2009-12-30 20:16:52Z scott $
+ *  $Id$
  * 
  *  This code is derived from public domain sources. Commercial use is allowed. 
  *  However, all rights remain permanently assigned to the public domain.
@@ -28,9 +28,9 @@ package us.conxio.HL7.HL7Message;
 
 /**
  *
- * $Revision: 67 $
- * $Date: 2009-12-30 12:16:52 -0800 (Wed, 30 Dec 2009) $
- * $Author: scott $
+ * $Revision$
+ * $Date$
+ * $Author$
  * *
  * 
  * @author scott herman <scott.herman@unconxio.us>
