@@ -29,7 +29,7 @@ package us.conxio.HL7.HL7Message;
 /**
  *
  * $Revision: 67 $
- * $Date: 2009-12-30 15:16:52 -0500 (Wed, 30 Dec 2009) $
+ * $Date: 2009-12-30 12:16:52 -0800 (Wed, 30 Dec 2009) $
  * $Author: scott $
  * *
  * 

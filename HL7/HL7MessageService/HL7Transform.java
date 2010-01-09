@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Transform.java 35 2009-12-09 02:52:16Z scott $
+ *  $Id: HL7Transform.java 69 2010-01-06 17:09:51Z scott $
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -34,6 +34,7 @@ package us.conxio.HL7.HL7MessageService;
 
 import org.w3c.dom.*;
 import java.util.regex.*;
+import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
@@ -397,7 +398,7 @@ class HL7Operation {
  * <li><code>remove</code>: specifies removal of specific content.<br>eg; <code>&lt;remove designator="PID.14" /&gt;</code>
  * </ul>
  */
-public class HL7Transform {
+public class HL7Transform extends HL7SpecificationElement {
    String                  idStr;
    HL7Operation[]          operations;
    private static Logger   logger = null;
@@ -405,7 +406,10 @@ public class HL7Transform {
    /**
     * Instantiates an empty object.
     */
-   public HL7Transform() {}
+   public HL7Transform(URI uri) throws Exception {
+      this.initialize("HL7Transform", uri);
+      initializeHL7Transform(this.root);
+   } // HL7Transform
    
    
    /**
@@ -424,7 +428,11 @@ public class HL7Transform {
     * <li>OrderControl - ORC.1
     */
    public HL7Transform(Node xForm) {
-      HL7Transform.logger = Logger.getLogger(this.getClass());
+      initializeHL7Transform(xForm);
+   } // HL7Transform
+
+   private void initializeHL7Transform(Node xForm) {
+      HL7Transform.logger = Logger.getLogger(this.loggerName(this.getClass().getSimpleName()));
       HL7Transform.logger.setLevel(Level.TRACE);
 
       // Handle attributes
@@ -498,7 +506,7 @@ public class HL7Transform {
             } // if
          } // for
       } // if
-   } // HL7Transform
+   } // initializeHL7Transform
    
    
    private void AddOperation(HL7Operation opern) {
@@ -516,15 +524,6 @@ public class HL7Transform {
       this.operations = newOpList;
    } // AddOperation
    
-
-   private void logDebug(String msg) {
-      if (HL7Transform.logger != null) {
-         HL7Transform.logger.debug(msg);
-      } else {
-         System.out.println(msg);
-      } // if - else
-   } // logDebug
-
 
    /**
     * Creates a formatted dump of the context HL7Transform.

@@ -90,7 +90,7 @@ Tightened up the licensing documentation, and cleaned up warnings, on all module
  - HL7MessageServiceWorker.java : Transitioned to HL7Stream from HL7MessageStream.
  - HL7Route.java : Transitioned to HL7Stream from HL7MessageStream, allowing
      inbound stream to be optional.
- - Hl7SpecificationElement.java : removed unused imports.
+ - HL7SpecificationElement.java : removed unused imports.
  - HL7Transform.java : Transitioned to HL7Stream and HL7IOExceptions, although
        there's probably more to do.
 
@@ -98,7 +98,14 @@ Tightened up the licensing documentation, and cleaned up warnings, on all module
 20091213:
  - HL7Route.java : Corrected logic in open().
 
-* $Revision: 65 $
+* Revision: 65 
 20091214:
 - HL7MessageServiceWorker.java : Removed. Note that the entire HL7MessageStream
 package was also removed.
+
+* $Revision: 69 $
+20100105:
+ - HL7SpecificationElement.java : Added IOException messages to
+IllegalArgumentException messages.
+ - HL7Transform.java : Modified to allow standalone instantiation of HL7Transform
+objects, outside of HL7Route objects.

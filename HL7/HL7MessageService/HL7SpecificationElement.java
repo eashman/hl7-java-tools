@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7SpecificationElement.java 35 2009-12-09 02:52:16Z scott $
+ *  $Id: HL7SpecificationElement.java 69 2010-01-06 17:09:51Z scott $
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -32,7 +32,11 @@ import java.util.ArrayList;
 import java.net.URI;
 
 import org.w3c.dom.*;
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -66,7 +70,7 @@ public class HL7SpecificationElement {
     * @param uri The URI of the source document.
     * @throws java.lang.Exception
     */
-   void initialize(String name, URI uri) throws Exception {
+   void initialize(String name, URI uri) throws IllegalArgumentException {
       this.documentURI = uri;
       try {
          DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -78,8 +82,13 @@ public class HL7SpecificationElement {
             this.initialize(name, nodes.item(0));
          } // if
 
-      } catch (Exception ex) {
-         throw new Exception("HL7SpecificationElement: Caught Exception: ",  ex);
+      } catch (SAXException saxEx) {
+         throw new IllegalArgumentException("HL7SpecificationElement: Caught SAXException: ",  saxEx);
+      } catch (IOException ioEx) {
+         throw new IllegalArgumentException("HL7SpecificationElement: Caught IOException: "
+                                          + ioEx.getMessage(),  ioEx);
+      } catch (ParserConfigurationException parsEx) {
+         throw new IllegalArgumentException("HL7SpecificationElement: Caught ParserConfigurationException: ",  parsEx);
       } // try - catch        
    } // initialize
 
@@ -90,14 +99,14 @@ public class HL7SpecificationElement {
     * @param node The root element node of the Node level HL7 specification XML item.
     * @throws java.lang.Exception
     */
-   void initialize(String name, Node node) throws Exception {
+   void initialize(String name, Node node) throws IllegalArgumentException  {
       String nodeNameStr = node.getNodeName();
       if (nodeNameStr.equals(name)) {
          this.root = node;
          this.elementName = name;
          this.getID();        
       } else {
-         throw new InstantiationException("HL7MessageService: Incorrect node [" + nodeNameStr + "].");
+         throw new IllegalArgumentException("HL7MessageService: Incorrect node [" + nodeNameStr + "].");
       } // if - else
 
       if (HL7SpecificationElement.logger == null) {

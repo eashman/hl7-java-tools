@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7FileWriter.java 66 2009-12-23 20:15:19Z scott $
+ *  $Id: HL7FileWriter.java 70 2010-01-06 17:47:08Z scott $
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -94,7 +94,7 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
       this.mediaType = HL7Stream.FILE_TYPE;
 
       if (hl7File == null) {
-         throw new NullPointerException("HL7FileWriter():File is null.");
+         throw new HL7IOException("HL7FileWriter():File is null.");
       } // if
 
       this.file = hl7File;
@@ -128,7 +128,8 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
       try {
          this.writer = new BufferedWriter(new FileWriter(this.file, append) );
       } catch (IOException ioEx) {
-         throw new HL7IOException("HL7FileWriter.open:IOException:", ioEx);
+         throw new HL7IOException(  "HL7FileWriter.open:IOException:"
+                                 +  ioEx.getMessage(), ioEx);
       } // try - catch
 
       this.statusValue = HL7Stream.OPEN;
