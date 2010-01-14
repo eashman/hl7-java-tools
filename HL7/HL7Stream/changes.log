@@ -82,5 +82,5 @@ HL7StreamURI.java : Updated javadocs.
 - HL7FileReader.java, HL7SocketStream.java : Added BHS and BTS handling.
 - HL7IOException.java : Added the NOT_VALID_MSG error type.
 
-* $Revision: 70 $
+* $Revision$
 - HL7FileWriter.java : Added more detail to error messages.
