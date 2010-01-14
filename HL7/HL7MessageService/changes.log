@@ -103,9 +103,20 @@ Tightened up the licensing documentation, and cleaned up warnings, on all module
 - HL7MessageServiceWorker.java : Removed. Note that the entire HL7MessageStream
 package was also removed.
 
-* $Revision: 69 $
+*** new code repository at https://hl7-java-tools.googlecode.com/svn/ ***
+
+* Revision: 9
 20100105:
  - HL7SpecificationElement.java : Added IOException messages to
 IllegalArgumentException messages.
  - HL7Transform.java : Modified to allow standalone instantiation of HL7Transform
 objects, outside of HL7Route objects.
+
+* $Revision$
+20100110:
+ - HL7Transform.java : Added "newsegment", and "appoint" operations.
+20100112:
+ - HL7SpecificationElement.java : Added InputStream argument type to
+HL7SpecificationElement.initialization.
+ - HL7Route.java : Added InputStream argument type to contructors.
+

@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7MessageService.java 65 2009-12-23 20:14:39Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.

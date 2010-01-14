@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7SpecificationElement.java 69 2010-01-06 17:09:51Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -36,6 +36,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import java.util.UUID;
 
@@ -61,9 +62,82 @@ public class HL7SpecificationElement {
    Document                document = null;
    URI                     documentURI = null;
    int                     verbosity = 0;
-   
-   
-   
+
+
+   void initialize(String name, String xmlString) throws IllegalArgumentException {
+      xmlString = xmlStart(xmlString);
+
+      if (xmlString == null) {
+         throw new IllegalArgumentException("XML prologue not found.");
+      } // if
+      
+      try {
+         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+         DocumentBuilder builder = factory.newDocumentBuilder();
+         Document doc = builder.parse(new InputSource(new StringReader(xmlString)));
+         NodeList nodes = doc.getElementsByTagName(name);
+         if (nodes.getLength() > 0) {
+            this.initialize(name, nodes.item(0));
+         } // if
+      } catch (SAXException saxEx) {
+         throw new IllegalArgumentException(this.getClass().getName()
+                                          + ":"
+                                          + name
+                                          + ":caught SAXException:"
+                                          + saxEx.getMessage(), saxEx);
+      } catch (IOException ioEx) {
+         throw new IllegalArgumentException(this.getClass().getName()
+                                          + ":"
+                                          + name
+                                          + ":caught IOException:"
+                                          + ioEx.getMessage(), ioEx);
+      } catch (ParserConfigurationException parsEx) {
+         throw new IllegalArgumentException(this.getClass().getName()
+                                          + ":"
+                                          + name
+                                          + ":caught ParserConfigurationException:"
+                                          + parsEx.getMessage(), parsEx);
+      } // try - catch
+   } // initialize
+
+
+   private String xmlStart(String xmlStr) {
+      if (xmlStr.startsWith("<")) {
+         return xmlStr;
+      } // if
+
+      int start = xmlStr.indexOf("<");
+      if (start > -1) {
+         return xmlStr.substring(start);
+      } // if
+
+      return null;
+   } // xmlStart
+
+
+   void initialize(String name, InputStream inStream) {
+      try {
+         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+         DocumentBuilder builder = builderFactory.newDocumentBuilder();
+
+         Document doc = builder.parse(inStream);
+         NodeList nodes = doc.getElementsByTagName(name);
+         if (nodes.getLength() > 0) {
+            this.initialize(name, nodes.item(0));
+         } // if
+
+         inStream.close();
+      } catch (SAXException saxEx) {
+         throw new IllegalArgumentException("HL7SpecificationElement: Caught SAXException: ",  saxEx);
+      } catch (IOException ioEx) {
+         throw new IllegalArgumentException("HL7SpecificationElement: Caught IOException: "
+                                          + ioEx.getMessage(),  ioEx);
+      } catch (ParserConfigurationException parsEx) {
+         throw new IllegalArgumentException("HL7SpecificationElement: Caught ParserConfigurationException: ",  parsEx);
+      } // try - catch
+   } // initialize
+
+
    /**
     * Generic initialization for a document level HL7 specification XML item.
     * @param name The name of the document level HL7 specification XML item.
@@ -110,11 +184,14 @@ public class HL7SpecificationElement {
       } // if - else
 
       if (HL7SpecificationElement.logger == null) {
-         HL7SpecificationElement.logger = Logger.getLogger(this.loggerName(name));
+         // HL7SpecificationElement.logger = Logger.getLogger(this.loggerName(name));
+         HL7SpecificationElement.logger = Logger.getLogger(this.getClass());
+
          this.configureLogger();
          HL7SpecificationElement.logger.setLevel(Level.TRACE);
          this.logInfo("loggerName:"  + HL7SpecificationElement.logger.getName());
       } // if
+      
    } // initialize
 
 

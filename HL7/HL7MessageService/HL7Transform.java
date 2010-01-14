@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Transform.java 69 2010-01-06 17:09:51Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -75,6 +75,9 @@ class HL7Operation {
    Pattern                 opPattern;
    Operand[]               operands;
    private static Logger   logger = null;
+
+   /* TBD: Add an operation to add a segment.
+    */
    
    // constructors
    public HL7Operation() { }
@@ -88,21 +91,21 @@ class HL7Operation {
    
    public HL7Operation(Node node) {
      HL7Operation.logger = Logger.getLogger(this.getClass());
-     HL7Operation.logger.setLevel(Level.TRACE);
+     HL7Operation.logger.setLevel(Level.TRACE); 
      String localOpName = node.getNodeName();
 
      this.opName = localOpName;
       if (node.hasAttributes()) {
          Node tmpNode;
          NamedNodeMap map = node.getAttributes();
-         if (localOpName.matches("assign|exclude|replace|qualify|scrub|copy|remove") ) {
+         if (localOpName.matches("assign|appoint|exclude|replace|qualify|scrub|copy|remove|newseg.*") ) {
             if ( (tmpNode = map.getNamedItem("designator")) != null) {
                this.resultDesignator = tmpNode.getNodeValue();
             } // if
             
             if (localOpName.equals("replace")) {
                if ( (tmpNode = map.getNamedItem("search")) != null) {
-                  this.AddOperand(new Operand("search", tmpNode.getNodeValue() ) );
+                  this.addOperand(new Operand("search", tmpNode.getNodeValue() ) );
                } // if               
             } // if
          } // if 
@@ -113,7 +116,7 @@ class HL7Operation {
          String[] operandsArray = nodeText.split(", ?", -2);
          int opsLength = operandsArray.length;
          for (int index = 0; index < opsLength; ++index) {
-            this.AddOperand(new Operand("string", operandsArray[index]));
+            this.addOperand(new Operand("string", operandsArray[index]));
          } // for
       } // if
    } // HL7Operation
@@ -128,7 +131,7 @@ class HL7Operation {
    } // logDebug
 
 
-   void AddOperand(Operand operand) {
+   void addOperand(Operand operand) {
       int opListLength = 0;
       if (this.operands != null) {
          opListLength = this.operands.length;
@@ -140,9 +143,9 @@ class HL7Operation {
       } // for
       newOps[opListLength] = operand;
       this.operands = newOps;
-   } // AddOperation
-   
-   
+   } // addOperand
+
+
    void dump() {
       this.logDebug("HL7Operation name:" + this.opName + ", ResultDesignator:" + this.resultDesignator);
       
@@ -225,7 +228,7 @@ class HL7Operation {
       return false;
    } // qualify
    
-   
+
    String assign(HL7Message msg) {
       if (this.opName.equals("assign")) {
          String designator = this.resultDesignator;
@@ -244,7 +247,61 @@ class HL7Operation {
       return null;
    } // assign
    
-   
+
+   boolean newSegment(HL7Message msg) {
+      if (this.opName.equals("newsegment")) {
+         String designator = this.resultDesignator;
+         String arg = this.operands[0] == null ? null : this.operands[0].value;
+         String segStr = designator;
+         if (segStr == null) {
+            segStr = arg;
+         } else if (arg != null && segStr != null && arg.length() > segStr.length()) {
+            segStr = arg;
+         } // if
+
+         if (segStr == null || segStr.length() < 3) {
+            return false;
+         } // if
+
+         msg.addSegment(segStr);
+         return true;
+      } // if
+
+      return false;
+   } // newSegment
+
+
+   private String normalizeDesignator(String designatorStr, HL7Message msg) {
+      String returnStr = designatorStr;
+      HL7Designator hl7Designator = new HL7Designator(designatorStr);
+      if (hl7Designator.getSegIndex() <= 0) {
+         hl7Designator.setSegIndex(msg.countSegment(hl7Designator.getSegID()) - 1);
+         returnStr = hl7Designator.toString();
+      } // if
+
+      return returnStr;
+   } // normalizeDesignator
+
+
+   String appoint(HL7Message msg) {
+      if (this.opName.equals("appoint")) {
+         String designator = this.resultDesignator;
+         String subject = null;
+
+         if (  this.operands[0] != null && this.operands[0].typeStr.equals("string") ) {
+            subject = this.operands[0].value;
+         } // if
+
+         if (subject != null) {
+            msg.set(normalizeDesignator(designator, msg), subject);
+            return(subject);
+         } // if
+      } // if
+
+      return null;
+   } // appoint
+
+
    boolean swap(HL7Message msg) {
       if (this.opName.equals("swap")) {
          if (this.operands[0] == null || this.operands[1] == null) {
@@ -404,15 +461,6 @@ public class HL7Transform extends HL7SpecificationElement {
    private static Logger   logger = null;
    
    /**
-    * Instantiates an empty object.
-    */
-   public HL7Transform(URI uri) throws Exception {
-      this.initialize("HL7Transform", uri);
-      initializeHL7Transform(this.root);
-   } // HL7Transform
-   
-   
-   /**
     * Reads the argument DOM node and creates an appropriate HL7Transform.
     * @param xForm The DOM node representing the XML HL7Transform specification. 
     * <ul>A HL7Transform XML specification may contain the following attributes, 
@@ -431,9 +479,25 @@ public class HL7Transform extends HL7SpecificationElement {
       initializeHL7Transform(xForm);
    } // HL7Transform
 
+
+   /**
+    * Instantiates an HL7Transform from the argument URI
+    */
+   public HL7Transform(URI uri) throws Exception {
+      this.initialize("HL7Transform", uri);
+      initializeHL7Transform(this.root);
+   } // HL7Transform
+
+
+   public HL7Transform(String xmlString) {
+      this.initialize("HL7Transform", xmlString);
+      initializeHL7Transform(this.root);
+   } // HL7Transform
+
+   
    private void initializeHL7Transform(Node xForm) {
-      HL7Transform.logger = Logger.getLogger(this.loggerName(this.getClass().getSimpleName()));
-      HL7Transform.logger.setLevel(Level.TRACE);
+      /* HL7Transform.logger = Logger.getLogger(this.getClass());
+      HL7Transform.logger.setLevel(Level.TRACE); */
 
       // Handle attributes
       if (xForm.hasAttributes() ) {
@@ -454,44 +518,44 @@ public class HL7Transform extends HL7SpecificationElement {
          if ( ( (tmpNode = map.getNamedItem("MsgType") ) != null)
          ||   ( (tmpNode = map.getNamedItem("MessageType") ) != null) ) {
             HL7Operation opMsgTypeQual = new HL7Operation("qualify", "MSH.9.1"); 
-            opMsgTypeQual.AddOperand(new Operand("string", tmpNode.getNodeValue()));
+            opMsgTypeQual.addOperand(new Operand("string", tmpNode.getNodeValue()));
             this.AddOperation(opMsgTypeQual);
          } // if
 
          if ( ( (tmpNode = map.getNamedItem("MsgEvent") ) != null)
          ||   ( (tmpNode = map.getNamedItem("MessageEvent") ) != null) ) {
             HL7Operation opMsgEventQual = new HL7Operation("qualify", "MSH.9.2");
-            opMsgEventQual.AddOperand(new Operand("string", tmpNode.getNodeValue()));
+            opMsgEventQual.addOperand(new Operand("string", tmpNode.getNodeValue()));
             this.AddOperation(opMsgEventQual);
          } // if
 
          if ( (tmpNode = map.getNamedItem("SendingApplication") ) != null) {
             HL7Operation opSendAppQual = new HL7Operation("qualify", "MSH.3");
-            opSendAppQual.AddOperand(new Operand("string", tmpNode.getNodeValue()));
+            opSendAppQual.addOperand(new Operand("string", tmpNode.getNodeValue()));
             this.AddOperation(opSendAppQual);
          } // if
 
          if ( (tmpNode = map.getNamedItem("SendingFacility") ) != null) {
             HL7Operation opSendFacQual = new HL7Operation("qualify", "MSH.4");
-            opSendFacQual.AddOperand(new Operand("string", tmpNode.getNodeValue()));
+            opSendFacQual.addOperand(new Operand("string", tmpNode.getNodeValue()));
             this.AddOperation(opSendFacQual);
          } // if
 
          if ( (tmpNode = map.getNamedItem("ReceivingApplication") ) != null) {
             HL7Operation opRecvAppQual = new HL7Operation("qualify", "MSH.5");
-            opRecvAppQual.AddOperand(new Operand("string", tmpNode.getNodeValue()));
+            opRecvAppQual.addOperand(new Operand("string", tmpNode.getNodeValue()));
             this.AddOperation(opRecvAppQual);
          } // if
 
          if ( (tmpNode = map.getNamedItem("ReceivingFacility") ) != null) {
             HL7Operation opRecvFacQual = new HL7Operation("qualify", "MSH.6");
-            opRecvFacQual.AddOperand(new Operand("string", tmpNode.getNodeValue()));
+            opRecvFacQual.addOperand(new Operand("string", tmpNode.getNodeValue()));
             this.AddOperation(opRecvFacQual);
          } // if
 
          if ( (tmpNode = map.getNamedItem("OrderControl") ) != null) {
             HL7Operation opOrderCtlQual = new HL7Operation("qualify", "ORC.1");
-            opOrderCtlQual.AddOperand(new Operand("string", tmpNode.getNodeValue()));
+            opOrderCtlQual.addOperand(new Operand("string", tmpNode.getNodeValue()));
             this.AddOperation(opOrderCtlQual);
          } // if
       } // if
@@ -576,6 +640,10 @@ public class HL7Transform extends HL7SpecificationElement {
             continue;
          } else if (this.operations[index].opName.equals("assign") ) {
             this.operations[index].assign(msg);
+         } else if (this.operations[index].opName.equals("appoint") ) {
+            this.operations[index].appoint(msg);
+         } else if (this.operations[index].opName.startsWith("newseg") ) {
+            this.operations[index].newSegment(msg);
          } else if (this.operations[index].opName.equals("swap") ) {
             this.operations[index].swap(msg);
          } else if (this.operations[index].opName.equals("replace") ) {

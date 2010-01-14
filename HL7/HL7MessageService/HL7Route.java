@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Route.java 44 2009-12-14 04:06:19Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -34,6 +34,7 @@ package us.conxio.HL7.HL7MessageService;
  */
 
 import java.net.*;
+import java.io.InputStream;
 import java.util.ArrayList;
 import org.w3c.dom.*;
 
@@ -53,7 +54,20 @@ public class HL7Route extends HL7SpecificationElement {
    HL7Transform[]          transforms;
    HL7Stream               hl7StreamIn,
                            hl7StreamOut;
-   
+
+
+    public HL7Route(String xmlStr) throws Exception {
+      this.initialize("HL7Route", xmlStr);
+      initializeHL7Route(this.root);
+   } // HL7Route (Constructor)
+
+
+   public HL7Route(InputStream inStream) throws Exception {
+      this.initialize("HL7Route", inStream);
+      initializeHL7Route(this.root);
+   } // HL7Route (Constructor)
+
+
    /**
     * Creates a HL7Route object from the XML content of the object referenced by the argument URI.
     * @param uri a URI which contains an XML string containing the HL7Route specification
