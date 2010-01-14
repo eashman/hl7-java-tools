@@ -150,9 +150,9 @@ Provisional check-in after functional verification of new package structure.
 20091210:
  - HL7Message.java : Trapped null pointer.
 
-* $Revision: 67 $
+* Revision: 67 
 20091230: Modfications to handle BHS and BTS segments as succinct messages.
- - HL7Encoding.java : Modified to qualifiy encoding characters in accordance
+ - HL7Encoding.java : Modified to qualify encoding characters in accordance
                       with the following reasonable constraints:
          - Must not be the same as any other encoding character. Precedence :
               field Separator,
@@ -169,3 +169,18 @@ Provisional check-in after functional verification of new package structure.
         character usage.
      Added handling of BHS and BTS as succinct messages.
      Added a controlID() method.
+
+*** new code repository at https://hl7-java-tools.googlecode.com/svn/ ***
+
+* Revision: 10 
+20100109:
+ - HL7Encoding.java : Tightened access to encoding characters. No longer public.
+ - HL7Message.java : Modifications to comply with above.
+
+* $Revision$
+20100110:
+ - HL7Encoding.java : Tightened access to encoding characters even further.
+                      They are now private.
+ - HL7Message.java : Modifications to comply with above.
+                     Added public addSegment() functionality.
+ - HL7Designator.java : Encapsulated the fields, and maded them private for safe public access.

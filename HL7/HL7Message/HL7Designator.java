@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Designator.java 14 2009-11-20 22:03:44Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources.
  *  Commercial use is allowed.
@@ -44,38 +44,26 @@ package us.conxio.HL7.HL7Message;
  */
 public class HL7Designator {
    /**
-    * The Hl7Designator represented as a String.
+    * The HL7Designator represented as a String.
     */
-   String   argString,
+   private String  argString;
    /**
-    * The HL7 segment identifier; The first 3 characters of the subject HL7 segment.
-    */           
-            segID;
+    * The HL7Designator Segment ID.
+    */
+   private String segID;
    /**
     * The index of the specific occurence of the subject segment. -1 for all.
     */
-   int      segIndex,
+   private int segIndex;
+   private int sequence;
+   private int repetition;
+   private int component;
+   private int subComponent;
    /**
-    * The index of the subject sequence, or field.
-    */
-            sequence,
-   /**
-    * The index of the subject sequence, or field repetition. -1 for all.
-    */
-            repetition,
-   /**
-    * The index of the subject component, in the subject field, or sequence.
-    */
-            component,
-   /**
-    * The index of the subject sub-component, in the subject component.
-    */         
-            subComponent;
-   /**
-    * A flsg to control the explicit represention of segment and repetition idices 
+    * A flag to control the explicit represention of segment and repetition idices
     * in the String representation of the HL7Designator.
     */
-   boolean  verbose;
+   private boolean verbose;
 
    /**
     * Creates an empty HL7Designator()
@@ -96,7 +84,7 @@ public class HL7Designator {
     * nbsp;&nbsp;&nbsp; &lt;segID&gt;[index].&lt;sequence&gt;[index].&lt;component&gt;.&lt;subcomponent&gt; </b><br>
     */
    public HL7Designator(String argStr) {
-      this.argString = new String( argStr );
+      this.argString = argStr;
       this.segIndex = -3;
       this.verbose = false;
       parse();
@@ -113,50 +101,54 @@ public class HL7Designator {
       this.segIndex = argLocation.segIndex;
       this.sequence = argLocation.sequence;
       this.subComponent = argLocation.subComponent;
-      this.segID = new String(argLocation.segID);
-      this.argString = new String(argLocation.argString);
+      this.segID = new String(argLocation.getSegID());
+      this.argString = new String(argLocation.getArgString());
       this.verbose = argLocation.verbose;
    } // HL7Designator constructor
    
    
-   // Returns the repetition value, that is, value expressed between the square brackets of
-   // the argument location element. 
-   // Returns 
-   //    the integral value of positive base 10 numeric representations.
-   //    -1 if the wildcard ('*'), indicating 'all' is specified.
-   //    -3 if the element contains no bracketed value, or the value is not valid.
+   /**
+    * Returns the repetition value, that is, value expressed between the square brackets of
+    * the argument location element.
+    * @return the integral value of positive base 10 numeric representations.
+    *    -1 if the wildcard ('*'), indicating 'all' is specified.
+    *    -3 if the element contains no bracketed value, or the value is not valid.
+    */
    private int indexValueOf(String argStr) {
       int openPosn   = argStr.indexOf("["),
-          closePosn  = argStr.indexOf("]");
+          closePosn  = argStr.indexOf("]"),
+          retnV      = -3;
 
       if (openPosn >= 0 && closePosn > openPosn) {
          String vStr = argStr.substring(++openPosn, closePosn);
-         if (vStr.startsWith("*")) { return(-1); }
-         Integer retnV = Integer.decode(vStr);
-         return retnV;
+         if (vStr.startsWith("*")) { 
+            retnV = -1;
+         } else {
+            retnV = Integer.decode(vStr);
+         }
       } // if
 
-      return -3;
+      return retnV;
    } // indexValueOf
 
    
-   // Returns the value of the non-bracketed portion of the argument location element,
-   // or -3 if there is no non-bracketed portion of the argument.
+   /**
+    * Returns the value of the non-bracketed portion of the argument location element,
+    * or -3 if there is no non-bracketed portion of the argument.
+    */
    private int positionValueOf(String argStr) {
       int openPosn   = argStr.indexOf("[");
-      Integer tempInt;
-      int retnInt;
+      int retnInt = -3;
       
       if (openPosn > 0) {
-         tempInt = Integer.decode(argStr.substring(0, openPosn));
-         retnInt = tempInt;
+         retnInt = Integer.decode(argStr.substring(0, openPosn));
          return(retnInt);  
       } else if (openPosn == 0) {
-         return (-3);
-      } // if - else if
-      
-      tempInt = Integer.decode(argStr);
-      retnInt = tempInt;
+         retnInt = -3;
+      } else {
+         retnInt = Integer.decode(argStr);
+      } // if - else if - else
+
       return(retnInt);  
       
    } // positionValueOf
@@ -164,35 +156,35 @@ public class HL7Designator {
    
    
    private void parse() {
-      String[] args = this.argString.split("\\.");
+      String[] args = this.getArgString().split("\\.");
 
       if (args[0].length() < 3) {
          return;
       } // if
 
-      this.segIndex = 0;
-      this.repetition = -3;
-      this.component = -3;
-      this.sequence = -3;
-      this.subComponent = -3;
+      this.setSegIndex(0);
+      this.setRepetition(-3);
+      this.setComponent(-3);
+      this.setSequence(-3);
+      this.setSubComponent(-3);
 
       // Segment index specification
       if (args[0].length() > 3) {
-         this.segIndex = indexValueOf(args[0]);
+         this.setSegIndex(indexValueOf(args[0]));
          // if (this.segIndex == -1) { ++this.segIndex; }
       } // if
 
       // Segment ID is the first three characters.
-      this.segID = args[0].substring(0, 3);
+      this.setSegID(args[0].substring(0, 3));
 
       // Sequence is the second item.
       if (args.length > 1) {
-         this.sequence = this.positionValueOf(args[1]);
-         this.repetition = indexValueOf(args[1]);
+         this.setSequence(this.positionValueOf(args[1]));
+         this.setRepetition(indexValueOf(args[1]));
          
          // Correct for MSH indexing idiosyncracy.
-         if (this.segID.equals("MSH") && this.sequence >= 0) {
-            --this.sequence;
+         if (this.getSegID().equals("MSH") && this.getSequence() >= 0) {
+            this.setSequence(this.getSequence() - 1);
          } // if
       } // if      
 
@@ -200,13 +192,13 @@ public class HL7Designator {
       if (args.length > 2) {
          Integer tempInt = Integer.decode(args[2]);
          if (tempInt > 0) { --tempInt; }  // correct for ordinal designations
-         this.component = tempInt;
+         this.setComponent((int) tempInt);
       } // if 
 
       if (args.length > 3) {
          Integer tempInt = Integer.decode(args[3]);
          if (tempInt > 0) { --tempInt; }  // correct for ordinal designations
-         this.subComponent = tempInt;
+         this.setSubComponent((int) tempInt);
       } // if
    } // parse
    
@@ -216,19 +208,26 @@ public class HL7Designator {
     * @return the depth, or precision, of the subject designator.
     */
    public int depth() {
-      if (this.segIndex       < -1) { return 0; }
-      if (this.sequence       < 0) { return 1; }
-      if (this.repetition     < -1) { return 2; }
-      if (this.component      < 0) { return 3; }
-      if (this.subComponent   < 0) { return 4; }
-      return 5;
+      int retnV = 5;
+      if (this.getSegIndex()  < -1) { 
+         retnV =  0;
+      } else if (this.getSequence() < 0) {
+         retnV = 1;
+      } else if (this.getRepetition() < -1) {
+         retnV = 2;
+      } else if (this.getComponent() < 0) {
+         retnV = 3;
+      } else if (this.getSubComponent() < 0) {
+         retnV = 4;
+      } // if - else if,,,
+      return retnV;
    } // length
 
 
    void snip() {
       switch (this.depth()) {
-         case 3 : this.repetition = -3;  break;
-         case 4 : this.component  = -1;  break;
+         case 3 : this.setRepetition(-3);  break;
+         case 4 : this.setComponent(-1);  break;
          default: ;
       } // switch
    } // snip
@@ -242,62 +241,62 @@ public class HL7Designator {
    public String toString() {
       StringBuffer tempStr = new StringBuffer();
       
-      if (this.segID.length() < 3) {
+      if (this.getSegID().length() < 3) {
          return(null);
       } // if
       
-      tempStr.append(this.segID);
+      tempStr.append(this.getSegID());
       
-      if (this.segIndex == 0 && this.verbose == false) {
+      if (this.getSegIndex() == 0 && this.isVerbose() == false) {
          ;
-      } else if (this.segIndex >= 0) {
-         tempStr.append("[" + Integer.toString(this.segIndex) + "]");
-      } else if (this.segIndex == -1) {
+      } else if (this.getSegIndex() >= 0) {
+         tempStr.append("[" + Integer.toString(this.getSegIndex()) + "]");
+      } else if (this.getSegIndex() == -1) {
          tempStr.append("[*]");
       } else {
-         this.argString = new String(tempStr.toString());
-         return(this.argString);
+         this.setArgString(new String(tempStr.toString()));
+         return(this.getArgString());
       } // if - else if - else
       
-      if (this.sequence >= 0) {
-         int seqIndex = this.sequence;
-         if (this.segID.equals("MSH") ) {
+      if (this.getSequence() >= 0) {
+         int seqIndex = this.getSequence();
+         if (this.getSegID().equals("MSH") ) {
             ++seqIndex;
          } // if
          
          tempStr.append("." + Integer.toString(seqIndex));
       } else {
-         this.argString = new String(tempStr.toString());
-         return(this.argString);
+         this.setArgString(new String(tempStr.toString()));
+         return(this.getArgString());
       } // if - else 
       
-      if (this.repetition == 0 && this.verbose == false) {
+      if (this.getRepetition() == 0 && this.isVerbose() == false) {
          ;
-      } else if (this.repetition == -1) {
+      } else if (this.getRepetition() == -1) {
          tempStr.append("[*]");
-      } else if (this.repetition >= 0) {
-         tempStr.append("[" + Integer.toString(this.repetition) + "]");
+      } else if (this.getRepetition() >= 0) {
+         tempStr.append("[" + Integer.toString(this.getRepetition()) + "]");
       } else {
-         this.argString = new String(tempStr.toString());
-         return(this.argString);
+         this.setArgString(new String(tempStr.toString()));
+         return(this.getArgString());
       } // if - else if - else
       
-      if (this.component >= 0) {
-         tempStr.append("." + Integer.toString(this.component + 1));
+      if (this.getComponent() >= 0) {
+         tempStr.append("." + Integer.toString(this.getComponent() + 1));
       } else {
-         this.argString = new String(tempStr.toString());
-         return(this.argString);
+         this.setArgString(new String(tempStr.toString()));
+         return(this.getArgString());
       } // if - else
       
-      if (this.subComponent >= 0) {
-         tempStr.append("." + Integer.toString(this.subComponent + 1));
+      if (this.getSubComponent() >= 0) {
+         tempStr.append("." + Integer.toString(this.getSubComponent() + 1));
       } else {
-         this.argString = new String(tempStr.toString());
-         return(this.argString);
+         this.setArgString(new String(tempStr.toString()));
+         return(this.getArgString());
       } // if - else
       
-      this.argString = new String(tempStr.toString());
-      return(this.argString);
+      this.setArgString(new String(tempStr.toString()));
+      return(this.getArgString());
       
    } // toString
    
@@ -309,38 +308,38 @@ public class HL7Designator {
    public String toXMLString() {
       StringBuffer tempStr = new StringBuffer();
       
-      if (this.segID.length() < 3) {
+      if (this.getSegID().length() < 3) {
          return(null);
       } // if
       
-      tempStr.append(this.segID);
+      tempStr.append(this.getSegID());
       
-      if (this.segIndex < -1) {
+      if (this.getSegIndex() < -1) {
          return(this.argString = new String(tempStr.toString()));
       } // if - else if - else
       
-      if (this.sequence >= 0) {
-         tempStr.append("." + Integer.toString(this.sequence));
+      if (this.getSequence() >= 0) {
+         tempStr.append("." + Integer.toString(this.getSequence()));
       } else {
          return(this.argString = new String(tempStr.toString()));
       } // if - else 
       
-      if (this.repetition < -1) {
+      if (this.getRepetition() < -1) {
          return(this.argString = new String(tempStr.toString()));
       } // if - else if - else
       
-      if (this.component >= 0) {
-         tempStr.append("." + Integer.toString(this.component + 1));
+      if (this.getComponent() >= 0) {
+         tempStr.append("." + Integer.toString(this.getComponent() + 1));
       } else {
          return(this.argString = new String(tempStr.toString()));
       } // if - else
       
-      if (this.subComponent >= 0) {
-         tempStr.append("." + Integer.toString(this.subComponent + 1));
+      if (this.getSubComponent() >= 0) {
+         tempStr.append("." + Integer.toString(this.getSubComponent() + 1));
       } // if
       
-      this.argString = new String(tempStr.toString());
-      return(this.argString);
+      this.setArgString(new String(tempStr.toString()));
+      return(this.getArgString());
       
    } // toXMLString
    
@@ -355,33 +354,33 @@ public class HL7Designator {
       
       switch (retn.depth()) {
          case 0 : 
-            retn.segIndex = index;
-            retn.sequence = -1;
+            retn.setSegIndex(index);
+            retn.setSequence(-1);
             break;
             
          case 1 : 
-            retn.sequence = index;     
-            retn.repetition = -3;   
+            retn.setSequence(index);
+            retn.setRepetition(-3);
             break;
             
          case 2 : 
-            retn.repetition = index;   
-            retn.component = -1;    
+            retn.setRepetition(index);
+            retn.setComponent(-1);
             break;
             
          case 3 : 
-            retn.component = index;    
-            retn.subComponent = -1; 
+            retn.setComponent(index);
+            retn.setSubComponent(-1);
             break;
             
          case 4 : 
-            retn.subComponent = index; 
+            retn.setSubComponent(index);
             break;
             
          default: return(null);
       } // switch
       
-      retn.argString = retn.toString();
+      retn.setArgString(retn.toString());
       return(retn);
    } // spawn
    
@@ -392,5 +391,110 @@ public class HL7Designator {
    public void setVerbose() {
       this.verbose = true;
    } // setVerbose
+
+   /**
+    * @return the argString
+    */
+   public String getArgString() {
+      return argString;
+   }
+
+   /**
+    * @param argString the argString to set
+    */
+   public void setArgString(String argString) {
+      this.argString = argString;
+   }
+
+   /**
+    * @return the segID
+    */
+   public String getSegID() {
+      return segID;
+   }
+
+   /**
+    * @param segID the segID to set
+    */
+   public void setSegID(String segID) {
+      this.segID = segID;
+   }
+
+   /**
+    * @return the segIndex
+    */
+   public int getSegIndex() {
+      return segIndex;
+   }
+
+   /**
+    * @param segIndex the segIndex to set
+    */
+   public void setSegIndex(int segIndex) {
+      this.segIndex = segIndex;
+   }
+
+   /**
+    * @return the sequence
+    */
+   public int getSequence() {
+      return sequence;
+   }
+
+   /**
+    * @param sequence the sequence to set
+    */
+   public void setSequence(int sequence) {
+      this.sequence = sequence;
+   }
+
+   /**
+    * @return the repetition
+    */
+   public int getRepetition() {
+      return repetition;
+   }
+
+   /**
+    * @param repetition the repetition to set
+    */
+   public void setRepetition(int repetition) {
+      this.repetition = repetition;
+   }
+
+   /**
+    * @return the component
+    */
+   public int getComponent() {
+      return component;
+   }
+
+   /**
+    * @param component the component to set
+    */
+   public void setComponent(int component) {
+      this.component = component;
+   }
+
+   /**
+    * @return the subComponent
+    */
+   public int getSubComponent() {
+      return subComponent;
+   }
+
+   /**
+    * @param subComponent the subComponent to set
+    */
+   public void setSubComponent(int subComponent) {
+      this.subComponent = subComponent;
+   }
+
+   /**
+    * @return the verbose
+    */
+   public boolean isVerbose() {
+      return verbose;
+   }
 
 } // HL7Designator

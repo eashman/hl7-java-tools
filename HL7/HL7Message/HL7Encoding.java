@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Encoding.java 67 2009-12-30 20:16:52Z scott $
+ *  $Id$
  * 
  *  This code is derived from public domain sources. 
  *  Commercial use is allowed. 
@@ -27,19 +27,19 @@
 
 package us.conxio.HL7.HL7Message;
 
-import java.util.HashMap;
-
 /**
  * Provides access to HL7 message encoding characters.
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7Encoding {
-   public String        fieldSeparator,
+   private String       fieldSeparator,
                         componentSeparator,
                         repetitionSeparator,
                         subComponentSeparator,
                         escapeChar,
                         string;
+   /* TBD: make the encoding characters private (and protected?).
+    */
 
    // constructors
    HL7Encoding(String encodingChars) {
@@ -118,19 +118,19 @@ public class HL7Encoding {
    // Utilities
    String NextSeparator(String separator) {
       if (separator.equals("\r")) {
-         return(this.fieldSeparator);
+         return(this.getFieldSeparator());
       } // if 
 
-      if (separator.equals(fieldSeparator)) {
-            return(this.repetitionSeparator);
+      if (separator.equals(getFieldSeparator())) {
+            return(this.getRepetitionSeparator());
       } // if
 
-      if (separator.equals(repetitionSeparator)) {
-            return(this.componentSeparator);
+      if (separator.equals(getRepetitionSeparator())) {
+            return(this.getComponentSeparator());
       } // if
 
-      if (separator.equals(componentSeparator) ) {
-            return(this.subComponentSeparator);
+      if (separator.equals(getComponentSeparator()) ) {
+            return(this.getSubComponentSeparator());
       } // if
 
       // fall through 
@@ -142,5 +142,75 @@ public class HL7Encoding {
    public String toString() {
       return(this.string);
    } // toString
+
+   /**
+    * @return the fieldSeparator
+    */
+   public String getFieldSeparator() {
+      return fieldSeparator;
+   }
+
+   /**
+    * @param fieldSeparator the fieldSeparator to set
+    */
+   public void setFieldSeparator(String fieldSeparator) {
+      this.fieldSeparator = fieldSeparator;
+   }
+
+   /**
+    * @return the componentSeparator
+    */
+   public String getComponentSeparator() {
+      return componentSeparator;
+   }
+
+   /**
+    * @param componentSeparator the componentSeparator to set
+    */
+   public void setComponentSeparator(String componentSeparator) {
+      this.componentSeparator = componentSeparator;
+   }
+
+   /**
+    * @return the repetitionSeparator
+    */
+   public String getRepetitionSeparator() {
+      return repetitionSeparator;
+   }
+
+   /**
+    * @param repetitionSeparator the repetitionSeparator to set
+    */
+   public void setRepetitionSeparator(String repetitionSeparator) {
+      this.repetitionSeparator = repetitionSeparator;
+   }
+
+   /**
+    * @return the subComponentSeparator
+    */
+   public String getSubComponentSeparator() {
+      return subComponentSeparator;
+   }
+
+   /**
+    * @param subComponentSeparator the subComponentSeparator to set
+    */
+   public void setSubComponentSeparator(String subComponentSeparator) {
+      this.subComponentSeparator = subComponentSeparator;
+   }
+
+   /**
+    * @return the escapeChar
+    */
+   public String getEscapeChar() {
+      return escapeChar;
+   }
+
+   /**
+    * @param escapeChar the escapeChar to set
+    */
+   public void setEscapeChar(String escapeChar) {
+      this.escapeChar = escapeChar;
+   }
       
 } // class HL7Encoding

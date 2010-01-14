@@ -115,7 +115,7 @@ class HL7MsgItem {
          firstTime = false;
       
          String prefix = this.hl7Content.substring(separatorIndex - 1, separatorIndex);
-         if (!prefix.equals(this.encodingCharacters.escapeChar) ) {
+         if (!prefix.equals(this.encodingCharacters.getEscapeChar()) ) {
             return true;
          } // if
       
@@ -139,10 +139,10 @@ class HL7MsgItem {
          return array;
       } else {
          String   regExp = null;
-         if (this.encodingCharacters.escapeChar != null
-         &&  this.encodingCharacters.escapeChar.charAt(0) == 0x5c) {
+         String   escapeChar = this.encodingCharacters.getEscapeChar();
+         if (escapeChar != null &&  escapeChar.charAt(0) == 0x5c) {
             regExp  = "(?<!\\"                             // negative look back for the lack of
-                           + this.encodingCharacters.escapeChar   // an escape character
+                           + escapeChar   // an escape character
                            + ")\\"                                // before the
                            + this.hl7Separator;                   // item separator
          } else {
@@ -240,43 +240,54 @@ class HL7MsgItem {
 
 
    private boolean isAtSegmentLevel() {
-      if (this.hl7Separator == null)                                                return false;
-      if (this.encodingCharacters == null)                                          return false;
-      if (this.encodingCharacters.repetitionSeparator == null)                      return false;
-      if (this.hl7Separator.equals(this.encodingCharacters.fieldSeparator) )        return true;
-      return false;
+      if (  this.hl7Separator == null
+      ||    this.encodingCharacters == null
+      ||    this.encodingCharacters.getFieldSeparator() == null
+      ||    !this.hl7Separator.equals(this.encodingCharacters.getFieldSeparator()))  {
+         return false;
+      } 
+      return true;
    } // isAtSegmentLevel
    
    
    private boolean isAtSequenceLevel() {
-      if (this.hl7Separator == null)                                                return false;
-      if (this.encodingCharacters == null)                                          return false;
-      if (this.encodingCharacters.repetitionSeparator == null)                      return false;
-      if (this.hl7Separator.equals(this.encodingCharacters.repetitionSeparator) )   return true;
-      return false;
+      if (  this.hl7Separator == null
+      ||    this.encodingCharacters == null
+      ||    this.encodingCharacters.getRepetitionSeparator() == null
+      ||    !this.hl7Separator.equals(this.encodingCharacters.getRepetitionSeparator()) ) {
+         return false;
+      }
+      return true;
    } // isAtSequenceLevel
    
    
    private boolean isAtRepetitionLevel() {
-      if (this.hl7Separator == null)                                                return false;
-      if (this.encodingCharacters == null)                                          return false;
-      if (this.encodingCharacters.repetitionSeparator == null)                      return false;
-      if (this.hl7Separator.equals(this.encodingCharacters.componentSeparator) )    return true;
-      return false;
+      if (  this.hl7Separator == null
+      ||    this.encodingCharacters == null
+      ||    this.encodingCharacters.getComponentSeparator() == null
+      ||    !this.hl7Separator.equals(this.encodingCharacters.getComponentSeparator()) ) {
+            return false;
+      } // if
+      return true;
    } // isAtRepetitionLevel
    
    
    private boolean isAtComponentLevel() {
-      if (this.hl7Separator == null)                                                return false;
-      if (this.encodingCharacters == null)                                          return false;
-      if (this.encodingCharacters.repetitionSeparator == null)                      return false;
-      if (this.hl7Separator.equals(this.encodingCharacters.subComponentSeparator) ) return true;
-      return false;
+      if (  this.hl7Separator == null
+      ||    this.encodingCharacters == null
+      ||    this.encodingCharacters.getSubComponentSeparator() == null
+      ||    !this.hl7Separator.equals(this.encodingCharacters.getSubComponentSeparator()) ) {
+         return false;
+      }
+      return true;
    } // isAtComponentLevel
    
    
    private boolean isAtSubComponentLevel() {
-      if (this.hl7Separator == null && this.hl7Constituents == null) return true;
+      if (  this.hl7Separator == null
+      &&    this.hl7Constituents == null) {
+         return true;
+      } // if
       return false;
    } // isAtSubComponentLevel
    
@@ -308,7 +319,7 @@ class HL7MsgItem {
       if (this.location == null) {
          tagString = "null.location";
       } else if (this.isAtSegmentLevel()) {
-         tagString = this.location.segID;
+         tagString = this.location.getSegID();
       } else if (this.isAtRepetitionLevel() 
              ||  this.isAtComponentLevel() 
              ||  this.isAtSubComponentLevel()
@@ -393,20 +404,20 @@ class HL7MsgItem {
    // Given a location specifier, returns the index of the constituent component
    // referenced by the argument location specifier.
    private int locate(HL7Designator location) {
-      if (this.hl7Separator.equals(this.encodingCharacters.fieldSeparator)) {
-         return(location.sequence);
+      if (this.hl7Separator.equals(this.encodingCharacters.getFieldSeparator())) {
+         return(location.getSequence());
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.repetitionSeparator)) {
-         return(location.repetition);
+      if (this.hl7Separator.equals(this.encodingCharacters.getRepetitionSeparator())) {
+         return(location.getRepetition());
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.componentSeparator)) {
-         return(location.component);
+      if (this.hl7Separator.equals(this.encodingCharacters.getComponentSeparator())) {
+         return(location.getComponent());
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.subComponentSeparator)) {
-         return(location.subComponent);
+      if (this.hl7Separator.equals(this.encodingCharacters.getSubComponentSeparator())) {
+         return(location.getSubComponent());
       } // if
       
       return(-11);
@@ -414,24 +425,24 @@ class HL7MsgItem {
    
    
    private boolean isTerminal(HL7Designator location) {
-      if (this.hl7Separator.equals(this.encodingCharacters.fieldSeparator)) {
-         return(location.sequence < 0  ? true : false);
+      if (this.hl7Separator.equals(this.encodingCharacters.getFieldSeparator())) {
+         return(location.getSequence() < 0  ? true : false);
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.repetitionSeparator)) {
-         if (location.repetition < 0 && location.component < 0) {
+      if (this.hl7Separator.equals(this.encodingCharacters.getRepetitionSeparator())) {
+         if (location.getRepetition() < 0 && location.getComponent() < 0) {
             return true;
          } else {
             return false;
          } // if - else
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.componentSeparator)) {
-         return(location.component < 0 ? true : false);
+      if (this.hl7Separator.equals(this.encodingCharacters.getComponentSeparator())) {
+         return(location.getComponent() < 0 ? true : false);
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.subComponentSeparator)) {
-         return(location.subComponent < 0 ? true : false);
+      if (this.hl7Separator.equals(this.encodingCharacters.getSubComponentSeparator())) {
+         return(location.getSubComponent() < 0 ? true : false);
       } // if
       
       return(true);
@@ -460,7 +471,7 @@ class HL7MsgItem {
          } // if
          
          return this.hl7Constituents[locator].pick(location, create);
-      } else if ( this.hl7Separator.equals(this.encodingCharacters.repetitionSeparator) ) {
+      } else if ( this.hl7Separator.equals(this.encodingCharacters.getRepetitionSeparator()) ) {
         //* create a new constituent if needed, and authorized...   
          if (this.hl7Constituents == null && create == true) {
             this.expandConstituents(1);
@@ -483,13 +494,13 @@ class HL7MsgItem {
          return (1);
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.repetitionSeparator)) {
+      if (this.hl7Separator.equals(this.encodingCharacters.getRepetitionSeparator())) {
          return(this.hl7Constituents.length);
       } // if
       
-      if (this.hl7Separator.equals(this.encodingCharacters.fieldSeparator) 
-      &&  this.hl7Constituents.length > here.sequence) {
-         return(this.hl7Constituents[here.sequence].numberOfRepetitionsAt(here));
+      if (this.hl7Separator.equals(this.encodingCharacters.getFieldSeparator())
+      &&  this.hl7Constituents.length > here.getSequence()) {
+         return(this.hl7Constituents[here.getSequence()].numberOfRepetitionsAt(here));
       } // if
       
       return(0);
@@ -535,12 +546,12 @@ class HL7SegmentHash {
        if (this.segmentHash.containsKey(segID)) {
           ArrayList<HL7MsgItem> thisList = (ArrayList<HL7MsgItem>)this.segmentHash.get(segID);
           if (segment.location != null) {
-            segment.location.segIndex = thisList.size();
+            segment.location.setSegIndex(thisList.size());
           } // if
           thisList.add(segment);
        } else {
           if (segment.location != null) {
-            segment.location.segIndex = 0;
+            segment.location.setSegIndex(0);
           } // if
           ArrayList<HL7MsgItem> segList = new ArrayList<HL7MsgItem>();
           segList.add(segment);
@@ -588,7 +599,8 @@ public class HL7Message {
    /**
     * The set of characters used to encode the subject HL7 message
     */
-   private HL7Encoding encodingCharacters;
+   private HL7Encoding        encodingCharacters;
+   private static HL7Encoding previousEncodingCharacters;
    /**
     * An array of the the constituent segments of the subject HL7 message.
     */
@@ -613,117 +625,127 @@ public class HL7Message {
     * @throws              IOException.
     */ 
    public HL7Message(String hl7MsgStr) throws HL7IOException {
+      this.initialize(hl7MsgStr);
+   } // HL7Message constructor
+
+
+   private void initialize(String hl7MsgStr) throws HL7IOException {
       this.hl7MessageString = hl7MsgStr;
-       
+
       if (hl7MsgStr == null || hl7MsgStr.length() < 9) {
          throw new HL7IOException("HL7Message: Not a valid message:[" + hl7MsgStr + "].");
       } // if
-       
+
       // Set the encoding characters
       if (hl7MsgStr.startsWith("MSH") || hl7MsgStr.startsWith("BHS")) {
          this.encodingCharacters = new HL7Encoding(hl7MsgStr.substring(3, 8));
       } else if (hl7MsgStr.startsWith("BTS")) {
-         this.encodingCharacters = new HL7Encoding("|^~\\&");
+         if (this.previousEncodingCharacters != null) {
+            this.encodingCharacters = new HL7Encoding(this.previousEncodingCharacters.toString() );
+         } else {
+            this.encodingCharacters = new HL7Encoding("|^~\\&");
+         } // if - else
       } else {
          throw new HL7IOException("HL7Message: Not a valid message:[" + hl7MsgStr + "].");
       } // if - else if - else
-          
+
       // split to segments
       String[] segmentStrings = hl7MsgStr.split("\r");
-       
+
       // build the segment items array
       this.segments = new HL7MsgItem[segmentStrings.length];
-       
+
       // build the segment hash
       this.segmentHash = new HL7SegmentHash(segmentStrings.length);
-       
+
       for (int index = 0; index < segmentStrings.length; ++index) {
          if (segmentStrings[index].length() < 4) {
             continue;
          } // if
-         
+
          int segIndex = 0;
          HL7MsgItem[] segHashEntry = this.segmentHash.get(segmentStrings[index].substring(0, 3));
          if (segHashEntry != null) {
             segIndex = segHashEntry.length;
          } // if
-         
+
          HL7Designator location = new HL7Designator(segmentStrings[index].substring(0, 3) );
          if (segIndex > 0) {
-            location.segIndex = segIndex;
+            location.setSegIndex(segIndex);
          } // if
-         
-         this.segments[index] = new HL7MsgItem( segmentStrings[index], 
-                                                this.encodingCharacters.fieldSeparator, 
+
+         this.segments[index] = new HL7MsgItem( segmentStrings[index],
+                                                this.encodingCharacters.getFieldSeparator(),
                                                 this.encodingCharacters,
                                                 location);
          this.segmentHash.put(this.segments[index]);
       } // for
-   } // HL7Message constructor
+   } // initialize
  
    
    /**
     * Access to the HL7 encoding characters of the context HL7 message.
     * @return The HL7 encoding characters of the context HL7 message, as a string.
     */  
-   public String HL7Encoding() { return(this.encodingCharacters.string); } 
+   public String HL7Encoding() { return(this.encodingCharacters.toString()); }
 
    /**
     * Access to the HL7 field separator of the context HL7 message.
     * @return The HL7 field separator of the context HL7 message, as a string.
     */
-   public String HL7FieldSeparator() { return(this.encodingCharacters.fieldSeparator); } 
+   public String HL7FieldSeparator() { return(this.encodingCharacters.getFieldSeparator()); }
     
    /**
     * Access to the HL7 component separator of the context HL7 message.
     * @return The HL7 component separator of the context HL7 message, as a string.
     */
-   public String HL7ComponentSeparator() { return(this.encodingCharacters.componentSeparator); }
+   public String HL7ComponentSeparator() { return(this.encodingCharacters.getComponentSeparator()); }
    
    /**
     * Access to the HL7 escape character of the context HL7 message.
     * @return The HL7 escape character of the context HL7 message, as a string.
     */
-   public String HL7Escape() { return(this.encodingCharacters.escapeChar); }
+   public String HL7Escape() { return(this.encodingCharacters.getEscapeChar()); }
    
    /**
     * Access to the HL7 repetition separator of the context HL7 message.
     * @return The HL7 repetition separator of the context HL7 message, as a string.
     */
-   public String HL7RepetitionSeparator() { return(this.encodingCharacters.repetitionSeparator); }
+   public String HL7RepetitionSeparator() { return(this.encodingCharacters.getRepetitionSeparator()); }
    
    /**
     * Access to the HL7 sub-component separator of the context HL7 message.
     * @return The HL7 sub-component separator of the context HL7 message, as a string.
     */
-   public String HL7SubComponentSeparator() { return(this.encodingCharacters.subComponentSeparator); }
+   public String HL7SubComponentSeparator() { return(this.encodingCharacters.getSubComponentSeparator()); }
    
    /**
     * Access to the HL7 component separator of the context HL7 message.
     * @return The HL7 component separator of the context HL7 message, as a char.
     */
-   public char HL7ComponentSeparatorChar() { return(this.encodingCharacters.componentSeparator.charAt(0)); }
+   public char HL7ComponentSeparatorChar() { return(this.encodingCharacters.getComponentSeparator().charAt(0)); }
    
    /**
     * Access to the HL7 escape character of the context HL7 message.
     * @return The HL7 escape character of the context HL7 message, as a char.
     */
-   public char HL7EscapeChar() { return(this.encodingCharacters.escapeChar.charAt(0)); }
+   public char HL7EscapeChar() { return(this.encodingCharacters.getEscapeChar().charAt(0)); }
    
    /**
     * Access to the HL7 repetition separator of the context HL7 message.
     * @return The HL7 repetition separator of the context HL7 message, as a char.
     */
-   public char HL7RepetitionSeparatorChar() { return(this.encodingCharacters.repetitionSeparator.charAt(0)); }
+   public char HL7RepetitionSeparatorChar() { return(this.encodingCharacters.getRepetitionSeparator().charAt(0)); }
    
    /**
     * Access to the HL7 sub-component separator of the context HL7 message.
     * @return The HL7 sub-component separator of the context HL7 message, as a char.
     */
-   public char HL7SubComponentSeparatorChar() { return(this.encodingCharacters.subComponentSeparator.charAt(0)); }
+   public char HL7SubComponentSeparatorChar() { return(this.encodingCharacters.getSubComponentSeparator().charAt(0)); }
+
    
    
-   private void addSegment(HL7MsgItem newSeg) {
+   private void addToSegmentList(HL7MsgItem newSeg) {
       HL7MsgItem[]   currSegArray = this.segments;
       this.segments = new HL7MsgItem[currSegArray.length + 1];
       
@@ -734,8 +756,7 @@ public class HL7Message {
             this.segments[index] = newSeg;
          } // if - else         
       } // for
-    } // addSegment
-    
+    } // addToSegmentList
 
     /**
      * Retrieves the complete item from the specified location of the parsed HL7Message as a string.
@@ -750,7 +771,7 @@ public class HL7Message {
      */
     public String[] get(String location) {
       HL7Designator     hl7Designator = new HL7Designator(location);
-      String            segKey  = hl7Designator.segID;
+      String            segKey  = hl7Designator.getSegID();
       HL7MsgItem[]      segs = this.segmentHash.get(segKey);
       
       if (segs == null) {
@@ -761,13 +782,13 @@ public class HL7Message {
       
       // Handle MSH / BHS idiosyncracy
       if (segKey.equals("MSH") || segKey.equals("BHS") ) {
-         int seqIndex = hl7Designator.sequence;
+         int seqIndex = hl7Designator.getSequence();
          if (seqIndex == -1) {
             retnItems.add(segKey);
          } else if (seqIndex == 0) {
-            retnItems.add(this.encodingCharacters.fieldSeparator);
+            retnItems.add(this.encodingCharacters.getFieldSeparator());
          } else if (seqIndex == 1) {
-            retnItems.add(this.encodingCharacters.string);
+            retnItems.add(this.encodingCharacters.toString());
          } // if - else if
          
          if (!retnItems.isEmpty()) {
@@ -778,11 +799,11 @@ public class HL7Message {
       
       boolean dontCreate = false;
       boolean expandReps = false;
-      if (hl7Designator.depth() > 2 && hl7Designator.repetition < 0) {
+      if (hl7Designator.depth() > 2 && hl7Designator.getRepetition() < 0) {
          expandReps = true;
       } // if
      
-      int segLocation = hl7Designator.segIndex;
+      int segLocation = hl7Designator.getSegIndex();
       for (int segIndex = 0; segIndex < segs.length; ++segIndex) {   
          if (segLocation < 0 || segLocation == segIndex) {
             // expand repetitions
@@ -791,7 +812,7 @@ public class HL7Message {
                HL7Designator tempLocn = new HL7Designator(location);
 
                for (int repIndex = 0; repIndex < numberOfReps; ++repIndex) {
-                  tempLocn.repetition = repIndex;
+                  tempLocn.setRepetition(repIndex);
                   HL7MsgItem item = segs[segIndex].pick(tempLocn, dontCreate);
                   // check in case pick returns null
                   if (item != null) {
@@ -825,7 +846,7 @@ public class HL7Message {
      */    
    public String[] census(String location) {
       HL7Designator     hl7Designator = new HL7Designator(location);
-      String            segKey = hl7Designator.segID;
+      String            segKey = hl7Designator.getSegID();
       HL7MsgItem[]      segs = this.segmentHash.get(segKey);
       
       if (segs == null) {
@@ -834,7 +855,7 @@ public class HL7Message {
       
       ArrayList<String> retnItems = new ArrayList<String>();
          
-      int segLocation = hl7Designator.segIndex;
+      int segLocation = hl7Designator.getSegIndex();
       for (int segIndex = 0; segIndex < segs.length; ++segIndex) {   
          if (segLocation < 0 || segLocation == segIndex) {
             // expand repetitions
@@ -842,7 +863,7 @@ public class HL7Message {
             HL7Designator tempLocn = new HL7Designator(location);
 
             for (int repIndex = 0; repIndex < numberOfReps; ++repIndex) {
-               tempLocn.repetition = repIndex;
+               tempLocn.setRepetition(repIndex);
                HL7MsgItem item = segs[segIndex].pick(tempLocn, false);
                // check in case pick returns null
                if (item != null && item.location != null) {
@@ -866,11 +887,11 @@ public class HL7Message {
     */
    public void set(String location, String hl7Str) {
       HL7Designator  hl7Designator = new HL7Designator(location);
-      String         segKey  = hl7Designator.segID;
+      String         segKey  = hl7Designator.getSegID();
       
       // Handle MSH idiosyncracy
       if (segKey.equals("MSH") || segKey.equals("BHS")) {
-         int seqIndex = hl7Designator.sequence;
+         int seqIndex = hl7Designator.getSequence();
          if (seqIndex == -1) {
             return;
          } else if (seqIndex == 0) {
@@ -878,34 +899,34 @@ public class HL7Message {
                return;
             } // if
             
-            this.encodingCharacters.fieldSeparator = hl7Str;
+            this.encodingCharacters.setFieldSeparator(hl7Str.substring(0, 1));
             return;
          } else if (seqIndex == 1) {
-            this.encodingCharacters.string = hl7Str;
+            this.encodingCharacters = new HL7Encoding(hl7Str.substring(0, 5));
             return;
          } // if - else if
       } // if
       
       // create new segment key if one does not exist....
       HL7MsgItem[] segmentList = this.segmentHash.get(segKey);
-      if (segmentList == null || (segmentList.length - 1) < hl7Designator.segIndex) {
-         String newSegmentStr = segKey + this.encodingCharacters.fieldSeparator;
+      if (segmentList == null || (segmentList.length - 1) < hl7Designator.getSegIndex()) {
+         String newSegmentStr = segKey + this.encodingCharacters.getFieldSeparator();
          HL7MsgItem newSegment = new HL7MsgItem(newSegmentStr,
-                                                this.encodingCharacters.fieldSeparator, 
+                                                this.encodingCharacters.getFieldSeparator(),
                                                 this.encodingCharacters);
          this.segmentHash.put(newSegment);
          segmentList = this.segmentHash.get(segKey);
-         this.addSegment(newSegment);
+         this.addToSegmentList(newSegment);
       } // if
       
       boolean  create = true;
       boolean  expandReps = false;
       
-      if (hl7Designator.depth() > 2 && hl7Designator.repetition < 0) {
+      if (hl7Designator.depth() > 2 && hl7Designator.getRepetition() < 0) {
          expandReps = true;
       } // if
        
-      int segLocation = hl7Designator.segIndex; // parse out segment repetition(s)
+      int segLocation = hl7Designator.getSegIndex(); // parse out segment repetition(s)
       
       for (int segIndex = 0; segIndex < segmentList.length; ++segIndex) {
          if (segLocation < 0 || segIndex == segLocation) {
@@ -915,7 +936,7 @@ public class HL7Message {
                if (numberOfReps == 0) { ++numberOfReps; }
                
                for (int repIndex = 0; repIndex < numberOfReps; ++repIndex) {
-                  tempLocn.repetition = repIndex;
+                  tempLocn.setRepetition(repIndex);
                   segmentList[segIndex].pick(tempLocn, create).set(hl7Str);
                } // for
             } else {
@@ -985,7 +1006,7 @@ public class HL7Message {
     */
    public String clean(String argStr) {    
       char[]   encoderArray = this.encodingCharacters.toString().toCharArray();
-      char     escapeChar = this.encodingCharacters.escapeChar.charAt(0);
+      char     escapeChar = this.HL7EscapeChar();
       char[]   argArray = argStr.toCharArray();
       char[]   newArray = new char[(argStr.length() * 2) + 16];
       
@@ -1138,8 +1159,59 @@ public class HL7Message {
 
 
    public boolean hasSegment(String segID) {
-      return (this.segmentHash.get(segID) == null) ? false : true;
+      if (segID == null || segID.length() < 3) {
+         return false;
+      } // if
+
+      return    (this.segmentHash.get(segID.substring(0, 3)) == null)
+              ? false
+              : true;
    } // hasSegment
+
+
+   public int countSegment(String segID) {
+      if (!hasSegment(segID)) {
+         return 0;
+      } // if
+
+      return this.segmentHash.get(segID.substring(0, 3)).length;
+   } // countSegment
+
+
+   private HL7MsgItem newSegment(String segStr) {
+      return new HL7MsgItem(  segStr,
+                              this.encodingCharacters.getFieldSeparator(),
+                              this.encodingCharacters);
+   } // newSegment
+
+
+   public int addSegment(String segStr) {
+      if (segStr == null || segStr.length() < 3) {
+         return 0;
+      } // if
+
+      if (  segStr.startsWith("MSH")
+      ||    segStr.startsWith("BHS")
+      ||    segStr.startsWith("BTS") ) {
+         if (this.hl7MessageString == null || this.hl7MessageString.isEmpty()) {
+            try {
+               this.initialize(segStr);
+            } catch (HL7IOException hl7Ex) {
+               hl7Ex.printStackTrace();
+               return 0;
+            } // try - catch
+            
+            return 1;
+         } else if (this.hasSegment(segStr.substring(0, 3))) {
+            return 0;
+         } // if - else if
+      } // if
+
+      HL7MsgItem newSeg = newSegment(segStr);
+      this.addToSegmentList(newSeg);
+      this.segmentHash.put(newSeg);
+      return this.countSegment(segStr);
+   } // addSegment
    
 
    public String controlID() {
@@ -1257,16 +1329,16 @@ public class HL7Message {
       
       // create new message for acknowledgement
       HL7Message ackMsg = new HL7Message("MSH" 
-                                       + this.HL7Encoding()
-                                       + this.encodingCharacters.fieldSeparator
+                                       + this.encodingCharacters.toString()
+                                       + this.encodingCharacters.getFieldSeparator()
                                        + receivingApplication
-                                       + this.encodingCharacters.fieldSeparator
+                                       + this.encodingCharacters.getFieldSeparator()
                                        + receivingFacility
-                                       + this.encodingCharacters.fieldSeparator
+                                       + this.encodingCharacters.getFieldSeparator()
                                        + sendingApplication
-                                       + this.encodingCharacters.fieldSeparator
+                                       + this.encodingCharacters.getFieldSeparator()
                                        + sendingFacility
-                                       + this.encodingCharacters.fieldSeparator);
+                                       + this.encodingCharacters.getFieldSeparator());
       // Message DateTime
       String now = new HL7Time().get();
       ackMsg.set("MSH.7", now);
@@ -1294,12 +1366,12 @@ public class HL7Message {
       
       StringBuffer msaSegmentBuffer = new StringBuffer();
       msaSegmentBuffer.append("MSA");
-      msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
+      msaSegmentBuffer.append(ackMsg.encodingCharacters.getFieldSeparator());
       msaSegmentBuffer.append(ackCode);
-      msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
+      msaSegmentBuffer.append(ackMsg.encodingCharacters.getFieldSeparator());
       msaSegmentBuffer.append(msgCtlID);
-      msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
-      msaSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
+      msaSegmentBuffer.append(ackMsg.encodingCharacters.getFieldSeparator());
+      msaSegmentBuffer.append(ackMsg.encodingCharacters.getFieldSeparator());
       // msaSegmentBuffer.append("\r");
       ackMsg.set("MSA", msaSegmentBuffer.toString());
       
@@ -1316,9 +1388,9 @@ public class HL7Message {
       // If it's a NMQ add the NCK segment.
       StringBuffer nckSegmentBuffer = new StringBuffer();
       nckSegmentBuffer.append("NCK"); 
-      nckSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
+      nckSegmentBuffer.append(ackMsg.encodingCharacters.getFieldSeparator());
       nckSegmentBuffer.append(now);
-      nckSegmentBuffer.append(ackMsg.encodingCharacters.fieldSeparator);
+      nckSegmentBuffer.append(ackMsg.encodingCharacters.getFieldSeparator());
       // nckSegmentBuffer.append("\r");
       ackMsg.set("NCK", nckSegmentBuffer.toString());
       
