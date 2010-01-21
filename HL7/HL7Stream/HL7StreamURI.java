@@ -85,6 +85,22 @@ public class HL7StreamURI {
    } // isServerURI
 
 
+   public boolean isXMLURI() {
+      String uriScheme = this.uri.getScheme();
+
+      if (uriScheme == null) {
+         return false;
+      } // if
+
+      uriScheme = uriScheme.toLowerCase();
+      if (uriScheme.contains("xml")) {
+         return true;
+      } // if
+
+      return false;
+   } // isXMLURI
+
+
    /**
     * Determines whether the context URI refers to a socket.
     * @return true if the context URI could refer to a socket, otherwise false.
@@ -259,6 +275,8 @@ public class HL7StreamURI {
          return new HL7FileWriter(this.fileURIOf());
       } else if (this.isSocketURI()) {
          return new HL7SocketStream(this.uri.getHost(), this.uriPortNo());
+      } else if (this.isXMLURI()) {
+         return new HL7XMLFileWriter(this.uri);
       } // if - else if
 
       throw new HL7IOException(  "HL7StreamURI.getHL7StreamWriter():Uninterpreable URI:"
