@@ -85,6 +85,10 @@ public class HL7StreamURI {
    } // isServerURI
 
 
+   /**
+    * Determines whether the context HL7URI is a XML stream.
+    * @return true if the context HL7URI is a XML stream, otherwise false.
+    */
    public boolean isXMLURI() {
       String uriScheme = this.uri.getScheme();
 

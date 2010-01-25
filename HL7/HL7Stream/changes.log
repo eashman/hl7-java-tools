@@ -85,7 +85,15 @@ HL7StreamURI.java : Updated javadocs.
 * Revision: 13 
 - HL7FileWriter.java : Added more detail to error messages.
 
-* $Revision$
+* Revision: 14
 20100121:
  - HL7XMLFileWriter.java : Added new HL7 output type to the HL7Stream package.
  - HL7StreamURI.java : Added provisions for HL7XMLFileWriter class.
+
+* $Revision$
+20100121 -20100124:
+ - HL7XMLFileWriter.java : Improved exception handling.
+                           Modified open so that the logging contains context info.
+                           Created javadoc dcoumentation.
+ - HL7StreamURI.java : Improved exception handling for XML writer.
+                       Updated javadoc dcoumentation.
