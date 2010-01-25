@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7StreamURI.java 49 2009-12-15 03:53:03Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.

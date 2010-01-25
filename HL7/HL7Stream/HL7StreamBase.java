@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7StreamBase.java 66 2009-12-23 20:15:19Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
