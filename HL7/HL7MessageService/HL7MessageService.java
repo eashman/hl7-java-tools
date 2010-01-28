@@ -163,12 +163,12 @@ public class HL7MessageService extends HL7SpecificationElement implements HL7Mes
     * @param route The route to subscribe to the inbound HL7MessageStream.
     */
    public void subscribe(HL7Route route) {
-      if (route == null) return;
+      if (route == null || route.isOpen()) { return; }
       if (this.hl7SourceURI == null) {
-         this.hl7SourceURI = route.hl7SourceURI;
+         this.hl7SourceURI = route.getHL7SourceURI();
       } // if
-      
-      route.hl7SourceURI = null;
+
+      route.setHL7SourceURI(null);
       this.routes.add(route);
    } // subscribe
 

@@ -112,7 +112,7 @@ IllegalArgumentException messages.
  - HL7Transform.java : Modified to allow standalone instantiation of HL7Transform
 objects, outside of HL7Route objects.
 
-* $Revision$
+$Revision: 12 
 20100110:
  - HL7Transform.java : Added "newsegment", and "appoint" operations.
 20100112:
@@ -120,3 +120,10 @@ objects, outside of HL7Route objects.
 HL7SpecificationElement.initialization.
  - HL7Route.java : Added InputStream argument type to contructors.
 
+* $Revision$
+20100128:
+ - HL7Route.java : Modified to allow multiple delivery URIs.
+                   limited scope of URIs and streams, and encapsulated
+                   required access in methods.
+ - HL7MessageService : Modified route subscription for compliance with route
+                       modifications detailed above.
