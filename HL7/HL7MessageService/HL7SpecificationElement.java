@@ -184,9 +184,7 @@ public class HL7SpecificationElement {
       } // if - else
 
       if (HL7SpecificationElement.logger == null) {
-         // HL7SpecificationElement.logger = Logger.getLogger(this.loggerName(name));
-         HL7SpecificationElement.logger = Logger.getLogger(this.getClass());
-
+         HL7SpecificationElement.logger = Logger.getLogger(this.loggerName(name));
          this.configureLogger();
          HL7SpecificationElement.logger.setLevel(Level.TRACE);
          this.logInfo("loggerName:"  + HL7SpecificationElement.logger.getName());
@@ -321,8 +319,6 @@ public class HL7SpecificationElement {
       String successStr = "*** Logging initialized for " + this.elementName + ":" + this.idString  + " ***";
       String nodeErrorStr = null;
 
-      BasicConfigurator.configure();
-
       Node node = this.getElement("LogConfig");
       if (node != null) {
          String fileName = this.getAttribute(node, "file");
@@ -351,8 +347,9 @@ public class HL7SpecificationElement {
             HL7SpecificationElement.logger.info(nodeErrorStr);
          } // if
          return;
-      }
+      } // if
 
+      BasicConfigurator.configure();
       HL7SpecificationElement.logger.info( "No logger configuration found. "
                                          + "Using basic configuration for "
                                          + this.elementName

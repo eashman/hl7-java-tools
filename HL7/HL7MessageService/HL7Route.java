@@ -125,6 +125,9 @@ public class HL7Route extends HL7SpecificationElement {
       ArrayList<Node> uris = this.getElements(uriTagName);
 
       if (uris == null || uris.size() < 1) {
+         this.logDebug( "extractURIs("
+                      +  uriTagName
+                      +  "): None found.");
          return null;
       } // if
 
@@ -143,7 +146,7 @@ public class HL7Route extends HL7SpecificationElement {
       } // for
       
       return uriList;
-   } // extractURI
+   } // extractURIs
    
 
    private URI extractURI(String uriTagName) throws Exception {
@@ -164,7 +167,7 @@ public class HL7Route extends HL7SpecificationElement {
     * @return true if the argument HL7Message qualifies for passage, by any HL7Transform, or false if it does not. 
     * Note that the message will not qualify if the route contains no HL7Transforms
     */
-   public boolean IsQualified(HL7Message msg) {
+   public boolean isQualified(HL7Message msg) {
       int xFormCount = 0;
       if (this.transforms != null) {
          xFormCount = this.transforms.length;
@@ -199,7 +202,7 @@ public class HL7Route extends HL7SpecificationElement {
     * @return the transformed HL7Message.
     * @throws java.lang.Exception in the event of a ML7Message handling issue.
     */
-   public HL7Message Render(HL7Message msg) throws HL7IOException {
+   public HL7Message render(HL7Message msg) throws HL7IOException {
       HL7Message workMsg = null;
      
       int xFormCount = 0;
@@ -239,7 +242,9 @@ public class HL7Route extends HL7SpecificationElement {
       this.logTrace("HL7Route.openDelivery():constructing outbound HL7Stream("
                     +  uri.toString()
                     +  ").");
-      return new HL7StreamURI(uri).getHL7StreamWriter();
+      HL7Stream stream =  new HL7StreamURI(uri).getHL7StreamWriter();
+      stream.open();
+      return stream;
    } // openDelivery
 
 
@@ -260,20 +265,22 @@ public class HL7Route extends HL7SpecificationElement {
             HL7Stream hl7Stream = this.openDelivery(uri);
             if (hl7Stream != null) {
                this.hl7StreamsOut.add(hl7Stream);
-            } // if
 
-            if (!hl7Stream.isOpen()) {
-               throw new HL7IOException(  "HL7Route.open():Cannot open Outbound HL7Stream",
-                                    HL7IOException.NULL_STREAM);
+               if (!hl7Stream.isOpen()) {
+                  throw new HL7IOException(  "HL7Route.open():Cannot open Outbound HL7Stream:"
+                                          +  uri.toString()
+                                          +  ".",
+                                             HL7IOException.NULL_STREAM);
+               } // if
+               this.logTrace("HL7Route.open():hl7Stream["
+                           + Integer.toString(this.hl7StreamsOut.size() - 1)
+                           + "]:"
+                           + hl7Stream.description() );
             } // if
-            this.logTrace("HL7Route.open():hl7Stream["
-                        + Integer.toString(this.hl7StreamsOut.size() - 1)
-                        + "]:"
-                        + hl7Stream.description() );
          } // for
 
          if (this.hl7StreamsOut.isEmpty()) {
-            throw new HL7IOException(  "HL7Route.open():Cannot open Outbound HL7Stream",
+            throw new HL7IOException(  "HL7Route.open():Cannot open any Outbound HL7Stream",
                                     HL7IOException.NULL_STREAM);
          } // if 
       } // if
@@ -326,8 +333,8 @@ public class HL7Route extends HL7SpecificationElement {
       if (msg == null) return false;
 
       try {
-         if (this.IsQualified(msg) ) {
-            HL7Message msgOut = this.Render(msg);
+         if (this.isQualified(msg) ) {
+            HL7Message msgOut = this.render(msg);
             if (this.hl7StreamsOut == null || this.hl7StreamsOut.isEmpty()) {
                this.open();
             } // if

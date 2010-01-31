@@ -120,10 +120,15 @@ $Revision: 12
 HL7SpecificationElement.initialization.
  - HL7Route.java : Added InputStream argument type to contructors.
 
-* $Revision$
+* Revision: 17
 20100128:
  - HL7Route.java : Modified to allow multiple delivery URIs.
                    limited scope of URIs and streams, and encapsulated
                    required access in methods.
  - HL7MessageService : Modified route subscription for compliance with route
                        modifications detailed above.
+
+* $Revision$
+20100131:
+- HL7Route.java : Fixed multi-destination route open.
+- HL7SpecificationElement.java : Inital attempt to untangle logging.
