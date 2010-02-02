@@ -128,7 +128,13 @@ HL7SpecificationElement.initialization.
  - HL7MessageService : Modified route subscription for compliance with route
                        modifications detailed above.
 
-* $Revision$
+* Revision: 18 
 20100131:
 - HL7Route.java : Fixed multi-destination route open.
 - HL7SpecificationElement.java : Inital attempt to untangle logging.
+
+* $Revision$
+20100131:
+- HL7Transform.java : Added "freshen " operation.
+                      Trapped null pointers in assign() and appoint().
+                      Updated javadocs.

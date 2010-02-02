@@ -98,7 +98,7 @@ class HL7Operation {
       if (node.hasAttributes()) {
          Node tmpNode;
          NamedNodeMap map = node.getAttributes();
-         if (localOpName.matches("assign|appoint|exclude|replace|qualify|scrub|copy|remove|newseg.*") ) {
+         if (localOpName.matches("assign|appoint|exclude|replace|qualify|scrub|copy|remove|newseg.*|freshen") ) {
             if ( (tmpNode = map.getNamedItem("designator")) != null) {
                this.resultDesignator = tmpNode.getNodeValue();
             } // if
@@ -232,9 +232,11 @@ class HL7Operation {
    String assign(HL7Message msg) {
       if (this.opName.equals("assign")) {
          String designator = this.resultDesignator;
-         String subject = null;
+         String subject = "";
 
-         if (  this.operands[0] != null && this.operands[0].typeStr.equals("string") ) {
+         if (  this.operands != null
+         &&    this.operands[0] != null
+         &&    this.operands[0].typeStr.equals("string") ) {
             subject = this.operands[0].value;
          } // if
 
@@ -288,7 +290,9 @@ class HL7Operation {
          String designator = this.resultDesignator;
          String subject = null;
 
-         if (  this.operands[0] != null && this.operands[0].typeStr.equals("string") ) {
+         if (  this.operands != null
+         &&    this.operands[0] != null
+         &&    this.operands[0].typeStr.equals("string") ) {
             subject = this.operands[0].value;
          } // if
 
@@ -448,11 +452,14 @@ class HL7Operation {
  * <li><code>qualify</code>: specifies transaction qualification criteria.<br>eg; <code>&lt;qualify designator="MSH.9.2"&gt;A01|A02|A03&lt;/qualify&gt;</code>
  * <li><code>exclude</code>: specifies transaction exclusion criteria.<br>eg; <code>&lt;exclude designator="MSH.9.2"&gt;A01|A02|A03&lt;/exclude&gt;</code>
  * <li><code>assign</code>: specifies &quot;hard-coded&quot; assignments.<br>eg; <code>&lt;assign designator="MSH.5"&gt;Test&lt;/assign&gt;</code>
+ * <li><code>appoint</code>: specifies assignments to the last segment without requiring the segment index.<br>eg; <code>&lt;appoint designator="OBX.5"&gt;Test&lt;/assign&gt;</code>
  * <li><code>replace</code>: specifies regular expression based replacement.<br>eg; <code>&lt;replace designator="PID.3.1" search="^0+"&gt;&lt;/replace&gt;</code>
  * <li><code>swap</code>: specifies swapping of transaction content items.<br>eg; <code>&lt;swap&gt;OBR.2, OBR.3&lt;/swap&gt;</code>
  * <li><code>scrub</code>: specifies encoding of personal identity items.<br>eg; <code>&lt;scrub designator="PID.14" /&gt;</code>
  * <li><code>copy</code>: specifies duplication of item content.<br>eg; <code>&lt;copy designator="ORC.3.1"&gt;MSH.5&lt;/copy&gt;</code>
  * <li><code>remove</code>: specifies removal of specific content.<br>eg; <code>&lt;remove designator="PID.14" /&gt;</code>
+ * <li><code>freshen</code>: specifies assignment of the creation date time to the message.<br>eg; <code>&lt;freshen/&gt;</code>
+ * <li><code>newsegment</code>: specifies addition of a new segment to the message.<br>eg; <code>&lt;newsegment designator="OBX"/&gt;</code>
  * </ul>
  */
 public class HL7Transform extends HL7SpecificationElement {
@@ -654,6 +661,8 @@ public class HL7Transform extends HL7SpecificationElement {
             this.operations[index].remove(msg);
          } else if (this.operations[index].opName.equals("copy") ) {
             this.operations[index].copy(msg);
+         } else if (this.operations[index].opName.equals("freshen") ) {
+            msg.fresh();
          } else {
             this.logDebug("HL7Transform.Render:Unexpected operation:" + this.operations[index].opName);
          } // if - else if, else if, ,,, else 
