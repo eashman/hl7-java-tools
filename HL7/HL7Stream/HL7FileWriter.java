@@ -42,8 +42,9 @@ import us.conxio.HL7.HL7Message.*;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
-   File           file;
-   BufferedWriter writer;
+   private boolean   isAppender = false;
+   File              file;
+   BufferedWriter    writer;
 
    /**
     * Creates a new file writer object using the argument File object.
@@ -77,21 +78,29 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
    public HL7FileWriter(URI fileURI) throws HL7IOException {
       HL7StreamURI streamURI = new HL7StreamURI(fileURI);
 
-      if (streamURI.isFileReaderURI()
-      ||  (!streamURI.isFileWriterURI() && !streamURI.isFileURI()) ) {
+      if (!streamURI.isFileURI()
+      ||   streamURI.isFileReaderURI()
+      ||  !(streamURI.isFileWriterURI() || streamURI.isFileAppenderURI() ) ) {
          throw new IllegalArgumentException("HL7FileWriter(" 
                                           + fileURI.toString()
                                           + "):Not a file writer URI.");
       } // if
 
-      this.initialize(new File(fileURI) );
-   } // HL7FileReader
+      if (streamURI.isFileAppenderURI()) {
+         this.isAppender = true;
+      } // if
+
+      this.initialize(new File(streamURI.fileURIOf()) );
+   } // HL7FileWriter
 
 
    // * Construction support.
    private void initialize(File hl7File) throws HL7IOException {
-      this.directive = HL7FileWriter.WRITER;
       this.mediaType = HL7Stream.FILE_TYPE;
+      this.directive = HL7FileWriter.WRITER;
+      if (this.isAppender == true) {
+         this.directive = HL7Stream.APPENDER;
+      } // if
 
       if (hl7File == null) {
          throw new HL7IOException("HL7FileWriter():File is null.");
@@ -108,7 +117,7 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean open() throws HL7IOException {
-      return this.open(false);
+      return this.open(this.isAppender);
    } // open
 
 

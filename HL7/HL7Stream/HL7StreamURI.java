@@ -213,7 +213,23 @@ public class HL7StreamURI {
    } // isFileWriterURI
 
 
-   /**
+    public boolean isFileAppenderURI() {
+      String uriScheme = this.uri.getScheme();
+
+      if (uriScheme == null) {
+         return false;
+      } // if
+
+      uriScheme = uriScheme.toLowerCase();
+      if (uriScheme.equals("file-appender")) {
+         return true;
+      } // if
+
+      return false;
+   } // isFileAppenderURI
+
+
+  /**
     * Determines the server thread pool size specified in the context URI
     * @return 0 or the specified thread pool size for the context server URI.
     */
@@ -275,8 +291,8 @@ public class HL7StreamURI {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7Stream getHL7StreamWriter() throws HL7IOException {
-      if (this.isFileURI() && !this.isFileReaderURI()) {
-         return new HL7FileWriter(this.fileURIOf());
+      if (this.isFileWriterURI() || this.isFileAppenderURI()) {
+         return new HL7FileWriter(this.uri);
       } else if (this.isSocketURI()) {
          return new HL7SocketStream(this.uri.getHost(), this.uriPortNo());
       } else if (this.isXMLURI()) {
