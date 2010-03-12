@@ -155,8 +155,14 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean close() throws HL7IOException {
+      if (this.statusValue == HL7SocketStream.CLOSED) {
+         return true;
+      } // if
+
       try {
-         this.socket.close();
+         if (!this.socket.isClosed()) {
+            this.socket.close();
+         } // if
       } catch (IOException ioEx) {
          throw new HL7IOException(  "HL7SocketStream("
                                  +  this.host 

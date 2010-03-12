@@ -98,9 +98,12 @@ HL7StreamURI.java : Updated javadocs.
  - HL7StreamURI.java : Improved exception handling for XML writer.
                        Updated javadoc dcoumentation.
 
-* $Revision$
+* Revision: 19 
 20100131:
 - HL7StreamURI.java, HL7FileWriter.java : Modified to differentiate between
        file writers and appenders. Modified HL7FileWriter(URI) constructor
        to handle raw URIs.
 
+* $Revision$
+20100312:
+- HL7SocketStream.java : Cleaning up socket closure.
