@@ -108,9 +108,11 @@ public class HL7MessageAgent {
       } else if (deliveryURI == null) {
          HL7MessageAgent.logger.info(  "HL7MessageAgent: No delivery specified.");
       } else { // * Ad hoc delivery
+         HL7Stream msgReader = null;
+         HL7Stream msgWriter = null;
          try {
-            HL7Stream msgReader = new HL7StreamURI(sourceURI).getHL7StreamReader();
-            HL7Stream msgWriter = new HL7StreamURI(deliveryURI).getHL7StreamWriter();
+            msgReader = new HL7StreamURI(sourceURI).getHL7StreamReader();
+            msgWriter = new HL7StreamURI(deliveryURI).getHL7StreamWriter();
             HL7Message hl7Msg;
 
             while ( (hl7Msg = msgReader.read() ) != null) {
@@ -124,6 +126,26 @@ public class HL7MessageAgent {
                                        +  deliveryURI.toString()
                                        +  ": "
                                        +  ioEx.toString());
+         } finally {
+            // close the reader
+            try {
+               msgReader.close();
+            } catch (HL7IOException ioEx) {
+               HL7MessageAgent.logger.info(  "HL7MessageAgent: caught HL7IOException on closure of reader:"
+                                          +  sourceURI.toString()
+                                          +  ": "
+                                          +  ioEx.toString());
+            } // try - catch
+
+            // close the writer
+            try {
+               msgWriter.close();
+            } catch (HL7IOException ioEx) {
+               HL7MessageAgent.logger.info(  "HL7MessageAgent: caught HL7IOException on closure of writer:"
+                                          +  deliveryURI.toString()
+                                          +  ": "
+                                          +  ioEx.toString());
+            } // try - catch
          } // try - catch
       } // if, else if,.. else
    } // main
@@ -136,10 +158,14 @@ public class HL7MessageAgent {
  * Id: 22
  * Origination. Tested and verified.
  *
- * HL7MessageAgent.java 26 2009-11-30 05:31:17Z scott 
+ * HL7MessageAgent.java 26 2009-11-30 05:31:17Z scott
  * Added proper licensing and annotation.
  *
- * $Id: HL7MessageAgent.java 40 2009-12-11 00:41:49Z scott $
+ * HL7MessageAgent.java 40 2009-12-11 00:41:49Z scott
  * Modified for compatability with the us.conxio.HL7Stream package.
+ *
+ * $Id: HL7MessageAgent.java 40 2009-12-11 00:41:49Z scott $
+ * Cleaning up HL7Stream closure, and associated exception handling.
+
  */
 
