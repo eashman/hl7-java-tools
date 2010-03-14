@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7MessageAgent.java 40 2009-12-11 00:41:49Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -164,7 +164,7 @@ public class HL7MessageAgent {
  * HL7MessageAgent.java 40 2009-12-11 00:41:49Z scott
  * Modified for compatability with the us.conxio.HL7Stream package.
  *
- * $Id: HL7MessageAgent.java 40 2009-12-11 00:41:49Z scott $
+ * $Id$
  * Cleaning up HL7Stream closure, and associated exception handling.
 
  */
