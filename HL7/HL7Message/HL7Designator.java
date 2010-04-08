@@ -84,7 +84,7 @@ public class HL7Designator {
     * nbsp;&nbsp;&nbsp; &lt;segID&gt;[index].&lt;sequence&gt;[index].&lt;component&gt;.&lt;subcomponent&gt; </b><br>
     */
    public HL7Designator(String argStr) {
-      this.argString = argStr;
+      this.argString = new String(argStr);
       this.segIndex = -3;
       this.verbose = false;
       parse();
@@ -102,7 +102,8 @@ public class HL7Designator {
       this.sequence = argLocation.sequence;
       this.subComponent = argLocation.subComponent;
       this.segID = new String(argLocation.getSegID());
-      this.argString = new String(argLocation.getArgString());
+      // this.argString = new String(argLocation.getArgString());
+      this.argString = argLocation.toString();
       this.verbose = argLocation.verbose;
    } // HL7Designator constructor
    
@@ -171,7 +172,6 @@ public class HL7Designator {
       // Segment index specification
       if (args[0].length() > 3) {
          this.setSegIndex(indexValueOf(args[0]));
-         // if (this.segIndex == -1) { ++this.segIndex; }
       } // if
 
       // Segment ID is the first three characters.
@@ -496,5 +496,28 @@ public class HL7Designator {
    public boolean isVerbose() {
       return verbose;
    }
+
+   public boolean isSpecifiedSegmentIndex() {
+      return (this.segIndex != -3);
+   } // isSpecifiedSegmentIndex
+
+   public boolean isSpecifiedSequence() {
+      return (this.sequence != -3);
+   } // isSpecifiedSequence
+
+   
+   public boolean isSpecifiedRepetition() {
+      return (this.repetition != -3);
+   } // isSpecifiedRepetition
+
+
+   public boolean isSpecifiedComponent() {
+      return (this.component != -3);
+   } // isSpecifiedComponent
+
+
+   public boolean isSpecifiedSubComponent() {
+      return (this.subComponent != -3);
+   } // isSpecifiedSubComponent
 
 } // HL7Designator

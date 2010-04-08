@@ -177,10 +177,13 @@ Provisional check-in after functional verification of new package structure.
  - HL7Encoding.java : Tightened access to encoding characters. No longer public.
  - HL7Message.java : Modifications to comply with above.
 
-* $Revision$
+* Revision: 11 
 20100110:
  - HL7Encoding.java : Tightened access to encoding characters even further.
                       They are now private.
  - HL7Message.java : Modifications to comply with above.
                      Added public addSegment() functionality.
  - HL7Designator.java : Encapsulated the fields, and maded them private for safe public access.
+
+* $Revision$
+20100131: Some bug fixes and preparation for a comprehensive refactor.

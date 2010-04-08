@@ -28,91 +28,159 @@
 package us.conxio.HL7.HL7Message;
 
 /**
- * Provides access to HL7 message encoding characters.
+ * Provides access to HL7 message encoding characters,
+ * as well as encoding and decoding methodology.
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7Encoding {
-   private String       fieldSeparator,
+   private int          fieldSeparator,
                         componentSeparator,
                         repetitionSeparator,
                         subComponentSeparator,
-                        escapeChar,
-                        string;
-   /* TBD: make the encoding characters private (and protected?).
+                        escapeChar;
+
+
+   // * constructors *
+   /**
+    * Creates a HL7Encoding object based on the argument encoding characters array.
+    * @param chars The array of encoding character values.
+    * <ul>Must be populated as follows:
+    * <li>field separator
+    * <li>component separator
+    * <li>repetition separator
+    * <li>escape indicator
+    * <li>subcomponent separator
+    * </ul>Encoding characters must be printable ascii character values, and not
+    * alpha-numeric or whitespace.
     */
-
-   // constructors
-   HL7Encoding(String encodingChars) {
-      this.string = new String(encodingChars);
-      // check for string overrun / underrun.
-      if (encodingChars.length() > 0) {
-         int lastFieldSep = encodingChars.lastIndexOf(encodingChars.charAt(0));
-         if (lastFieldSep != 0) {
-            this.string = encodingChars.substring(0, lastFieldSep);
-            encodingChars = this.string;
-         } // if
-         this.fieldSeparator = encodingChars.substring(0, 1);
-      } else {
-          this.fieldSeparator = null;
-      } // if - else
-
-      if (encodingChars.length() > 1) {
-         int lastCompSep = encodingChars.lastIndexOf(encodingChars.charAt(1));
-         this.componentSeparator = (lastCompSep == 1) ? encodingChars.substring(1, 2) : null;
-         if (this.componentSeparator != null) {
-            int compSepChar = this.componentSeparator.charAt(0);
-            if (Character.isLetterOrDigit(compSepChar)
-            ||  Character.isSpaceChar(compSepChar)) {
-               this.componentSeparator = null;
-            } // if
-         } // if
-      } else {
-         this.componentSeparator = null;
-      } // if - else
-
-
-      if (encodingChars.length() > 2) {
-         int lastRepSep = encodingChars.lastIndexOf(encodingChars.charAt(2));
-         this.repetitionSeparator = (lastRepSep == 2) ? encodingChars.substring(2, 3) : null;
-         if (this.repetitionSeparator != null) {
-            int repSepChar = this.repetitionSeparator.charAt(0);
-            if (Character.isLetterOrDigit(repSepChar)
-            ||  Character.isSpaceChar(repSepChar)) {
-               this.repetitionSeparator = null;
-            } // if
-         } // if
-      } else {
-         this.repetitionSeparator = null;
-      } // if - else
-
-      if (encodingChars.length() > 3) {
-         int lastEscChar = encodingChars.lastIndexOf(encodingChars.charAt(3));
-         this.escapeChar = (lastEscChar == 3) ? encodingChars.substring(3, 4) : null;
-         if (this.escapeChar != null) {
-            int escChar = this.escapeChar.charAt(0);
-            if (Character.isLetterOrDigit(escChar)
-            ||  Character.isSpaceChar(escChar)) {
-               this.escapeChar = null;
-            } // if
-         } // if
-      } else {
-         this.escapeChar = null;
-      } // if - else
-
-      if (encodingChars.length() > 4) {
-         int lastSubCompSep = encodingChars.lastIndexOf(encodingChars.charAt(4));
-         this.subComponentSeparator = (lastSubCompSep == 4) ? encodingChars.substring(4, 5) : null;
-         if (this.subComponentSeparator != null) {
-            int subCompSepChar = this.subComponentSeparator.charAt(0);
-            if (Character.isLetterOrDigit(subCompSepChar)
-            ||  Character.isSpaceChar(subCompSepChar)) {
-               this.subComponentSeparator = null;
-            } // if
-         } // if
-      } else {
-         this.subComponentSeparator = null;
-      } // if - else
+   public HL7Encoding(int[] chars) {
+      this.initialize(chars);
    } // HL7Encoding
+
+   /**
+    * Creates a HL7Encoding object based on the argument encoding characters.
+    * Encoding characters must be printable ascii character values, and not
+    * alpha-numeric or whitespace.
+    * @param fs field separator
+    * @param cs component separator
+    * @param rs repetition separator
+    * @param ec escape indicator
+    * @param ss subcomponent separator
+    */
+   public HL7Encoding(int fs, int cs, int rs, int ec, int ss) {
+      int[] ints = { fs, cs, rs, ec, ss };
+      this.initialize(ints);
+   } // HL7Encoding
+
+
+   /**
+    * Creates a HL7Encoding object based on the argument string of encoding characters.
+    * @param encodingChars The argument string of encoding characters.
+    * <ul>Must be populated as follows:
+    * <li>field separator
+    * <li>component separator
+    * <li>repetition separator
+    * <li>escape indicator
+    * <li>subcomponent separator
+    * </ul>Encoding characters must be printable ascii character values, and not
+    * alpha-numeric or whitespace.
+    */
+   public HL7Encoding(String encodingChars) {
+      char[] chars = encodingChars.toCharArray();
+      int len = chars.length;
+      int[] ints = new int[len];
+      for (int index = 0; index < len; ++index) {
+         ints[index] = (int)chars[index];
+      } // for
+
+      this.initialize(ints);
+   } // HL7Encoding
+
+   // * construction utilities *
+   private void initialize(int[] chars) {
+      if (!this.isUnambiguous(chars)) {
+         throw new IllegalArgumentException(
+                 new StringBuffer("Ambiguous encoding characters:")
+                     .append(this.infoString(chars))
+                     .append(".").toString());
+      } // if
+
+      int len = chars.length;
+      for (int index = 0; index < len; ++index) {
+         if (!this.isValidEncoder(chars[index])) {
+            throw new IllegalArgumentException( "Not a valid encoding character:"
+                                             +  Character.toString((char)chars[index])
+                                             +  "("
+                                             +  Integer.toString(chars[index])
+                                             + ").");
+         } // if
+      } // for
+
+      this.fieldSeparator = chars[0];
+      this.componentSeparator = chars[1];
+      this.repetitionSeparator = chars[2];
+      this.escapeChar = chars[3];
+      this.subComponentSeparator = chars[4];
+      this.toString();
+   } // initialize
+
+
+   /**
+    * Checks the argument array of encoding characters to verify that each
+    * character occurs once and only once.
+    * @param ints the array of encoding characters to check
+    * @return true if all characters are unique within the argument array,
+    * otherwise false.
+    */
+   private boolean isUnambiguous(int[] ints) {
+      int len = ints.length;
+
+      for (int leftIndex = 0; leftIndex < len; ++leftIndex) {
+         for (int rightIndex = len -1; rightIndex > leftIndex; --rightIndex) {
+            if (  ints[rightIndex] == ints[leftIndex]
+            &&    leftIndex != rightIndex) {
+               return false;
+            } // if
+         } // for
+      } // for
+
+      return true;
+   } // isUnambiguous
+
+
+   /**
+    * Checks for valid encoding character
+    * @param charV the encoding character value to check
+    * @return true if valid, otherwise false.
+    */
+   private boolean isValidEncoder(int charV) {
+      if (  charV == 0
+      ||    Character.isLetterOrDigit(charV)
+      ||    Character.isWhitespace(charV)) {
+         return false;
+      } // if
+
+      return true;
+   } // isValidEncoder
+
+
+   /**
+    * Creates an arguemtn information string for error logging.
+    * @param chars
+    * @return
+    */
+   private String infoString(int[] chars) {
+      StringBuffer sb = new StringBuffer();
+      int len = chars.length;
+      for (int index = 0; index < len; ++index) {
+         sb.append(chars[index])
+           .append("(")
+           .append(Integer.toString(chars[index]))
+           .append("), ");
+      } // for
+
+      return sb.toString();
+   } // infoString
 
 
    // Utilities
@@ -138,79 +206,125 @@ public class HL7Encoding {
 
    } // NextSeparator
    
-   
+
+   /**
+    * @return The set of encoding characers as a String.
+    */
    public String toString() {
-      return(this.string);
+      return(new StringBuffer()
+              .append((char)this.fieldSeparator)
+              .append((char)this.componentSeparator)
+              .append((char)this.repetitionSeparator)
+              .append((char)this.escapeChar)
+              .append((char)this.subComponentSeparator)
+              .toString());
    } // toString
 
    /**
     * @return the fieldSeparator
     */
    public String getFieldSeparator() {
-      return fieldSeparator;
-   }
+      return Character.toString((char)fieldSeparator);
+   } // getFieldSeparator
 
    /**
     * @param fieldSeparator the fieldSeparator to set
     */
-   public void setFieldSeparator(String fieldSeparator) {
-      this.fieldSeparator = fieldSeparator;
-   }
+   public void setFieldSeparator(String fieldSep) {
+      this.fieldSeparator = fieldSep.charAt(0);
+   } // setFieldSeparator
 
-   /**
+    /**
+    * @param fieldSeparator the fieldSeparator to set
+    */
+   public void setFieldSeparator(int fieldSep) {
+      this.fieldSeparator = fieldSep;
+   } // setFieldSeparator
+
+  /**
     * @return the componentSeparator
     */
    public String getComponentSeparator() {
-      return componentSeparator;
-   }
+      return Character.toString((char)componentSeparator);
+   } // getComponentSeparator
 
    /**
     * @param componentSeparator the componentSeparator to set
     */
-   public void setComponentSeparator(String componentSeparator) {
-      this.componentSeparator = componentSeparator;
-   }
+   public void setComponentSeparator(String componentSep) {
+      this.componentSeparator = componentSep.charAt(0);
+   } // setComponentSeparator
+
+   /**
+    * @param componentSeparator the componentSeparator to set
+    */
+   public void setComponentSeparator(int componentSep) {
+      this.componentSeparator = componentSep;
+   } // setComponentSeparator
 
    /**
     * @return the repetitionSeparator
     */
    public String getRepetitionSeparator() {
-      return repetitionSeparator;
-   }
+      return Character.toString((char)repetitionSeparator);
+   } // getRepetitionSeparator
 
    /**
     * @param repetitionSeparator the repetitionSeparator to set
     */
-   public void setRepetitionSeparator(String repetitionSeparator) {
-      this.repetitionSeparator = repetitionSeparator;
-   }
+   public void setRepetitionSeparator(String repetitionSep) {
+      this.repetitionSeparator = repetitionSep.charAt(0);
+   } // setRepetitionSeparator
 
-   /**
+    /**
+    * @param repetitionSeparator the repetitionSeparator to set
+    */
+   public void setRepetitionSeparator(int repetitionSep) {
+      this.repetitionSeparator = repetitionSep;
+   } // setRepetitionSeparator
+
+  /**
     * @return the subComponentSeparator
     */
    public String getSubComponentSeparator() {
-      return subComponentSeparator;
-   }
+      return Character.toString((char)subComponentSeparator);
+   } // getSubComponentSeparator
 
    /**
     * @param subComponentSeparator the subComponentSeparator to set
     */
-   public void setSubComponentSeparator(String subComponentSeparator) {
-      this.subComponentSeparator = subComponentSeparator;
-   }
+   public void setSubComponentSeparator(String subComponentSep) {
+      this.subComponentSeparator = subComponentSep.charAt(0);
+   } // setSubComponentSeparator
+
+   /**
+    * @param subComponentSeparator the subComponentSeparator to set
+    */
+   public void setSubComponentSeparator(int subComponentSep) {
+      this.subComponentSeparator = subComponentSep;
+   } // setSubComponentSeparator
 
    /**
     * @return the escapeChar
     */
    public String getEscapeChar() {
-      return escapeChar;
-   }
+      return Character.toString((char)escapeChar);
+   } // getEscapeChar
 
    /**
     * @param escapeChar the escapeChar to set
     */
    public void setEscapeChar(String escapeChar) {
+      this.escapeChar = escapeChar.charAt(0);
+   } // setEscapeChar
+
+
+   /**
+    * @param escapeChar the escapeChar to set
+    */
+   public void setEscapeChar(int  escapeChar) {
       this.escapeChar = escapeChar;
-   }
-      
+   } // setEscapeChar
+
+
 } // class HL7Encoding

@@ -591,9 +591,9 @@ class HL7Time {
  * <li>...or a XML string.
  * </ul>
  */
-public class HL7Message {
+public class HL7Message  {
    /**
-    * The subject HL7 message represneted as a String.
+    * The subject HL7 message represented as a String.
     */
    private String                hl7MessageString;
    /**
@@ -681,7 +681,59 @@ public class HL7Message {
          this.segmentHash.put(this.segments[index]);
       } // for
    } // initialize
- 
+
+
+   public void setEncoding(HL7Encoding encoding) {
+      if (  this.encodingCharacters != null
+      &&    this.segments != null
+      &&    this.segments.length > 0) {
+         this.recode(encoding);
+      } else {
+         this.encodingCharacters = encoding;
+      } // if
+   } // setEncoding
+
+
+   private void recode(HL7Encoding newEncoding) {
+      String current = this.toString();
+
+      String newEC = newEncoding.getEscapeChar();
+      if (newEC != null && !newEC.isEmpty()) {
+         String tmp = current.replace(this.HL7EscapeChar(), newEC.charAt(0));
+         current = tmp;
+      } // if
+
+      String newSS = newEncoding.getSubComponentSeparator();
+      if (newSS != null && !newSS.isEmpty()) {
+         String tmp = current.replace( this.HL7SubComponentSeparatorChar(),
+                                       newSS.charAt(0));
+         current = tmp;
+      } // if
+
+      String newCS = newEncoding.getComponentSeparator();
+      if (newCS != null && !newCS.isEmpty()) {
+         String tmp = current.replace( this.HL7ComponentSeparatorChar(),
+                                       newCS.charAt(0));
+         current = tmp;
+      } // if
+
+      String newRS = newEncoding.getRepetitionSeparator();
+      if (newRS != null && !newRS.isEmpty()) {
+         String tmp = current.replace( this.HL7RepetitionSeparatorChar(),
+                                       newRS.charAt(0));
+         current = tmp;
+      } // if
+
+      String newFS = newEncoding.getFieldSeparator();
+      if (newFS != null && !newFS.isEmpty()) {
+         String tmp = current.replace( this.HL7FieldSeparator().charAt(0),
+                                       newFS.charAt(0));
+         current = tmp;
+      } // if
+
+      this.encodingCharacters = newEncoding;
+      this.hl7MessageString = current;
+   } // recode
    
    /**
     * Access to the HL7 encoding characters of the context HL7 message.
@@ -770,7 +822,10 @@ public class HL7Message {
      *                     or null if the item is empty, or does not exist.     
      */
     public String[] get(String location) {
-      HL7Designator     hl7Designator = new HL7Designator(location);
+      return this.get(new HL7Designator(location) );
+    }  // get
+
+    public String[] get(HL7Designator hl7Designator) {
       String            segKey  = hl7Designator.getSegID();
       HL7MsgItem[]      segs = this.segmentHash.get(segKey);
       
@@ -809,7 +864,7 @@ public class HL7Message {
             // expand repetitions
             if (expandReps == true) {
                int numberOfReps = segs[segIndex].numberOfRepetitionsAt(hl7Designator);
-               HL7Designator tempLocn = new HL7Designator(location);
+               HL7Designator tempLocn = new HL7Designator(hl7Designator);
 
                for (int repIndex = 0; repIndex < numberOfReps; ++repIndex) {
                   tempLocn.setRepetition(repIndex);
