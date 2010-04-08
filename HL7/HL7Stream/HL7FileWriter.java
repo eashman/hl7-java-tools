@@ -224,6 +224,10 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean close()throws HL7IOException {
+      if (!this.isOpen()) {
+         return true;
+      } // if
+
       try {
          this.writer.close();
       } catch (IOException ioEx) {

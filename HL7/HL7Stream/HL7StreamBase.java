@@ -83,7 +83,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return true if the stream is closed, otherwise false.
     */
    public boolean isClosed() {
-      return (this.statusValue == this.CLOSED);
+      return (this.statusValue == HL7Stream.CLOSED);
    } // isClosed
 
 
@@ -92,7 +92,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return true if the stream is open, otherwise false.
     */
    public boolean isOpen() {
-      return (this.statusValue == this.OPEN);
+      return (this.statusValue == HL7Stream.OPEN);
    } // isClosed
 
 

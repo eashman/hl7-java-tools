@@ -137,8 +137,7 @@ public class HL7FileReader extends HL7StreamBase implements HL7Stream {
     */
    public boolean close()throws HL7IOException {
       if (!this.isOpen()) {
-         throw new HL7IOException(  "HL7FileReader.close:Not open.",
-                                    HL7IOException.INCONSISTENT_STATE);
+         return true;
       } // if
 
       try {

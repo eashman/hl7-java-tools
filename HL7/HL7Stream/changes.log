@@ -104,6 +104,11 @@ HL7StreamURI.java : Updated javadocs.
        file writers and appenders. Modified HL7FileWriter(URI) constructor
        to handle raw URIs.
 
-* $Revision$
+* Revision: 21 
 20100312:
 - HL7SocketStream.java : Cleaning up socket closure.
+
+* $Revision$
+20100318:
+- HL7SocketStream.java : Cleaning up stream closure.
+- HL7FileReader.java, HL7FileWriter.java : Cleaning up file closure and IOException handling.
