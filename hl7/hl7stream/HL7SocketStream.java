@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7SocketStream.java 21 2010-03-12 15:55:41Z scott.herman@unconxio.us $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.

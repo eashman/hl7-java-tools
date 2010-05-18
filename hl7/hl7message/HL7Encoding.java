@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7Encoding.java 11 2010-01-14 09:51:18Z scott.herman@unconxio.us $
+ *  $Id$
  * 
  *  This code is derived from public domain sources. 
  *  Commercial use is allowed. 

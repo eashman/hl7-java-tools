@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7FileWriter.java 25 2010-04-08 19:33:27Z scott.herman@unconxio.us $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
