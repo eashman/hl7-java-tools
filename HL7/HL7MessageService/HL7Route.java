@@ -307,7 +307,7 @@ public class HL7Route extends HL7SpecificationElement {
 
 
    public boolean isOpen() {
-      if (this.hl7StreamIn.isOpen()) {
+      if (this.hl7StreamIn != null && this.hl7StreamIn.isOpen()) {
          return true;
       } // if
 
@@ -386,7 +386,9 @@ public class HL7Route extends HL7SpecificationElement {
    */
    public void dump() {
       this.logDebug("HL7Route.idString:" + this.idString);
-      this.logDebug("HL7Route.documentURI:" + this.documentURI.toString());
+      if (this.documentURI != null) {
+         this.logDebug("HL7Route.documentURI:" + this.documentURI.toString());
+      } // if
 
       if (this.hl7DeliveryURIs != null && !this.hl7DeliveryURIs.isEmpty()) {
          for (URI uri : this.hl7DeliveryURIs) {

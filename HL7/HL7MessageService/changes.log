@@ -133,8 +133,11 @@ HL7SpecificationElement.initialization.
 - HL7Route.java : Fixed multi-destination route open.
 - HL7SpecificationElement.java : Inital attempt to untangle logging.
 
-* $Revision$
+* Revision: 20 
 20100131:
 - HL7Transform.java : Added "freshen " operation.
                       Trapped null pointers in assign() and appoint().
                       Updated javadocs.
+* $Revision$
+20100408:
+- HL7Route.java : Fixed isOpen() to check the stream more thoroughly.
