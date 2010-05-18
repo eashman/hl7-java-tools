@@ -423,7 +423,12 @@ class HL7MsgItem {
       return(-11);
    } // locate
    
-   
+
+   /**
+    * Determines whether the context item is at or beyond the end of the specified location.
+    * @param location
+    * @return
+    */
    private boolean isTerminal(HL7Designator location) {
       if (this.hl7Separator.equals(this.encodingCharacters.getFieldSeparator())) {
          return(location.getSequence() < 0  ? true : false);
@@ -454,8 +459,13 @@ class HL7MsgItem {
       if (this.hl7Separator == null) {                      // at the bottom-most (sub-component) level.
          return this;
       } // if      
-      
-      if ( (this.isTerminal(location) || this.hl7Constituents == null) && create == false) {   // at the bottom-most existent level
+
+      /* Bug found:
+       * When specifying SEG.x.y and only SEG.x is defined
+       * null should be returned for any SEG.x.y for which y is > 1
+       * Instead SEG.x is returned in those cases.
+       */
+      if ( (this.isTerminal(location) /* || this.hl7Constituents == null */) && create == false) {   // at the bottom-most existent level
         return this;
       } // if
       
@@ -465,6 +475,8 @@ class HL7MsgItem {
          if (this.hl7Constituents == null || locator >= this.hl7Constituents.length) {
             if (create == true) {
                this.expandConstituents(locator + 1);
+            } else if (locator == 0 && this.hl7Constituents == null) {
+               return this;
             } else {
                return null; 
             } // if - else  
@@ -476,8 +488,16 @@ class HL7MsgItem {
          if (this.hl7Constituents == null && create == true) {
             this.expandConstituents(1);
          } // if
-      
-         if (this.hl7Constituents != null) {
+
+         /* Bug found and fixed:
+          * if there are no constituents, but the location specifies a component
+          * null must be returned for component specifcation > 1.
+          */
+         if (this.hl7Constituents == null) {
+            if (location.isSpecifiedComponent() && location.getComponent() > 0) {
+               return null;
+            } // if
+         } else {
             return(this.hl7Constituents[0].pick(location, create));
          } // if
       } // if - else if
