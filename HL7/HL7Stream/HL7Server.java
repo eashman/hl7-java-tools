@@ -300,7 +300,7 @@ public class HL7Server implements Runnable, HL7Stream {
       } // if
       
       HL7Server.logger.log(level, msg);
-    } // logInfo
+    } // log
 
 
     /**

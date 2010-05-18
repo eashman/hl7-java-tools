@@ -108,7 +108,12 @@ HL7StreamURI.java : Updated javadocs.
 20100312:
 - HL7SocketStream.java : Cleaning up socket closure.
 
-* $Revision$
+* Revision: 25
 20100318:
 - HL7SocketStream.java : Cleaning up stream closure.
 - HL7FileReader.java, HL7FileWriter.java : Cleaning up file closure and IOException handling.
+
+* $Revision$
+20100409:
+- HL7Server.java : Fixed logging
+- Updated license.
