@@ -1,5 +1,5 @@
 /*
- *  $Id: AttributeMap.java 71 2010-05-05 12:36:40Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
