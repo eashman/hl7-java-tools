@@ -33,28 +33,47 @@ import java.util.Iterator;
 import java.util.HashMap;
 
 /**
- *
+ * A map class for XML attributes.
  * @author scott
  */
 public class AttributeMap {
    private HashMap attributeMap = null;
 
+   /**
+    * Simple constructor.
+    */
    public AttributeMap() {
       this.attributeMap = new HashMap();
    } // AttributeMap constructor
 
 
+   /**
+    * Add a name value attribute pair to the map.
+    * @param name   The name of the attribute to be added.
+    * @param value  The value, as a String, of the added attribute.
+    * @return       The attribute map to whcih the argument name value pair was added.
+    */
    public AttributeMap add(String name, String value) {
       this.attributeMap.put(name, value);
       return this;
    } // add
 
 
+   /**
+    * Retrieves the value of the argument named attribute.
+    * @param name   The name of an attribute, in the attribute map.
+    * @return       The value of the argument attribute, as a String.
+    */
    public String get(String name) {
       return (String)this.attributeMap.get(name);
    } // get
 
 
+   /**
+    * Return the entire attribute map as a string.
+    * @return A String representation of the entire attribute map, suitable for
+    * inclusion in an XML element.
+    */
    @Override
    public String toString() {
       if (this.attributeMap.isEmpty()) {

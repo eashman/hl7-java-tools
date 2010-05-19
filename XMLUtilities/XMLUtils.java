@@ -55,8 +55,8 @@ public class XMLUtils {
 
    /**
     * Reads the argument XML input stream.
-    * @param inStream an input stream carrying the only subject XML
-    * @return the root node of the read DOM document.
+    * @param inStream An input stream carrying the only subject XML
+    * @return The root node of the read DOM document.
     */
    public static Node readXML(InputStream inStream) {
       try {
@@ -77,6 +77,11 @@ public class XMLUtils {
    } // readXML
 
 
+   /**
+    * Reads the argument XML input String.
+    * @param xmlString The XML input String to be parsed.
+    * @return The root node of the read DOM document.
+    */
    public static Node readXML(String xmlString) {
       try {
          DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -95,23 +100,38 @@ public class XMLUtils {
    } // readXML
 
 
-    public static String toXMLString(Node node) {
-        try {
-            Source source = new DOMSource(node);
-            StringWriter stringWriter = new StringWriter();
-            Result result = new StreamResult(stringWriter);
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer transformer = factory.newTransformer();
-            transformer.transform(source, result);
-            return stringWriter.getBuffer().toString();
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
-        return null;
-    } // toXMLString
+   /**
+    * Returns a String representation of the DOM hierarchy rooted at the argument Node.
+    * @param node The root Node of the DOM hierarchy to translate.
+    * @return A String representation of the DOM hierarchy rooted at the
+    * argument Node, or null if the operation fails.
+    */
+   public static String toXMLString(Node node) {
+      try {
+         Source source = new DOMSource(node);
+         StringWriter stringWriter = new StringWriter();
+         Result result = new StreamResult(stringWriter);
+         TransformerFactory factory = TransformerFactory.newInstance();
+         Transformer transformer = factory.newTransformer();
+         transformer.transform(source, result);
+         return stringWriter.getBuffer().toString();
+      } catch (TransformerConfigurationException e) {
+         e.printStackTrace();
+      } catch (TransformerException e) {
+         e.printStackTrace();
+      } // try - catch
 
+      return null;
+   } // toXMLString
+
+
+   /**
+    * Creates and returns a XML element as a String.
+    * @param tagName  The name of the element.
+    * @param content  The text content of the element, which may be,
+    *                 or include XML.
+    * @return         The element as a XML String.
+    */
    public static String elementString(String tagName, String content) {
       if (tagName == null) {
          return null;
@@ -127,6 +147,15 @@ public class XMLUtils {
    } // elementString
 
 
+   /**
+    * Creates and returns a XML element as a String. 
+    * @param tagName     The name of the element.
+    * @param attributes  A Attribute map of any atributes to be included in the
+    *                    XML element.
+    * @param content     The text content of the element, which may be,
+    *                    or include XML.
+    * @return            The XML element as a String.
+    */
    public static String elementString(String tagName, AttributeMap attributes, String content) {
       if (tagName == null) {
          return null;
