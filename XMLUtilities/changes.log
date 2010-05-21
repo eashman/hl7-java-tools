@@ -3,5 +3,8 @@ Revision: 35, Date: 2010-05-18 19:25:37 -0700 (Tue, 18 May 2010), Author: scott.
 - Moved from my local repository to google code:
     https://code.google.com/p/hl7-java-tools/source/browse/trunk/XMLUtilities
 
-$Revision$, $Date$, $Author$
+Revision: 36, Date: 2010-05-19 13:17:18 -0700 (Wed, 19 May 2010), Author: scott.herman@unconxio.us
 - Added javadocs.
+
+$Revision$, $Date$, $Author$
+- Added AttributeMap.entryCount().

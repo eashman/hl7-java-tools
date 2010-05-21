@@ -98,5 +98,13 @@ public class AttributeMap {
 
       return buildBuffer.toString();
    } // toString
+
+   /**
+    * Returns the number of attribute entries in the map.
+    * @return the number of attribute entries in the map.
+    */
+   public int entryCount() {
+      return this.attributeMap.size();
+   }
    
 } // AttributeMap
