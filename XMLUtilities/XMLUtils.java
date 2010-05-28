@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
 
 
 /**
- *
+ * Some static XML handling utilities and tools.
  * @author scott
  */
 public class XMLUtils {
@@ -173,6 +173,12 @@ public class XMLUtils {
    } // elementString
 
 
+   /**
+    * Returns the name of the first XML tag in the argument string.
+    * @param inStr The argument String to search.
+    * @return The name of the first XML tag in the argument string,
+    * or null if the operation fails.
+    */
    public static String firstTag(String inStr) {
       int startIndex = inStr.indexOf("<");
       if (startIndex < 0) return null;
@@ -209,8 +215,9 @@ public class XMLUtils {
 
    /**
     * Extracts outermost level XML from the argument String.
-    * @param inStr
-    * @return
+    * @param inStr The argument String to search.
+    * @return The XML String minus any leading or trailing characters which
+    * are not part of the XML, or null if the operation fails.
     */
    public static String extractXML(String inStr) {
       String elementName = firstTag(inStr);
@@ -246,6 +253,13 @@ public class XMLUtils {
    } // isNameChar
 
 
+   /**
+    * Extracts outermost level XML, that starts with the argument element, from
+    * the argument String.
+    * @param inStr The argument String to search.
+    * @return The XML String minus any leading or trailing characters which
+    * are not part of the specified XML, or null if the operation fails.
+    */
    public static String extractXML(String elementName, String argStr) {
       argStr = XMLUtils.startXMLFor(elementName, argStr);
       int tokenIndex = argStr.toLowerCase().indexOf(elementName.toLowerCase());
