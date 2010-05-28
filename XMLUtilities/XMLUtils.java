@@ -47,6 +47,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
+
 /**
  *
  * @author scott
@@ -170,4 +171,134 @@ public class XMLUtils {
       buildBuffer.append(">").append(content);
       return buildBuffer.append("</").append(tagName).append(">").toString();
    } // elementString
+
+
+   public static String firstTag(String inStr) {
+      int startIndex = inStr.indexOf("<");
+      if (startIndex < 0) return null;
+
+      // skip comments
+      while (inStr.substring(startIndex).equals("<!--")) {
+         inStr = inStr.substring(startIndex + 4);
+         startIndex = inStr.indexOf("-->");
+         if (startIndex < 0) return null;
+
+         startIndex = inStr.indexOf("<");
+         if (startIndex < 0) return null;
+      } // while
+
+      int tagOffset = 1;
+      while (Character.isWhitespace(inStr.charAt(startIndex + tagOffset))) {
+         ++tagOffset;
+      } // while
+
+      int tokenLen = 0;
+      if (isStartChar(inStr.charAt(startIndex + tagOffset))) {
+         ++tokenLen;
+         while (isNameChar(inStr.charAt(startIndex + tagOffset + tokenLen))) {
+            ++tokenLen;
+         } // while
+      } // if
+
+      if (!Character.isWhitespace(inStr.charAt(startIndex + tagOffset + tokenLen))) {
+         return null;
+      } // if
+
+      return inStr.substring(startIndex + tagOffset, startIndex + tagOffset + tokenLen);
+   } // firstTag
+
+   /**
+    * Extracts outermost level XML from the argument String.
+    * @param inStr
+    * @return
+    */
+   public static String extractXML(String inStr) {
+      String elementName = firstTag(inStr);
+      if (elementName == null)  return null;
+
+      inStr = startXMLFor(elementName, inStr);
+      return extractXML(elementName, inStr);
+   } // extractXML
+
+   /**
+    * NameStartChar ::=	":" | [A-Z] | "_" | [a-z]
+    * @param charV
+    * @return
+    */
+   private static boolean isStartChar(char charV) {
+      if (Character.isLetter(charV)) return true;
+      if (charV == ':')              return true;
+      if (charV == '_')              return true;
+      return false;
+   } // isStartChar
+
+   /**
+    * NameChar ::= NameStartChar | "-" | "." | [0-9]
+    * @param charV
+    * @return
+    */
+   private static boolean isNameChar(char charV) {
+      if (isStartChar(charV))       return true;
+      if (Character.isDigit(charV)) return true;
+      if (charV == '-')             return true;
+      if (charV == '.')             return true;
+      return false;
+   } // isNameChar
+
+
+   public static String extractXML(String elementName, String argStr) {
+      argStr = XMLUtils.startXMLFor(elementName, argStr);
+      int tokenIndex = argStr.toLowerCase().indexOf(elementName.toLowerCase());
+      
+      int offset = tokenIndex + elementName.length();
+      String remainder = argStr.substring(offset).toLowerCase();
+
+      // look for "/>
+      int endIndex = remainder.indexOf("/>");
+      if (endIndex >= 0) {
+         int checkIndex = remainder.indexOf("<");
+         if (checkIndex < 0) {
+            return argStr.substring(0, endIndex + 2);
+         }  // if
+      } // if
+
+      // otherwise look for the end
+      endIndex = remainder.indexOf(elementName.toLowerCase());
+      if (endIndex < 0)  return null;
+      while (endIndex > 0) {
+         endIndex += elementName.length();
+         while (remainder.charAt(endIndex) != '>'
+         &&     Character.isWhitespace(remainder.charAt(endIndex))) {
+            ++endIndex;
+         } // while
+
+         if (remainder.charAt(endIndex) == '>') {
+            return argStr.substring(0, ++endIndex + offset);
+         } // if
+
+         remainder = remainder.substring(endIndex);
+         endIndex = remainder.indexOf(elementName.toLowerCase());
+      } // while
+
+      return null;
+   } // extractXML
+
+
+   private static String startXMLFor(String elementName, String argStr) {
+      int tokenIndex = argStr.toLowerCase().indexOf(elementName.toLowerCase());
+      if (tokenIndex < 1)   return null;
+
+      int startIndex = tokenIndex;
+      while (startIndex >= 0
+      && argStr.charAt(startIndex) != '<'
+      && (  Character.isWhitespace(argStr.charAt(startIndex))
+         || startIndex == tokenIndex)) {
+         --startIndex;
+      } // while
+
+      if (startIndex < 0 || argStr.charAt(startIndex) != '<') return null;
+      if (startIndex == 0) return argStr;
+      return argStr.substring(startIndex);
+   } // startXMLFor
+
 } // XMLUtils

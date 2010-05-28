@@ -6,5 +6,8 @@ Revision: 35, Date: 2010-05-18 19:25:37 -0700 (Tue, 18 May 2010), Author: scott.
 Revision: 36, Date: 2010-05-19 13:17:18 -0700 (Wed, 19 May 2010), Author: scott.herman@unconxio.us
 - Added javadocs.
 
-$Revision$, $Date$, $Author$
+Revision: 37, Date: 2010-05-21 14:21:35 -0700 (Fri, 21 May 2010), Author: scott.herman@unconxio.us
 - Added AttributeMap.entryCount().
+
+$Revision$, $Date$, $Author$
+- XMLUtils.java : Added extractXML(), and firstTag().
