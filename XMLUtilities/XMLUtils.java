@@ -134,12 +134,12 @@ public class XMLUtils {
     * @return         The element as a XML String.
     */
    public static String elementString(String tagName, String content) {
-      if (tagName == null) {
+      if (tagName == null || tagName.isEmpty()) {
          return null;
       } // if
 
       StringBuffer buildBuffer = new StringBuffer("<").append(tagName);
-      if (content == null) {
+      if (content == null || content.isEmpty()) {
          return buildBuffer.append(" />").toString();
       } // if
 
@@ -158,13 +158,13 @@ public class XMLUtils {
     * @return            The XML element as a String.
     */
    public static String elementString(String tagName, AttributeMap attributes, String content) {
-      if (tagName == null) {
+      if (tagName == null || tagName.isEmpty()) {
          return null;
       } // if
 
       StringBuffer buildBuffer = new StringBuffer("<").append(tagName);
       buildBuffer.append(attributes.toString());
-      if (content == null) {
+      if (content == null || content.isEmpty()) {
          return buildBuffer.append(" />").toString();
       } // if
 

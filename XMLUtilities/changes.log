@@ -12,5 +12,8 @@ Revision: 37, Date: 2010-05-21 14:21:35 -0700 (Fri, 21 May 2010), Author: scott.
 Revision: 38, Date: 2010-05-27 17:26:43 -0700 (Thu, 27 May 2010), Author: scott.herman@unconxio.us
 - XMLUtils.java : Added extractXML(), and firstTag().
 
-$Revision$, $Date$, $Author$
+Revision: 41, Date: 2010-05-27 19:23:40 -0700 (Thu, 27 May 2010), Author: scott.herman@unconxio.us
 - Added javadocs for the last modifications.
+
+$Revision$, $Date$, $Author$
+Modified XMLUtils.elementString() to check for for empty as well as null arguments.
