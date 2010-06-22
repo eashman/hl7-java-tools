@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.HashMap;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * A map class for XML attributes.
@@ -99,12 +101,47 @@ public class AttributeMap {
       return buildBuffer.toString();
    } // toString
 
+
+   public static AttributeMap getAttributes(Node node, String[] allowed) {
+      if (node == null) return null;
+      if (!node.hasAttributes()) return null;
+
+      AttributeMap newMap = new AttributeMap();
+
+      NamedNodeMap attribs = node.getAttributes();
+      int attribCount = attribs.getLength();
+      for (int index = 0;index < attribCount; ++index) {
+         Node attribNode = attribs.item(index);
+         String attribName = attribNode.getNodeName().toLowerCase();
+         if (XMLUtils.equalsAny(attribName, allowed)) {
+            newMap.add(attribName, attribNode.getNodeValue());
+         } // if
+      } // for
+
+      if (newMap.entryCount() > 0) {
+         return newMap;
+      } // if
+
+      return null;
+   } // getAttributes
+
+
+   public boolean hasKey(String key) {
+      return this.attributeMap.containsKey(key.toLowerCase());
+   } // hasKey
+
+
+   public void remove(String key) {
+      this.attributeMap.remove(key.toLowerCase());
+   } // remove
+   
+
    /**
     * Returns the number of attribute entries in the map.
     * @return the number of attribute entries in the map.
     */
    public int entryCount() {
       return this.attributeMap.size();
-   }
+   } // entryCount
    
 } // AttributeMap

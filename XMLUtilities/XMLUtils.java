@@ -315,4 +315,16 @@ public class XMLUtils {
       return argStr.substring(startIndex);
    } // startXMLFor
 
+
+   static boolean equalsAny(String str, String[] strs) {
+      int strCount = strs.length;
+
+      for (int index = 0; index < strCount; ++index) {
+         if (str.equals(strs[index])) return true;
+      } // for
+
+      return false;
+   } // equalsAny
+
+
 } // XMLUtils
