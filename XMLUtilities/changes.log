@@ -21,3 +21,6 @@ Modified XMLUtils.elementString() to check for for empty as well as null argumen
 $Revision$, $Date$, $Author$
 - AttributeMap : Added getAttributes(), hasKey(), and remove().
 - XMLUtils : Added equalsAny().
+
+$Revision$, $Date$, $Author$
+- OOps! Made equalsAny() public.

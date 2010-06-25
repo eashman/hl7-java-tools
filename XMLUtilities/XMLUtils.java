@@ -316,7 +316,7 @@ public class XMLUtils {
    } // startXMLFor
 
 
-   static boolean equalsAny(String str, String[] strs) {
+   public static boolean equalsAny(String str, String[] strs) {
       int strCount = strs.length;
 
       for (int index = 0; index < strCount; ++index) {
