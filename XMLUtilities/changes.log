@@ -22,5 +22,8 @@ $Revision$, $Date$, $Author$
 - AttributeMap : Added getAttributes(), hasKey(), and remove().
 - XMLUtils : Added equalsAny().
 
-$Revision$, $Date$, $Author$
+Revision: 44, Date: 2010-06-25 10:20:37 -0700 (Fri, 25 Jun 2010), Author: scott.herman@unconxio.us
 - OOps! Made equalsAny() public.
+
+$Revision$, $Date$, $Author$
+- XMLUtils.extractXML():Null pointer check.

@@ -262,6 +262,8 @@ public class XMLUtils {
     */
    public static String extractXML(String elementName, String argStr) {
       argStr = XMLUtils.startXMLFor(elementName, argStr);
+      if (argStr == null) return null;
+      
       int tokenIndex = argStr.toLowerCase().indexOf(elementName.toLowerCase());
       
       int offset = tokenIndex + elementName.length();
