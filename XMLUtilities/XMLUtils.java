@@ -206,7 +206,8 @@ public class XMLUtils {
          } // while
       } // if
 
-      if (!Character.isWhitespace(inStr.charAt(startIndex + tagOffset + tokenLen))) {
+      char endChar = inStr.charAt(startIndex + tagOffset + tokenLen);
+      if (!(Character.isWhitespace(endChar) || (endChar == '>') ) ) {
          return null;
       } // if
 

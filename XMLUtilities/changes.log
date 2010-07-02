@@ -25,5 +25,8 @@ $Revision$, $Date$, $Author$
 Revision: 44, Date: 2010-06-25 10:20:37 -0700 (Fri, 25 Jun 2010), Author: scott.herman@unconxio.us
 - OOps! Made equalsAny() public.
 
-$Revision$, $Date$, $Author$
+Revision: 45, Date: 2010-07-02 14:57:21 -0700 (Fri, 02 Jul 2010), Author: scott.herman@unconxio.us
 - XMLUtils.extractXML():Null pointer check.
+
+$Revision$, $Date$, $Author$
+- XMLUtils.firstTagL():Correction:closure detected on close wicket as well as whitespace.
