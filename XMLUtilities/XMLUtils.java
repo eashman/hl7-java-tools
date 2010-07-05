@@ -293,6 +293,7 @@ public class XMLUtils {
             return argStr.substring(0, ++endIndex + offset);
          } // if
 
+         offset += endIndex;
          remainder = remainder.substring(endIndex);
          endIndex = remainder.indexOf(elementName.toLowerCase());
       } // while
