@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 
 import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -330,5 +332,40 @@ public class XMLUtils {
       return false;
    } // equalsAny
 
+   /**
+   Escape characters for text appearing as XML data, between tags.
 
+   <P>The following characters are replaced with corresponding character entities: &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;&amp;&quot;, &quot;, &quot;&#039;&quot;.
+
+   <P>Note that JSTL's forXML escapes the exact same set of
+   characters as this method. <span class='highlight'>That is, forXML
+    is good for escaping to produce valid XML, but not for producing safe
+    HTML.</span>
+  */
+   public static String forXML(String aText){
+      final StringBuilder result = new StringBuilder();
+      final StringCharacterIterator iterator = new StringCharacterIterator(aText);
+      char character =  iterator.current();
+      while (character != CharacterIterator.DONE ){
+         if (character == '<') {
+            result.append("&lt;");
+         } else if (character == '>') {
+            result.append("&gt;");
+         } else if (character == '\"') {
+            result.append("&quot;");
+         } else if (character == '\'') {
+            result.append("&#039;");
+         } else if (character == '&') {
+            result.append("&amp;");
+         } else {
+            //the char is not a special one
+            //add it to the result as is
+            result.append(character);
+         } // if - else if - else...
+
+         character = iterator.next();
+      } // while
+
+      return result.toString();
+   } // forXML
 } // XMLUtils
