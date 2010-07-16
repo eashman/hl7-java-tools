@@ -20,16 +20,18 @@ public class HL7ElementLevel {
    private int value;
 
    public HL7ElementLevel(int level) {
-      this.set(level);
+      this._set(level);
    } // HL7ElementLevel
    
-   public void set(int level) {
+   private void _set(int level) {
       if (level < HL7ElementLevel.SEGMENT || level > HL7ElementLevel.SUBCOMPONENT) {
          throw new IllegalArgumentException("Illegal level:" + Integer.toString(level));
       } // if
 
       value = level;
    } // set
+
+   public void set(int level) { this._set(level); }
 
    public int get() {
       return this.value;

@@ -23,7 +23,7 @@ public class HL7Component implements HL7Element {
 
    public HL7Component(String componentStr, HL7Encoding encoders) {
       this();
-      this.set(componentStr, encoders);
+      this._set(componentStr, encoders);
    } // HL7Component
 
 
@@ -42,7 +42,7 @@ public class HL7Component implements HL7Element {
    } // wasTouched
 
 
-   public void set(String msgText, HL7Encoding encoders) {
+   private void _set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.SUBCOMPONENT);
       ArrayList<String>  subComps = encoders.hl7Split(msgText, nextLevel);
       this.subComponents = new ArrayList<HL7SubComponent>();
@@ -53,6 +53,11 @@ public class HL7Component implements HL7Element {
       } // for
 
       this.touched = true;
+   } // set
+
+
+   public void set(String msgText, HL7Encoding encoders) {
+      this._set(msgText, encoders);
    } // set
 
 

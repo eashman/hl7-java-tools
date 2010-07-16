@@ -24,7 +24,7 @@ public class HL7FieldRepetition implements HL7Element {
 
    public HL7FieldRepetition(String repetitionStr, HL7Encoding encoders) {
       this();
-      this.set(repetitionStr, encoders);
+      this._set(repetitionStr, encoders);
    } // HL7FieldRepetition
 
 
@@ -68,7 +68,7 @@ public class HL7FieldRepetition implements HL7Element {
    } // wasTouched
 
 
-   public void set(String msgText, HL7Encoding encoders) {
+   private void _set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.COMPONENT);
       ArrayList<String>  elements = encoders.hl7Split(msgText, nextLevel);
       this.components = new ArrayList<HL7Component>();
@@ -79,6 +79,9 @@ public class HL7FieldRepetition implements HL7Element {
 
       this.touched = true;
    } // set
+
+
+   public void set(String msgText, HL7Encoding encoders) { this._set(msgText, encoders); }
 
 
    public String toHL7String(HL7Encoding encoders) {
@@ -199,6 +202,16 @@ public class HL7FieldRepetition implements HL7Element {
       } // if
 
       this.components.add(new HL7Component());
+   } // addComponent
+
+   public void addComponent(int index) {
+      if (this.hasComponent(index)) return;
+
+      if (this.components == null) {
+         this.components = new ArrayList<HL7Component>();
+      } // if
+
+      while (index >= this.components.size()) this.addComponent();
    } // addComponent
 
 } // HL7FieldRepetition

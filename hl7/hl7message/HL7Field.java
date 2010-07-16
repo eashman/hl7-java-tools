@@ -23,7 +23,7 @@ public class HL7Field implements HL7Element {
 
    public HL7Field(String fieldStr, HL7Encoding encoders) {
       this();
-      this.set(fieldStr, encoders);
+      this._set(fieldStr, encoders);
    } // HL7Field
 
    public void setLevel(int level) {
@@ -41,7 +41,7 @@ public class HL7Field implements HL7Element {
    } // wasTouched
 
 
-   public void set(String msgText, HL7Encoding encoders) {
+   private void _set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.REPETITION);
       ArrayList<String>  elements = encoders.hl7Split(msgText, nextLevel);
       this.repetitions = new ArrayList<HL7FieldRepetition>();
@@ -53,7 +53,8 @@ public class HL7Field implements HL7Element {
       this.touched = true;
    } // set
 
-
+   public void set(String msgText, HL7Encoding encoders) { this._set(msgText, encoders); }
+   
    public String toHL7String(HL7Encoding encoders) {
       if (!this.hasConstituents()) {
          return "";
@@ -155,7 +156,8 @@ public class HL7Field implements HL7Element {
       if (this.repetitions == null || this.repetitions.isEmpty()) {
          return false;
       } // if
-      
+
+      if (index >= this.repetitions.size() ) return false;
       return true;
    } // hasRepetition
 
@@ -167,7 +169,7 @@ public class HL7Field implements HL7Element {
       return null;
    } // getRepetition
 
-   void addRepetition() {
+   public void addRepetition() {
       if (this.repetitions == null) {
          this.repetitions = new ArrayList<HL7FieldRepetition>();
       } // if

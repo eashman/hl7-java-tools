@@ -27,7 +27,7 @@ public class HL7Segment implements HL7Element {
    public HL7Segment(String segmentStr, HL7Encoding encoders) {
       this();
       this.idStr = segmentStr.substring(0, 3);
-      this.set(segmentStr, encoders);
+      this._set(segmentStr, encoders);
    } // HL7Segment
 
 
@@ -73,7 +73,7 @@ public class HL7Segment implements HL7Element {
    } // wasTouched
 
 
-   public void set(String msgText, HL7Encoding encoders) {
+   private void _set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.FIELD);
       ArrayList<String>  elements = encoders.hl7Split(msgText, nextLevel);
       this.fields = new ArrayList<HL7Field>();
@@ -85,6 +85,8 @@ public class HL7Segment implements HL7Element {
    } // set
 
 
+   public void set(String msgText, HL7Encoding encoders) { this._set(msgText, encoders); }
+   
    public String toHL7String(HL7Encoding encoders) {
       if (!this.hasFields()) {
          return "";
@@ -171,6 +173,7 @@ public class HL7Segment implements HL7Element {
       return true;
    } // hasField
 
+
    int fieldCount() {
       if (!this.hasFields()) {
          return 0;
@@ -179,7 +182,7 @@ public class HL7Segment implements HL7Element {
       return this.fields.size();
    } // fieldCount
 
-   void addField() {
+   private void addField() {
       HL7Field field = new HL7Field();
       field.addRepetition();
 
@@ -204,5 +207,14 @@ public class HL7Segment implements HL7Element {
 
       return this.getField(sequence);
    } // pickSequence
+
+   public void addField(int index) {
+      if (this.hasField(index)) return;
+
+      if (this.fields == null) this.fields = new ArrayList<HL7Field>();
+      if (index >= this.fields.size()) {
+         while (index >= this.fields.size()) this.fields.add(new HL7Field());
+      } // if
+   } // addField
 
 } // HL7Segment

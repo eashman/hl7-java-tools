@@ -22,7 +22,7 @@ public class HL7Message {
 
 
    public HL7Message(String hl7Msg) {
-      this.parse(hl7Msg);
+      this._parse(hl7Msg);
    } // HL7Message
 
 
@@ -61,14 +61,16 @@ public class HL7Message {
    } // addSegments
 
 
-   public void parse(String msg) {
+   private void _parse(String msg) {
       this.encoders = this.extractEncoding(msg);
       this.addSegments(msg);
    } // parse
 
 
+   public void parse(String msg) { this._parse(msg); }
+
    public String toHL7String(HL7Encoding encode) {
-      StringBuffer msgBuffer = new StringBuffer();
+      StringBuilder msgBuffer = new StringBuilder();
       for (HL7Segment seg : this.segments) {
          msgBuffer.append(seg.toHL7String(encode) ).append((char)CR);
       } // for
@@ -225,8 +227,7 @@ public class HL7Message {
 
 
    public void fresh() {
-      HL7Time tHL7 = new HL7Time();
-      String tStr = new String(tHL7.get().toString());
+      String tStr = HL7Time.get().toString();
       if (this.hasSegment("MSH")) {
          this.set("MSH.7", tStr);
       } else if (this.hasSegment("BHS")) {
@@ -285,7 +286,7 @@ public class HL7Message {
                                        + sendingFacility
                                        + this.encoders.getFieldSeparator());
       // Message DateTime
-      String now = new HL7Time().get();
+      String now = HL7Time.get();
       ackMsg.set("MSH.7", now);
 
       // Message type
@@ -301,10 +302,8 @@ public class HL7Message {
          }
       } // if
 
-
-
       // Control ID
-      StringBuffer   msgCtlIDStr = new StringBuffer();
+      StringBuilder   msgCtlIDStr = new StringBuilder();
       if (msgCtlID == null) {
          msgCtlID = "";
       } // if
@@ -320,7 +319,7 @@ public class HL7Message {
          ackCode = "AE";
       } // if - else
 
-      StringBuffer msaSegmentBuffer = new StringBuffer();
+      StringBuilder msaSegmentBuffer = new StringBuilder();
       msaSegmentBuffer.append("MSA");
       msaSegmentBuffer.append(ackMsg.encoders.getFieldSeparator());
       msaSegmentBuffer.append(ackCode);
@@ -336,7 +335,7 @@ public class HL7Message {
       } // if
 
       // If it's a NMQ add the NCK segment.
-      StringBuffer nckSegmentBuffer = new StringBuffer();
+      StringBuilder nckSegmentBuffer = new StringBuilder();
       nckSegmentBuffer.append("NCK");
       nckSegmentBuffer.append(ackMsg.encoders.getFieldSeparator());
       nckSegmentBuffer.append(now);
@@ -353,7 +352,7 @@ public class HL7Message {
 
 
    public String idString() {
-      StringBuffer idStrBuffer = new StringBuffer();
+      StringBuilder idStrBuffer = new StringBuilder();
 
       if (this.hasSegment("MSH")) {
          idStrBuffer.append(this.get("MSH.3"));

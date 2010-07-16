@@ -35,20 +35,37 @@ import java.text.SimpleDateFormat;
  * @author scott
  */
 public class HL7Time {
-   final String hl7DTFormatStr = "yyyyMMddkkmmssZ";
-   SimpleDateFormat hl7DTFormat = new SimpleDateFormat(hl7DTFormatStr);
+   private static final String hl7DTFormatStr = "yyyyMMddkkmmssZ";
+   private static final SimpleDateFormat hl7DTFormat = new SimpleDateFormat(hl7DTFormatStr);
+   private static final SimpleDateFormat hl7DateFormat = new SimpleDateFormat(hl7DTFormatStr.substring(0, 8));
 
    public HL7Time() { }
 
-   public String get(Date dateTime) {
-      return(hl7DTFormat.format(dateTime));
+   private static String trimTime(String ts) {
+      if (ts.substring(8, 10).equals("24")) return ts.substring(0, 8);
+      return ts;
+   } // trimTime
+
+
+   public static String get(Date dateTime) {
+      return(trimTime(hl7DTFormat.format(dateTime)));
    } // get
 
 
-   public String get() {
+   public static String get() {
       Date dateTime = new Date();
-      return(hl7DTFormat.format(dateTime));
+      return(trimTime(hl7DTFormat.format(dateTime)));
    } // get
+
+   public static String getDate(Date dateTime) {
+      return(hl7DateFormat.format(dateTime));
+   } // getDate
+
+
+   public static String getDate() {
+      Date dateTime = new Date();
+      return(hl7DateFormat.format(dateTime));
+   } // getDate
 
 } // HL7Time
 
