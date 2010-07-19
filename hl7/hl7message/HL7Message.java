@@ -44,7 +44,7 @@ public class HL7Message {
 
       int segmentCount = segmentStrings.length;
       if (segmentCount > 0) {
-          if (this.segmentMap == null) {
+         if (this.segmentMap == null) {
             this.segmentMap = new HL7SegmentMap();
          } // if
 
@@ -60,6 +60,16 @@ public class HL7Message {
       } // for
    } // addSegments
 
+
+   public void addSegment(HL7Segment seg) {
+      if (seg == null) return;
+      
+      if (this.segmentMap == null) this.segmentMap = new HL7SegmentMap();
+      if (this.segments == null) this.segments = new ArrayList<HL7Segment>();
+
+      this.segments.add(seg);
+      this.segmentMap.put(seg);
+   } // addSegment
 
    private void _parse(String msg) {
       this.encoders = this.extractEncoding(msg);
@@ -427,6 +437,11 @@ public class HL7Message {
       returnBuffer.append("</").append(tag).append(">");
       return returnBuffer.toString();
    } // toXMLString
+
+   public void addSegments(ArrayList<HL7Segment> segments) {
+      if (segments == null) return;
+      for (HL7Segment seg : segments) this.addSegment(seg);
+   } // addSegments
 
 
 
