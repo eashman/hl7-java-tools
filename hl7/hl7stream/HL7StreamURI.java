@@ -32,6 +32,9 @@ package us.conxio.hl7.hl7stream;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -39,9 +42,9 @@ import java.net.URISyntaxException;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7StreamURI {
-   URI   uri;
+   private URI   uri;
 
-
+   private HL7StreamURI() { }
    /**
     * Constructs a new stream URI from the argument URI.
     * @param uri
@@ -61,6 +64,19 @@ public class HL7StreamURI {
          this.uri = new URI(uriStr);
       } catch (URISyntaxException uEx) {
          throw new HL7IOException("HL7StreamURI:URISyntaxException", uEx);
+      } // try - catch
+   } // HL7StreamURI
+
+   public HL7StreamURI(String host, int port) throws HL7IOException {
+      this();
+
+      StringBuilder uriBuilder = new StringBuilder("tcp://");
+      if (StringUtils.isNotEmpty(host)) uriBuilder.append(host);
+      if (port > 0) uriBuilder.append(":").append(Integer.toString(port));
+      try {
+         this.uri = new URI(uriBuilder.toString());
+      } catch (URISyntaxException uEx) {
+         throw new HL7IOException("URISyntaxException", uEx);
       } // try - catch
    } // HL7StreamURI
 
@@ -254,7 +270,7 @@ public class HL7StreamURI {
     * @return 0 or the specified port number for the context server URI.
     * @return the port number specified in the context URI.
     */
-   public int uriPortNo() {
+   public int getPortNo() {
       int portNo = 0;
       if ( (portNo = this.uri.getPort()) < 0) {
          String schemeStr = uri.getScheme();
@@ -264,11 +280,11 @@ public class HL7StreamURI {
       } // if
 
       return portNo;
-   } // uriPortNo
+   } // getPortNo
 
 
    /**
-    * Creates and returns an apppropriate stream reader based on the context URI.
+    * Creates and returns an appropriate stream reader based on the context URI.
     * @return the reader as a HL7Stream implementation.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
@@ -276,7 +292,7 @@ public class HL7StreamURI {
       if (this.isFileURI() && !this.isFileWriterURI()) {
          return new HL7FileReader(this.fileURIOf());
       } else if (this.isServerURI()) {
-         return new HL7Server(this.uriPortNo(), this.uriServerPoolSize());
+         return new HL7Server(this.getPortNo(), this.uriServerPoolSize());
       } // if - else if
 
       throw new HL7IOException(  "HL7StreamURI.getHL7StreamReader():Uninterpreable URI:"
@@ -286,7 +302,7 @@ public class HL7StreamURI {
 
 
    /**
-    * Creates and returns an apppropriate stream writer based on the context URI.
+    * Creates and returns an appropriate stream writer based on the context URI.
     * @return the writer as a HL7Stream implementation.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
@@ -294,7 +310,7 @@ public class HL7StreamURI {
       if (this.isFileWriterURI() || this.isFileAppenderURI()) {
          return new HL7FileWriter(this.uri);
       } else if (this.isSocketURI()) {
-         return new HL7SocketStream(this.uri.getHost(), this.uriPortNo());
+         return new HL7SocketStream(this.uri.getHost(), this.getPortNo());
       } else if (this.isXMLURI()) {
          return new HL7XMLFileWriter(this.uri);
       } // if - else if
@@ -303,6 +319,19 @@ public class HL7StreamURI {
                                  + this.uri.toString(),
                                  HL7IOException.UNINTERPERABLE_URI);
    } // getHL7StreamWriter
+
+   public String getHostName() {
+      return this.uri.getHost();
+   } // getHostName
+
+   public boolean isValid() {
+      // TODO: More comprehehnsive validation.
+      return   this.isFileAppenderURI()
+         ||    this.isFileReaderURI()
+         ||    this.isFileWriterURI()
+         ||    this.isServerURI()
+         ||    this.isSocketURI();
+   } // isValid
 
 
 } // HL7StreamURI

@@ -76,9 +76,9 @@ class HL7ServiceWorker  implements Runnable {
 
 
     private String logHeader() {
-      StringBuffer headerBuffer = new StringBuffer();
+      StringBuilder headerBuffer = new StringBuilder();
       headerBuffer.append(this.getClass().getName());
-      headerBuffer.append("(" + this.threadID + "): ");
+      headerBuffer.append("(").append(this.threadID).append("): ");
       return headerBuffer.toString();
     } // logHeader
 
@@ -199,7 +199,7 @@ public class HL7Server implements Runnable, HL7Stream {
                                           + "):Not a valid HL7 server URI.");
       } // if
 
-      this.serverPort = streamURI.uriPortNo();
+      this.serverPort = streamURI.getPortNo();
       int uriPoolSize = streamURI.uriServerPoolSize();
       this.poolSize = (uriPoolSize < 2) ? 2 : uriPoolSize;
       this.threadPool = Executors.newFixedThreadPool(this.poolSize);

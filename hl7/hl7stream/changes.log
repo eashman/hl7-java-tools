@@ -1,3 +1,4 @@
+* $Id$
 * Revision: 30
 20091130:
 Tightening up the polymorphic genericized model. Basically there are 2 imperfect
@@ -108,7 +109,12 @@ HL7StreamURI.java : Updated javadocs.
 20100312:
 - HL7SocketStream.java : Cleaning up socket closure.
 
-* $Revision$
+* Revision: 33
 20100318:
 - HL7SocketStream.java : Cleaning up stream closure.
 - HL7FileReader.java, HL7FileWriter.java : Cleaning up file closure and IOException handling.
+
+* $Revision$, $Date$, $Author$
+- HL7StreamURI.getPortNo(), .getHostName(), .isValid() : Added/modified these methods
+public use and access.
+- HL7Server: Minor cleanup.
