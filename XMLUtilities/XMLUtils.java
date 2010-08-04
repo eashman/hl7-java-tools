@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 
@@ -91,6 +92,24 @@ public class XMLUtils {
          DocumentBuilder builder = builderFactory.newDocumentBuilder();
 
          Document doc = builder.parse(new InputSource(new StringReader(xmlString)));
+         return doc.getDocumentElement();
+      } catch (SAXException saxEx) {
+         throw new IllegalArgumentException("readXML() Caught SAXException: ",  saxEx);
+      } catch (IOException ioEx) {
+         throw new IllegalArgumentException("readXML() Caught IOException: "
+                                          + ioEx.getMessage(),  ioEx);
+      } catch (ParserConfigurationException parsEx) {
+         throw new IllegalArgumentException("readXML() Caught ParserConfigurationException: ",  parsEx);
+      } // try - catch
+   } // readXML
+
+
+   public static Node readXML(URI uri) {
+      try {
+         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+         DocumentBuilder builder = builderFactory.newDocumentBuilder();
+
+         Document doc = builder.parse(uri.toString());
          return doc.getDocumentElement();
       } catch (SAXException saxEx) {
          throw new IllegalArgumentException("readXML() Caught SAXException: ",  saxEx);
@@ -331,5 +350,33 @@ public class XMLUtils {
 
       return false;
    } // equalsAny
+
+
+   /**
+    * Finds the node of the argument name in the tree under the argument node.
+    * @param name The name of the node to search for, case insensitive.
+    * @param node The root node of the tree under which to look for the named node.
+    * @return the first found occurrence of the named node (breadth first),
+    * or null if the node is not found.
+    */
+   public static Node findChild(String name, Node node) {
+      if (node == null) return null;
+
+      if (node.hasChildNodes()) {
+         NodeList kids = node.getChildNodes();
+         int numKids = kids.getLength();
+         for (int index = 0; index < numKids; ++index) {
+            Node kid = kids.item(index);
+            if (kid.getNodeName().equalsIgnoreCase(name)) return kid;
+         } // for
+
+         for (int index = 0; index < numKids; ++index) {
+            Node found = findChild(name, kids.item(index));
+            if (found != null) return found;
+         } // for
+      } // if
+
+      return null;
+   } // findChild
 
 } // XMLUtils

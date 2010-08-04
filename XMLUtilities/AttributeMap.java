@@ -56,7 +56,8 @@ public class AttributeMap {
     * @return       The attribute map to whcih the argument name value pair was added.
     */
    public AttributeMap add(String name, String value) {
-      this.attributeMap.put(name, value);
+      if (name == null) return this;
+      this.attributeMap.put(name.toLowerCase(), value);
       return this;
    } // add
 
@@ -67,7 +68,8 @@ public class AttributeMap {
     * @return       The value of the argument attribute, as a String.
     */
    public String get(String name) {
-      return (String)this.attributeMap.get(name);
+      if (name == null) return null;
+      return (String)this.attributeMap.get(name.toLowerCase());
    } // get
 
 
@@ -126,12 +128,36 @@ public class AttributeMap {
    } // getAttributes
 
 
+   public static AttributeMap getAttributes(Node node) {
+      if (node == null) return null;
+      if (!node.hasAttributes()) return null;
+
+      AttributeMap newMap = new AttributeMap();
+
+      NamedNodeMap attribs = node.getAttributes();
+      int attribCount = attribs.getLength();
+      for (int index = 0;index < attribCount; ++index) {
+         Node attribNode = attribs.item(index);
+         String attribName = attribNode.getNodeName().toLowerCase();
+         newMap.add(attribName, attribNode.getNodeValue());
+      } // for
+
+      if (newMap.entryCount() > 0) {
+         return newMap;
+      } // if
+
+      return null;
+   } // getAttributes
+
+
    public boolean hasKey(String key) {
+      if (key == null) return false;
       return this.attributeMap.containsKey(key.toLowerCase());
    } // hasKey
 
 
    public void remove(String key) {
+      if (key == null) return;
       this.attributeMap.remove(key.toLowerCase());
    } // remove
    

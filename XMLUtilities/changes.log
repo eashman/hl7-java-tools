@@ -37,5 +37,11 @@ Revision: 47, Date: 2010-07-05 11:09:28 -0700 (Mon, 05 Jul 2010), Author: scott.
 Revision: 48, Date: 2010-07-06 13:43:48 -0700 (Tue, 06 Jul 2010), Author: scott.herman@unconxio.us
 XMLUtils.forXML(): Added to escape HTML within XML.
 
-$Revision$, $Date$, $Author$
+Revision: 49, Date: 2010-07-07 10:02:13 -0700 (Wed, 07 Jul 2010), Author: scott.herman@unconxio.us
 Replaced XMLUtils.forXML() with the entire EscapeChars class.
+
+* $Revision$, $Date$, $Author$
+- AttributeMap: Made lowercasing of keys more consistent. Added null checks.
+- XMLUtils.findChild(String name, Node node): Added this method to find child node by name.
+- XMLUtils.readXML(URI uri): Added to read documents by URI.
+- AttributeMap.getAttributes(Node node): Added to retrieve all attributes of a node.
