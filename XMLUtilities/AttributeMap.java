@@ -49,18 +49,25 @@ public class AttributeMap {
    } // AttributeMap constructor
 
 
+   public AttributeMap(Node node) {
+      this();
+      this._getAttributes(node);
+   } // AttributeMap constructor
+
    /**
     * Add a name value attribute pair to the map.
     * @param name   The name of the attribute to be added.
     * @param value  The value, as a String, of the added attribute.
-    * @return       The attribute map to whcih the argument name value pair was added.
+    * @return       The attribute map to which the argument name value pair was added.
     */
-   public AttributeMap add(String name, String value) {
+   private AttributeMap _add(String name, String value) {
       if (name == null) return this;
       this.attributeMap.put(name.toLowerCase(), value);
       return this;
-   } // add
+   } // _add
 
+
+   public AttributeMap add(String name, String value) { return _add(name, value); }
 
    /**
     * Retrieves the value of the argument named attribute.
@@ -84,7 +91,7 @@ public class AttributeMap {
          return "";
       } // if
 
-      StringBuffer buildBuffer = new StringBuffer();
+      StringBuilder buildBuffer = new StringBuilder();
       Set attributeSet = this.attributeMap.entrySet();
       Iterator attributeIterator = attributeSet.iterator();
       while(attributeIterator.hasNext()) {
@@ -104,6 +111,20 @@ public class AttributeMap {
    } // toString
 
 
+   private void _getAttributes(Node node) {
+      if (node == null) return;
+      if (!node.hasAttributes()) return;
+
+      NamedNodeMap attribs = node.getAttributes();
+      int attribCount = attribs.getLength();
+      for (int index = 0;index < attribCount; ++index) {
+         Node attribNode = attribs.item(index);
+         String attribName = attribNode.getNodeName().toLowerCase();
+         this._add(attribName, attribNode.getNodeValue());
+      } // for
+   } // _getAttributes
+
+
    public static AttributeMap getAttributes(Node node, String[] allowed) {
       if (node == null) return null;
       if (!node.hasAttributes()) return null;
@@ -116,7 +137,7 @@ public class AttributeMap {
          Node attribNode = attribs.item(index);
          String attribName = attribNode.getNodeName().toLowerCase();
          if (XMLUtils.equalsAny(attribName, allowed)) {
-            newMap.add(attribName, attribNode.getNodeValue());
+            newMap._add(attribName, attribNode.getNodeValue());
          } // if
       } // for
 
@@ -132,19 +153,8 @@ public class AttributeMap {
       if (node == null) return null;
       if (!node.hasAttributes()) return null;
 
-      AttributeMap newMap = new AttributeMap();
-
-      NamedNodeMap attribs = node.getAttributes();
-      int attribCount = attribs.getLength();
-      for (int index = 0;index < attribCount; ++index) {
-         Node attribNode = attribs.item(index);
-         String attribName = attribNode.getNodeName().toLowerCase();
-         newMap.add(attribName, attribNode.getNodeValue());
-      } // for
-
-      if (newMap.entryCount() > 0) {
-         return newMap;
-      } // if
+      AttributeMap newMap = new AttributeMap(node);
+      if (newMap.entryCount() > 0) return newMap;
 
       return null;
    } // getAttributes
