@@ -155,36 +155,26 @@ public class XMLUtils {
     * @return         The element as a XML String.
     */
    public static String elementString(String tagName, String content) {
-      if (tagName == null || tagName.isEmpty()) {
-         return null;
-      } // if
-
-      StringBuffer buildBuffer = new StringBuffer("<").append(tagName);
-      if (content == null || content.isEmpty()) {
-         return buildBuffer.append(" />").toString();
-      } // if
-
-      buildBuffer.append(">").append(content);
-      return buildBuffer.append("</").append(tagName).append(">").toString();
+      return elementString(tagName, null, content);
    } // elementString
 
 
    /**
     * Creates and returns a XML element as a String. 
     * @param tagName     The name of the element.
-    * @param attributes  A Attribute map of any atributes to be included in the
+    * @param attributes  A Attribute map of any attributes to be included in the
     *                    XML element.
     * @param content     The text content of the element, which may be,
     *                    or include XML.
     * @return            The XML element as a String.
     */
    public static String elementString(String tagName, AttributeMap attributes, String content) {
-      if (tagName == null || tagName.isEmpty()) {
-         return null;
-      } // if
+      if (tagName == null || tagName.isEmpty()) return null;
 
       StringBuffer buildBuffer = new StringBuffer("<").append(tagName);
-      buildBuffer.append(attributes.toString());
+
+      if (attributes != null && attributes.isNotEmpty()) buildBuffer.append(attributes.toString());
+
       if (content == null || content.isEmpty()) {
          return buildBuffer.append(" />").toString();
       } // if

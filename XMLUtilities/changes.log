@@ -46,5 +46,9 @@ Replaced XMLUtils.forXML() with the entire EscapeChars class.
 - XMLUtils.readXML(URI uri): Added to read documents by URI.
 - AttributeMap.getAttributes(Node node): Added to retrieve all attributes of a node.
 
+* Revision: 54, Date: 2010-08-04 22:07:39 -0700 (Wed, 04 Aug 2010), Author: scott.herman@unconxio.us
+- AttributeMap: Secure constructor for Node type argument.
+
 * $Revision$, $Date$, $Author$
-- Attribute: Secure constructor for Node type argument.
+- AttributeMap.isEmpty(), .isNotEmpty(): Added for convenience.
+- XMLUtils.elementString(): modified to handle null attribute map.

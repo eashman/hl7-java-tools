@@ -179,5 +179,13 @@ public class AttributeMap {
    public int entryCount() {
       return this.attributeMap.size();
    } // entryCount
+
+   boolean isNotEmpty() {
+      return entryCount() > 0;
+   } // isNotEmpty
+
+   boolean isEmpty() {
+      return entryCount() < 1;
+   } // isEmpty
    
 } // AttributeMap
