@@ -7,7 +7,7 @@
  *  HL7FileReader.java : A file reader class for HL7 message streams.
  *                       Reads HL7 (v.2.x) transaction messages from a file.
  *
- *  Copyright (C) 2009  Scott Herman
+ *  Copyright (c) 2009, 2010  Scott Herman
  *
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by

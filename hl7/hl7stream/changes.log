@@ -114,7 +114,11 @@ HL7StreamURI.java : Updated javadocs.
 - HL7SocketStream.java : Cleaning up stream closure.
 - HL7FileReader.java, HL7FileWriter.java : Cleaning up file closure and IOException handling.
 
-* $Revision$, $Date$, $Author$
+* Revision: 52, Date: 2010-07-26 14:54:04 -0700 (Mon, 26 Jul 2010), Author: scott.herman@unconxio.us
 - HL7StreamURI.getPortNo(), .getHostName(), .isValid() : Added/modified these methods
 public use and access.
 - HL7Server: Minor cleanup.
+
+* $Revision$, $Date$, $Author$
+- HL7MLLPStream: Copied functionality from HL7SocketStream class, to allow expansion of the
+HL7SocketStream class into secured socket i/o without disrupting mllp functionality.

@@ -6,7 +6,7 @@
  *
  *  HL7StreamBase.java : A default base implementation of the HL7Stream interface.
  *
- *  Copyright (C) 2009  Scott Herman
+ *  Copyright (c) 2009, 2010  Scott Herman
  *
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -115,7 +115,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return the resulting description as a string.
     */
    public String description() {
-      StringBuffer retn = new StringBuffer();
+      StringBuilder retn = new StringBuilder();
       retn.append(this.statusString());
       retn.append(":");
       if (this.mediaType == HL7Stream.FILE_TYPE) {

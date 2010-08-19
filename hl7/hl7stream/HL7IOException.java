@@ -6,7 +6,7 @@
  *
  *  HL7IOException.java : An exception class for HL7 message streams.
  *
- *  Copyright (C) 2009  Scott Herman
+ *  Copyright (c) 2009, 2010  Scott Herman
  *
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by

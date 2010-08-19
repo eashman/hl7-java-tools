@@ -6,7 +6,7 @@
  *
  *  HL7StreamBase.java : A default base implementation of the HL7Stream interface.
  *
- *  Copyright (C) 2009  Scott Herman
+ *  Copyright (c) 2009, 2010  Scott Herman
  *
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -56,7 +56,7 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
 
 
    /**
-    * Unversal parameterized constructor.
+    * Universal parameterized constructor.
     * @param uri
     */
    public HL7XMLFileWriter(URI uri) {
@@ -154,7 +154,7 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
          String msgTypeCode = msg.get("MSH.9.1");
          String msgEventCode = msg.get("MSH.9.2");
          String msgDateTime = msg.get("MSH.7");
-         StringBuffer msgIDBuffer = new StringBuffer();
+         StringBuilder msgIDBuffer = new StringBuilder();
 
          if (msgTypeCode != null && !msgTypeCode.isEmpty()) {
             msgIDBuffer.append(msgTypeCode);
