@@ -1,6 +1,27 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  $Id$
+ *
+ *  This code is derived from public domain sources.
+ *  Commercial use is allowed.
+ *  However, all rights remain permanently assigned to the public domain.
+ *
+ *  HL7Field.java : Provides access to HL7 message field level items.
+ *
+ *  Copyright (c) 2009, 2010  Scott Herman
+ *
+ *  This is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This code is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this code.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package us.conxio.hl7.hl7message;
@@ -25,11 +46,6 @@ public class HL7Field implements HL7Element {
       this();
       this._set(fieldStr, encoders);
    } // HL7Field
-
-   public void setLevel(int level) {
-      this.level.set(level);
-   } // setLevel
-
 
    public int getLevel() {
       return this.level.get();

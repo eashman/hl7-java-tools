@@ -4,9 +4,9 @@
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
  *
- *  HL7Message.java : A structured base class for parsed HL7 Messages, providing structured access
- *                    to message data content, and constituent items.
- *  Copyright (C) 2009  Scott Herman
+ *  HL7Time.java : A utility class of HL7 Time and Date related methods.
+ *
+ *  Copyright (c) 2009, 2010  Scott Herman
  *
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by

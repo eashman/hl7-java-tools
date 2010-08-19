@@ -6,8 +6,9 @@
  *  However, all rights remain permanently assigned to the public domain.
  *
  *  HL7Designator.java : An interpreted string class representing the lexical
-                         location of an item in an HL7 message.
- *  Copyright (C) 2009  Scott Herman
+ *                       location of an item in an HL7 message.
+ *
+ *  Copyright (c) 2009, 2010  Scott Herman
  *
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -27,12 +28,13 @@
 
 package us.conxio.hl7.hl7message;
 
-import us.conxio.hl7.hl7message.HL7ElementLevel;
-
 /**
  * An interpreted string class representing the lexical location of an item in an HL7 message. 
- * The normalized string takes the form:<br><b>
- * &nbsp;&nbsp;&nbsp; &lt;segID&gt;[index].&lt;sequence&gt;[index].&lt;component&gt;.&lt;subcomponent&gt; </b><br>
+ * The normalized string takes the form:<br><br><b>
+ * {@code
+ *       <segID>[index].<sequence>[index].<component>.<subcomponent>
+ * }
+ * </b><br><br>
  * Note that all items below the segment ID level are optional, however the dot pre-fixed specifiers above the
  * most subordinate level specified are required. Bracket enclosed specifiers are optional, with the default 
  * being all (??? I don't think so, although it should be.), in the case of multiples.
@@ -109,8 +111,8 @@ public class HL7Designator {
       this.segIndex = argLocation.segIndex;
       this.sequence = argLocation.sequence;
       this.subComponent = argLocation.subComponent;
-      this.segID = new String(argLocation.getSegID());
-      this.argString = new String(argLocation.getArgString());
+      this.segID = argLocation.getSegID();
+      this.argString = argLocation.getArgString();
       this.verbose = argLocation.verbose;
    } // HL7Designator constructor
    
@@ -247,10 +249,11 @@ public class HL7Designator {
    
    /**
     * Creates a representation of the context HL7Designator.
-    * @return Returns the represention of the context HL7Designator, as a String.
+    * @return Returns the representation of the context HL7Designator, as a String.
     */
+   @Override
    public String toString() {
-      StringBuffer tempStr = new StringBuffer();
+      StringBuilder tempStr = new StringBuilder();
       
       if (this.getSegID().length() < 3) {
          return(null);
@@ -261,11 +264,11 @@ public class HL7Designator {
       if (this.getSegIndex() == 0 && this.isVerbose() == false) {
          ;
       } else if (this.getSegIndex() >= 0) {
-         tempStr.append("[" + Integer.toString(this.getSegIndex()) + "]");
+         tempStr.append("[").append(Integer.toString(this.getSegIndex())).append("]");
       } else if (this.getSegIndex() == -1) {
          tempStr.append("[*]");
       } else {
-         this.setArgString(new String(tempStr.toString()));
+         this.setArgString(tempStr.toString());
          return(this.getArgString());
       } // if - else if - else
       
@@ -275,9 +278,9 @@ public class HL7Designator {
             ++seqIndex;
          } // if
          
-         tempStr.append("." + Integer.toString(seqIndex));
+         tempStr.append(".").append(Integer.toString(seqIndex));
       } else {
-         this.setArgString(new String(tempStr.toString()));
+         this.setArgString(tempStr.toString());
          return(this.getArgString());
       } // if - else 
       
@@ -286,38 +289,38 @@ public class HL7Designator {
       } else if (this.getRepetition() == -1) {
          tempStr.append("[*]");
       } else if (this.getRepetition() >= 0) {
-         tempStr.append("[" + Integer.toString(this.getRepetition()) + "]");
+         tempStr.append("[").append(Integer.toString(this.getRepetition())).append("]");
       } else {
-         this.setArgString(new String(tempStr.toString()));
+         this.setArgString(tempStr.toString());
          return(this.getArgString());
       } // if - else if - else
       
       if (this.getComponent() >= 0) {
-         tempStr.append("." + Integer.toString(this.getComponent() + 1));
+         tempStr.append(".").append(Integer.toString(this.getComponent() + 1));
       } else {
-         this.setArgString(new String(tempStr.toString()));
+         this.setArgString(tempStr.toString());
          return(this.getArgString());
       } // if - else
       
       if (this.getSubComponent() >= 0) {
-         tempStr.append("." + Integer.toString(this.getSubComponent() + 1));
+         tempStr.append(".").append(Integer.toString(this.getSubComponent() + 1));
       } else {
-         this.setArgString(new String(tempStr.toString()));
+         this.setArgString(tempStr.toString());
          return(this.getArgString());
       } // if - else
       
-      this.setArgString(new String(tempStr.toString()));
+      this.setArgString(tempStr.toString());
       return(this.getArgString());
       
    } // toString
    
    
    /**
-    * Creates a representation of the context HL7Designator which is suitable for use in XML.
-    * @return a representation of the context HL7Designator which is suitable for use in XML, as a String.
+    * @return a representation of the context HL7Designator which is suitable
+    * for use in XML, as a String.
     */
    public String toXMLString() {
-      StringBuffer tempStr = new StringBuffer();
+      StringBuilder tempStr = new StringBuilder();
       
       if (this.getSegID().length() < 3) {
          return(null);
@@ -326,30 +329,30 @@ public class HL7Designator {
       tempStr.append(this.getSegID());
       
       if (this.getSegIndex() < -1) {
-         return(this.argString = new String(tempStr.toString()));
+         return(this.argString = tempStr.toString());
       } // if - else if - else
       
       if (this.getSequence() >= 0) {
-         tempStr.append("." + Integer.toString(this.getSequence()));
+         tempStr.append(".").append(Integer.toString(this.getSequence()));
       } else {
-         return(this.argString = new String(tempStr.toString()));
+         return(this.argString = tempStr.toString());
       } // if - else 
       
       if (this.getRepetition() < -1) {
-         return(this.argString = new String(tempStr.toString()));
+         return(this.argString = tempStr.toString());
       } // if - else if - else
       
       if (this.getComponent() >= 0) {
-         tempStr.append("." + Integer.toString(this.getComponent() + 1));
+         tempStr.append(".").append(Integer.toString(this.getComponent() + 1));
       } else {
-         return(this.argString = new String(tempStr.toString()));
+         return(this.argString = tempStr.toString());
       } // if - else
       
       if (this.getSubComponent() >= 0) {
-         tempStr.append("." + Integer.toString(this.getSubComponent() + 1));
+         tempStr.append(".").append(Integer.toString(this.getSubComponent() + 1));
       } // if
       
-      this.setArgString(new String(tempStr.toString()));
+      this.setArgString(tempStr.toString());
       return(this.getArgString());
       
    } // toXMLString

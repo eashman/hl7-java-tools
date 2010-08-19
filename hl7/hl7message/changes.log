@@ -11,4 +11,7 @@ Corrected overridable method in constructor.
 - HL7Time: Made all methods and members static.
 
 * $Revision$, $Date$, $Author$
-- HL7Message.addSegment(), .addSegments(): Added.
+Updated documentation, licensing, and copyright on all classes.
+- HL7Message.addSegment(), .addSegments(), .segMap(): Added.
+- HL7Component.set():Modified to address security concerns.
+- HL7Designator:General clean up of bad practices.

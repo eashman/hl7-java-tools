@@ -1,11 +1,33 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  $Id$
+ *
+ *  This code is derived from public domain sources. Commercial use is allowed.
+ *  However, all rights remain permanently assigned to the public domain.
+ *
+ *  HL7Component.java : An class for HL7 message component level elements,
+ *  providing structured access to message data content, and constituent items.
+ *
+ *  Copyright (c) 2009, 2010  Scott Herman
+ *
+ *  This is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This code is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this code.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package us.conxio.hl7.hl7message;
 
 import java.util.ArrayList;
+import org.apache.commons.lang.StringUtils;
 /**
  *
  * @author scott
@@ -43,16 +65,19 @@ public class HL7Component implements HL7Element {
 
 
    private void _set(String msgText, HL7Encoding encoders) {
+      this.subComponents = new ArrayList<HL7SubComponent>();
+      this.touched = true;
+
+      if (StringUtils.isEmpty(msgText)) return;
+
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.SUBCOMPONENT);
       ArrayList<String>  subComps = encoders.hl7Split(msgText, nextLevel);
-      this.subComponents = new ArrayList<HL7SubComponent>();
+      
       for (String elementStr : subComps) {
          HL7SubComponent element = new HL7SubComponent();
          element.set(elementStr, encoders);
          this.subComponents.add(element);
       } // for
-
-      this.touched = true;
    } // set
 
 

@@ -7,7 +7,7 @@
  * 
  *  HL7Encoding.java : Provides access to HL7 message encoding characters.
  * 
- *  Copyright (C) 2009  Scott Herman
+ *  Copyright (c) 2009, 2010  Scott Herman
  * 
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -174,7 +174,7 @@ public class HL7Encoding {
     * @return
     */
    private String infoString(int[] chars) {
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       int len = chars.length;
       for (int index = 0; index < len; ++index) {
          sb.append(chars[index])
@@ -227,7 +227,7 @@ public class HL7Encoding {
 
 
    public String toXMLString() {
-      StringBuffer contentBuffer = new StringBuffer();
+      StringBuilder contentBuffer = new StringBuilder();
       contentBuffer.append(XMLUtils.elementString( "FieldSeparator",
                                                    "&#"
                                                  + Integer.toString(this.fieldSeparator)));
@@ -416,7 +416,7 @@ public class HL7Encoding {
 
 
    private String hl7Join(ArrayList<String> elements, HL7ElementLevel level, boolean escaped) {
-      StringBuffer retnBuffer = new StringBuffer();
+      StringBuilder retnBuffer = new StringBuilder();
       char separator = (char)this.separatorAt(level);
 
       boolean firstTime = true;

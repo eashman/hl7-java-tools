@@ -1,6 +1,27 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  $Id$
+ *
+ *  This code is derived from public domain sources.
+ *  Commercial use is allowed.
+ *  However, all rights remain permanently assigned to the public domain.
+ *
+ *  HL7Message.java : Provides access to parsed HL7 message content.
+ *
+ *  Copyright (c) 2009, 2010  Scott Herman
+ *
+ *  This is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This code is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this code.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package us.conxio.hl7.hl7message;
@@ -43,20 +64,8 @@ public class HL7Message {
       String[] segmentStrings = segs.split("\r");
 
       int segmentCount = segmentStrings.length;
-      if (segmentCount > 0) {
-         if (this.segmentMap == null) {
-            this.segmentMap = new HL7SegmentMap();
-         } // if
-
-         if (this.segments == null) {
-            this.segments = new ArrayList<HL7Segment>();
-         } // if
-      } // if
-
       for (int index = 0; index < segmentCount; ++index) {
-         HL7Segment segment = new HL7Segment(segmentStrings[index], this.encoders);
-         this.segments.add(segment);
-         this.segmentMap.put(segment);
+         this.addSegment(new HL7Segment(segmentStrings[index], this.encoders));
       } // for
    } // addSegments
 
@@ -70,6 +79,15 @@ public class HL7Message {
       this.segments.add(seg);
       this.segmentMap.put(seg);
    } // addSegment
+
+
+   public void addSegment(String segStr) {
+      if (segStr == null) return;
+      int endIndex = segStr.indexOf("\r");
+      if (endIndex > 0) segStr = segStr.substring(0, endIndex);
+      this.addSegment(new HL7Segment(segStr, this.encoders));
+   } // addSegment
+
 
    private void _parse(String msg) {
       this.encoders = this.extractEncoding(msg);
@@ -211,7 +229,7 @@ public class HL7Message {
    } // hasSegment
 
 
-   int countSegment(String segID) {
+   public int countSegment(String segID) {
       if (segID == null || segID.length() < 3) {
          return 0;
       } // if
@@ -411,12 +429,12 @@ public class HL7Message {
    } // idString
 
    
-   void remove(String location) {
+   public void remove(String location) {
       this.set(location, "");
    } // remove
 
 
-   void swap(String location1, String location2) {
+   public void swap(String location1, String location2) {
       String str1 = this.get(location1);
       String str2 = this.get(location2);
       this.set(location1, str2);
@@ -443,6 +461,8 @@ public class HL7Message {
       for (HL7Segment seg : segments) this.addSegment(seg);
    } // addSegments
 
-
+   public HL7SegmentMap segMap() {
+      return this.segmentMap;
+   } // segMap
 
 } // HL7Message
