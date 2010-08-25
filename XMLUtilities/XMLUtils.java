@@ -286,7 +286,7 @@ public class XMLUtils {
       if (endIndex >= 0) {
          int checkIndex = remainder.indexOf("<");
          if (checkIndex < 0) {
-            return argStr.substring(0, endIndex + 2);
+            return argStr.substring(0, endIndex + offset + 2);
          }  // if
       } // if
 
