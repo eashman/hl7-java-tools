@@ -334,4 +334,9 @@ public class HL7StreamURI {
    } // isValid
 
 
+   public URI uri() {
+      return uri;
+   } // uri
+
+
 } // HL7StreamURI
