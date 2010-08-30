@@ -1,2 +1,6 @@
-* $Revision$, $Date$, $Author$
+* Revision: 58, Date: 2010-08-19 16:00:26 -0700 (Thu, 19 Aug 2010), Author: scott.herman@unconxio.us
 Created this package for hl7-2.0.
+
+* $Revision$, $Date$, $Author$
+- HL7Route.addDeliveryURI():Added to allow addition of URIs after construction.
+- HL7ServiceElement.getElements():Made public.

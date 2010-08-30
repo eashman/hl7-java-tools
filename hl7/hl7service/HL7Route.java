@@ -35,8 +35,10 @@ package us.conxio.hl7.hl7service;
 
 
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.net.URI;
+import org.apache.commons.lang.StringUtils;
 
 import org.w3c.dom.Node;
 
@@ -80,7 +82,7 @@ public class HL7Route extends HL7ServiceElement {
     * as a series of XML HL7Transform, and i/o specifications. 
     * Note that if the URI contains more that one HL7Route specification, only the first is returned.
     */
-   public HL7Route(URI uri) throws Exception {
+   public HL7Route(URI uri) {
       this.initialize("HL7Route", uri);
       initializeHL7Route(this.root);
    } // HL7Route (Constructor)
@@ -89,13 +91,13 @@ public class HL7Route extends HL7ServiceElement {
     * Creates a HL7Route object from the XML content of the argument document node.
     * @param node A HL7Route node of a DOM document.
     */
-   public HL7Route(Node node) throws Exception {
+   public HL7Route(Node node)  {
       this.initialize("HL7Route", node);
       initializeHL7Route(this.root);
    } // HL7Route
    
    
-   private void initializeHL7Route(Node node) throws Exception {
+   private void initializeHL7Route(Node node) {
       this.transforms = this.readHL7Transforms();
       this.hl7SourceURI = this.extractURI("HL7Source");
       this.hl7DeliveryURIs = this.extractURIs("HL7Delivery");
@@ -113,7 +115,7 @@ public class HL7Route extends HL7ServiceElement {
    } // setHL7SourceURI
 
 
-   private ArrayList<HL7Transform> readHL7Transforms() throws Exception {
+   private ArrayList<HL7Transform> readHL7Transforms() {
       ArrayList<Node> xForms = this.getElements("HL7Transform");
       if (xForms == null) return(null);
       ArrayList<HL7Transform> retnXForms = new ArrayList<HL7Transform>();
@@ -122,10 +124,10 @@ public class HL7Route extends HL7ServiceElement {
       return retnXForms;            
    } // readHL7Transforms
    
-   private ArrayList<URI> extractURIs(String uriTagName) throws Exception {
-      ArrayList<Node> uris = this.getElements(uriTagName);
+   private ArrayList<URI> extractURIs(String uriTagName) {
+      ArrayList<Node> uriNodes = this.getElements(uriTagName);
 
-      if (uris == null || uris.size() < 1) {
+      if (uriNodes == null || uriNodes.size() < 1) {
          logger.debug( "extractURIs("
                       +  uriTagName
                       +  "): None found.");
@@ -134,15 +136,16 @@ public class HL7Route extends HL7ServiceElement {
 
       ArrayList<URI> uriList = new ArrayList<URI>();
 
-      for (Node node : uris) {
+      for (Node node : uriNodes) {
          String uriStr = this.getAttribute(node, "uri");
+         if (StringUtils.isEmpty(uriStr)) uriStr = this.getAttribute(node, "URI");
 
-         if (uriStr == null) {
-            uriStr = this.getAttribute(node, "URI");
-         } // if
-
-         if (uriStr != null) {
-            uriList.add(new URI(uriStr) );
+         if (StringUtils.isNotEmpty(uriStr)) {
+            try {
+               uriList.add(new URI(uriStr));
+            } catch (URISyntaxException ex) {
+               logger.error("URI String:" + uriStr, ex);
+            } // try - catch
          } // if
       } // for
       
@@ -150,15 +153,23 @@ public class HL7Route extends HL7ServiceElement {
    } // extractURIs
    
 
-   private URI extractURI(String uriTagName) throws Exception {
+   private URI extractURI(String uriTagName)  {
       Node node = this.getElement(uriTagName);
       String uriStr = this.getAttribute(node, "uri");
       if (uriStr == null) {
          uriStr = this.getAttribute(node, "URI");
       } // if
 
-      if (uriStr == null) return null;
-      return new URI(uriStr);
+      if (StringUtils.isEmpty(uriStr)) return null;
+
+      URI uri = null;
+      try {
+         uri = new URI(uriStr);
+      } catch (URISyntaxException ex) {
+         logger.error("URI String:" + uriStr, ex);
+      } // try - catch
+
+      return uri;
    } // extractURI
 
    
@@ -183,7 +194,9 @@ public class HL7Route extends HL7ServiceElement {
    public HL7Message render(HL7Message msg) throws HL7IOException {
       HL7Message workMsg = new HL7Message(msg.toHL7String());
 
-      for (HL7Transform xForm : transforms) if (xForm.isQualified(msg)) xForm.render(workMsg);
+      for (HL7Transform xForm : transforms) {
+         if (xForm.isQualified(workMsg)) workMsg = xForm.render(workMsg);
+      } // for
 
       return workMsg;
    } // render
@@ -317,28 +330,33 @@ public class HL7Route extends HL7ServiceElement {
       for (HL7Transform xForm : transforms) xForm.dump();
    } // dump
 
-   private boolean hasOpenInputStream() {
+   public boolean hasOpenInputStream() {
       return hl7StreamIn != null && hl7StreamIn.isOpen();
    } // hasOpenInputStream
 
-   private boolean hasDeliveryURIs() {
-      return this.hl7DeliveryURIs != null && !this.hl7DeliveryURIs.isEmpty();
+   public boolean hasDeliveryURIs() {
+      return hl7DeliveryURIs != null && !hl7DeliveryURIs.isEmpty();
    } // hasDeliveryURIs
 
-   private boolean hasOutputStreams() {
+   public boolean hasOutputStreams() {
       return this.hl7StreamsOut != null && !this.hl7StreamsOut.isEmpty();
    } // hasOutputStreams
 
-   private boolean isOpen(HL7Stream stream) {
+   public boolean isOpen(HL7Stream stream) {
       return stream != null && stream.isOpen();
    } // isOpen
 
-   private boolean isClosedInput() {
+   public boolean isClosedInput() {
       return this.hl7StreamIn != null && this.hl7StreamIn.isClosed();
    } // isClosedInput
 
-   private boolean isNotClosed(HL7Stream hl7Stream) {
+   public boolean isNotClosed(HL7Stream hl7Stream) {
       return hl7Stream != null && !hl7Stream.isClosed();
    } // isNotClosed
+
+   public void addDeliveryURI(HL7StreamURI deliveryURI) {
+      if (hl7DeliveryURIs == null) hl7DeliveryURIs = new ArrayList<URI>();
+      hl7DeliveryURIs.add(deliveryURI.uri());
+   } // addDeliveryURI
 
 } // class HL7Route

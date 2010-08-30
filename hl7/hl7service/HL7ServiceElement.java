@@ -222,7 +222,7 @@ public class HL7ServiceElement {
     * of type Node
     * @throws java.lang.Exception
     */
-   public ArrayList<Node> getElements(String elementName) throws Exception {
+   public ArrayList<Node> getElements(String elementName) {
       ArrayList<Node> nodes = new ArrayList<Node>();
       
       if (this.root.hasChildNodes()) {
