@@ -34,8 +34,12 @@ package us.conxio.hl7.hl7service;
  */
 
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -82,7 +86,11 @@ public class HL7Transform extends HL7ServiceElement {
     * <li>OrderControl - ORC.1
     */
    public HL7Transform(Node xForm) {
-      initializeHL7Transform(xForm);
+      try {
+         initializeHL7Transform(xForm);
+      } catch (IOException ex) {
+         throw new IllegalArgumentException(null, ex);
+      } // try - catch
    } // HL7Transform
 
 
@@ -95,13 +103,13 @@ public class HL7Transform extends HL7ServiceElement {
    } // HL7Transform
 
 
-   public HL7Transform(String xmlString) {
+   public HL7Transform(String xmlString) throws Exception {
       this.initialize("HL7Transform", xmlString);
       initializeHL7Transform(this.root);
    } // HL7Transform
 
    
-   private void initializeHL7Transform(Node xForm) {
+   private void initializeHL7Transform(Node xForm) throws IOException {
       this.root = xForm;
       if (xForm.hasAttributes() ) parseAttributes(xForm);
       if (xForm.hasChildNodes())  parseChildElements(xForm);
@@ -167,7 +175,7 @@ public class HL7Transform extends HL7ServiceElement {
    } // addOperationForAttribute
 
 
-   private void parseChildElements(Node xForm) {
+   private void parseChildElements(Node xForm) throws IOException {
       NodeList kids = xForm.getChildNodes();
       int numKids = kids.getLength();
       for (int index = 0; index < numKids; ++index) {

@@ -62,7 +62,7 @@ public class HL7ServiceElement {
    int                     verbosity = 0;
 
 
-   void initialize(String name, String xmlString) throws IllegalArgumentException {
+   void initialize(String name, String xmlString) {
       Node node = XMLUtils.readXML(xmlString);
       if (node.getNodeName().equalsIgnoreCase(name)) {
          this.initialize(name, node);
@@ -90,7 +90,7 @@ public class HL7ServiceElement {
     * @param uri The URI of the source document.
     * @throws java.lang.Exception
     */
-   void initialize(String name, URI uri) throws IllegalArgumentException {
+   void initialize(String name, URI uri) {
       this.documentURI = uri;
       Node node = XMLUtils.readXML(uri);
       if (node.getNodeName().equalsIgnoreCase(name)) {

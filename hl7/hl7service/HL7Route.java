@@ -64,13 +64,13 @@ public class HL7Route extends HL7ServiceElement {
    private static Logger            logger = HL7ServiceElement.getLogger();
 
 
-    public HL7Route(String xmlStr) throws Exception {
+    public HL7Route(String xmlStr)  {
       this.initialize("HL7Route", xmlStr);
       initializeHL7Route(this.root);
    } // HL7Route (Constructor)
 
 
-   public HL7Route(InputStream inStream) throws Exception {
+   public HL7Route(InputStream inStream) {
       this.initialize("HL7Route", inStream);
       initializeHL7Route(this.root);
    } // HL7Route (Constructor)
@@ -98,10 +98,10 @@ public class HL7Route extends HL7ServiceElement {
    
    
    private void initializeHL7Route(Node node) {
-      this.transforms = this.readHL7Transforms();
-      this.hl7SourceURI = this.extractURI("HL7Source");
-      this.hl7DeliveryURIs = this.extractURIs("HL7Delivery");
-      this.verbosity = 11;
+      transforms = readHL7Transforms();
+      hl7SourceURI = extractURI("HL7Source");
+      hl7DeliveryURIs = extractURIs("HL7Delivery");
+      verbosity = 11;
    } // initializeHL7Route
    
    

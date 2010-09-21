@@ -1,6 +1,10 @@
 * Revision: 58, Date: 2010-08-19 16:00:26 -0700 (Thu, 19 Aug 2010), Author: scott.herman@unconxio.us
 Created this package for hl7-2.0.
 
-* $Revision$, $Date$, $Author$
+* Revision: 61, Date: 2010-08-30 16:49:22 -0700 (Mon, 30 Aug 2010), Author: scott.herman@unconxio.us
 - HL7Route.addDeliveryURI():Added to allow addition of URIs after construction.
 - HL7ServiceElement.getElements():Made public.
+
+* $Revision$, $Date$, $Author$
+- HL7MessageTransformOperation.translate():Added this function to facilitate table driven translation of message elements.
+- TranslationTable, TranslationTableDirectory:Added to support HL7MessageTransformOperation.translate().

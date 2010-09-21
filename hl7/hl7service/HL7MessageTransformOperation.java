@@ -28,13 +28,24 @@ package us.conxio.hl7.hl7service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
+
 import org.apache.log4j.Logger;
-import org.w3c.dom.NamedNodeMap;
+
 import org.w3c.dom.Node;
+
+import us.conxio.XMLUtilities.AttributeMap;
 import us.conxio.hl7.hl7message.HL7Designator;
 import us.conxio.hl7.hl7message.HL7Message;
 
@@ -71,22 +82,30 @@ class Operand {
 
 
 /**
- * A class for the atomic operations of HL7 transforms. Each operation is specified by a separate xml entity,
- * <ul>and contains <li>a name. (String)<li>a resultant HL7 item designation. (String)<li>a list of operands.</ul>
+ * A class for the atomic operations of HL7 transforms.
+ * Each operation is specified by a separate xml entity,
+ * <ul>and contains
+ * <li>a name. (String)
+ * <li>a resultant HL7 item designation. (String)
+ * <li>a list of operands.</ul>
  * @author scott
  */
 public class HL7MessageTransformOperation {
-   private String          opName;
-   private String          resultDesignator;
-   private Method          method = null;
-   private Pattern         opPattern;
-   ArrayList<Operand>      operands = null;
-   private static Logger   logger = Logger.getLogger("us.conxio.hl7");
+   private String             opName;
+   private String             resultDesignator;
+   private Method             method = null;
+   private Pattern            opPattern;
+   private TranslationTable   xlateTable = null;
+   private URI                resourceURI = null;
+
+   ArrayList<Operand>         operands = null;
+   private static Logger      logger = Logger.getLogger("us.conxio.hl7");
 
 
    public static final String   OPERAND_TYPE_STRING = "string";
    public static final String   OPERAND_TYPE_SEARCH = "search";
    public static final String   OPERAND_TYPE_DESIGNATOR = "designator";
+   public static final String   OPERAND_TYPE_RESOURCE = "resource-uri";
 
    public static final String   OPERATION_NAME_QUALIFY = "qualify";
    public static final String   OPERATION_NAME_EXCLUDE = "exclude";
@@ -109,22 +128,30 @@ public class HL7MessageTransformOperation {
    } // HL7MessageTransformOperation
 
 
-   public HL7MessageTransformOperation(Node node) {
-     this.opName = node.getNodeName().toLowerCase();
+   /**
+    * Constructs a HL7MessageTransformOperation for the argument xml Node.
+    * @param node The node from which to construct the object.
+    * @throws IOException If the file is not found, or is not properly formatted.
+    */
+   public HL7MessageTransformOperation(Node node) throws IOException {
+     opName = node.getNodeName().toLowerCase();
      if (!haveThisMethod()) {
         logger.error("Not a valid method:" + opName);
         return;
      } // if
 
       if (node.hasAttributes()) {
-         Node tmpNode;
-         NamedNodeMap map = node.getAttributes();
-         if ( (tmpNode = map.getNamedItem(OPERAND_TYPE_DESIGNATOR)) != null) {
-            this.resultDesignator = tmpNode.getNodeValue();
+         AttributeMap attributes = new AttributeMap(node);
+         if (attributes.hasKey(OPERAND_TYPE_DESIGNATOR)) {
+            resultDesignator = attributes.get(OPERAND_TYPE_DESIGNATOR);
          } // if
 
-         if ( (tmpNode = map.getNamedItem(OPERAND_TYPE_SEARCH)) != null) {
-            this._addOperand(new Operand(OPERAND_TYPE_SEARCH, tmpNode.getNodeValue() ) );
+         if (attributes.hasKey(OPERAND_TYPE_SEARCH)) {
+            _addOperand(new Operand(OPERAND_TYPE_SEARCH, attributes.get(OPERAND_TYPE_SEARCH)));
+         } // if
+         
+         if (attributes.hasKey(OPERAND_TYPE_RESOURCE)) {
+            initializeMap(attributes.get(OPERAND_TYPE_RESOURCE));
          } // if
       } // if
 
@@ -147,6 +174,12 @@ public class HL7MessageTransformOperation {
 
    void addOperand(Operand operand) { _addOperand(operand); }
 
+   /**
+    * Add an operand to the context operation.
+    * @param typeStr
+    * @param valueStr
+    * @return
+    */
    public HL7MessageTransformOperation addOperand(String typeStr, String valueStr) {
       this.addOperand(new Operand(typeStr, valueStr));
       return this;
@@ -162,16 +195,35 @@ public class HL7MessageTransformOperation {
    } // dump
 
 
+   private void initializeMap(String uriStr) throws FileNotFoundException, IOException {
+      try {
+         resourceURI = new URI(uriStr);
+      } catch (URISyntaxException ex) {
+         throw new IllegalArgumentException(ex);
+      } // try - catch
+
+      if (!resourceURI.getScheme().equalsIgnoreCase("file")) {
+         throw new IllegalArgumentException("URI schemes other than file/// not handled.");
+      } // if
+
+      xlateTable = this.loadTranslationTable();
+   } // initializeMap
+
+
+   private TranslationTable loadTranslationTable() throws FileNotFoundException, IOException {
+      return TranslationTable.make(this.resourceURI);
+   } // loadTranslationTable
+
 // Operation handlers:
 
    boolean qualify(HL7Message msg) {
-      if (!hasPattern() && hasStringOperandAt(0)) opPattern = Pattern.compile(StringOperandValueAt(0));
+      if (!hasPattern() && hasStringOperandAt(0)) opPattern = Pattern.compile(stringOperandValueAt(0));
       return this.messageMatches(msg);
    } // qualify
 
 
    boolean exclude(HL7Message msg) {
-      if (!hasPattern() && hasStringOperandAt(0)) opPattern = Pattern.compile(StringOperandValueAt(0));
+      if (!hasPattern() && hasStringOperandAt(0)) opPattern = Pattern.compile(stringOperandValueAt(0));
       return this.messageMatches(msg);
    } // exclude
 
@@ -185,7 +237,7 @@ public class HL7MessageTransformOperation {
 
    boolean assign(HL7Message msg) {
       if (hasDesignator() && hasStringOperandAt(0)) {
-         msg.set(resultDesignator, StringOperandValueAt(0));
+         msg.set(resultDesignator, stringOperandValueAt(0));
          return true;
       } // if
 
@@ -195,7 +247,7 @@ public class HL7MessageTransformOperation {
 
    boolean newsegment(HL7Message msg) {
       String segStr = null;
-      String arg = StringOperandValueAt(0);
+      String arg = stringOperandValueAt(0);
       if (hasDesignator() && resultDesignator.length() > 2) {
          segStr = this.resultDesignator.substring(0, 3);
       } // if
@@ -234,7 +286,7 @@ public class HL7MessageTransformOperation {
 
    boolean appoint(HL7Message msg) {    
       if (hasDesignator() && hasStringOperandAt(0)) {
-         msg.set(normalizeDesignator(resultDesignator, msg), StringOperandValueAt(0));
+         msg.set(normalizeDesignator(resultDesignator, msg), stringOperandValueAt(0));
          return true;
       } // if
 
@@ -244,7 +296,7 @@ public class HL7MessageTransformOperation {
 
    boolean swap(HL7Message msg) {
       if (!hasStringOperandAt(0) || !hasStringOperandAt(1)) return false;
-      msg.swap(StringOperandValueAt(0), StringOperandValueAt(1));
+      msg.swap(stringOperandValueAt(0), stringOperandValueAt(1));
       return(true);
    } // swap
 
@@ -324,6 +376,23 @@ public class HL7MessageTransformOperation {
       return(true);
    } // remove
 
+
+   boolean translate(HL7Message msg) throws FileNotFoundException, IOException {
+      if (!hasDesignator()) return false;
+
+      String subject = null;
+      if (hasStringOperandAt(0)) subject = stringOperandValueAt(0);
+      if (StringUtils.isEmpty(subject)) subject = msg.get(resultDesignator);
+      if (StringUtils.isEmpty(subject)) return false;
+
+      String replacement = null;
+      if (!hasTranslationTable()) xlateTable = this.loadTranslationTable();
+      if (!hasTranslationTable()) return false;
+      
+      replacement = this.xlateTable.get(subject);
+      msg.set(resultDesignator, replacement);
+      return true;
+   } // translate
 
    // operation "aliases"
    
@@ -409,9 +478,9 @@ public class HL7MessageTransformOperation {
       return this.hasTypeOperandAt(OPERAND_TYPE_STRING, index);
    } // hasStringOperandAt
 
-   private String StringOperandValueAt(int index) {
+   private String stringOperandValueAt(int index) {
       return (this.hasStringOperandAt(index)) ? this.operands.get(index).value : null;
-   } // StringOperandValueAt
+   } // stringOperandValueAt
 
    private boolean hasPattern() {
       return this.opPattern != null;
@@ -459,5 +528,9 @@ public class HL7MessageTransformOperation {
          return   opName.equalsIgnoreCase(OPERATION_NAME_QUALIFY)
          ||       opName.equalsIgnoreCase(OPERATION_NAME_EXCLUDE);
    } // isQualificationOperation
+
+   private boolean hasTranslationTable() {
+      return xlateTable != null && !xlateTable.isEmpty();
+   } // hasTranslationTable
 
 } // HL7MessageTransformOperation
