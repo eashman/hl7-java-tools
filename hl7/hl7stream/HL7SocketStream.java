@@ -335,7 +335,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
                                     .append( msgCtlID)
                                     .append( "]:").toString();
       HL7SocketStream.logger.trace(traceHeader);
-      HL7SocketStream.logger.trace(msg.toString());
+      HL7SocketStream.logger.trace(msg.toHL7String());
 
       HL7Message ack = msg.Acknowledgment(true, "ok", null, null);
       traceHeader = new StringBuffer( "read(): Sending acknowledgment [")
