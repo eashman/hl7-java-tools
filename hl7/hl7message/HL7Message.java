@@ -113,7 +113,14 @@ public class HL7Message {
 
 
    private HL7Segment pickSegment(String segID, int segIndex, boolean create) {
-      ArrayList<HL7Segment> segs = this.segmentMap.get(segID);
+      ArrayList<HL7Segment> segs = segmentMap.get(segID);
+
+      if (create && segs == null) {
+         HL7Segment seg = new HL7Segment(segID, encoders);
+         this.addSegment(seg);
+         return seg;
+      } // if
+
       int index;
       if (segIndex != HL7Designator.UNSPECIFIED) {
          index = segIndex;

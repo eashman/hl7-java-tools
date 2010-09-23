@@ -10,8 +10,11 @@ Corrected overridable method in constructor.
 - HL7Segment.addField(int): Added.
 - HL7Time: Made all methods and members static.
 
-* $Revision$, $Date$, $Author$
+* Revision: 57, Date: 2010-08-19 15:59:35 -0700 (Thu, 19 Aug 2010), Author: scott.herman@unconxio.us
 Updated documentation, licensing, and copyright on all classes.
 - HL7Message.addSegment(), .addSegments(), .segMap(): Added.
 - HL7Component.set():Modified to address security concerns.
 - HL7Designator:General clean up of bad practices.
+
+* $Revision$, $Date$, $Author$
+- HL7Message.pickSegment():Corrected to add missing segment when create option is specified.
