@@ -345,7 +345,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
                               .append( "]:").toString();
       this.writeMsg(ack.toString());
       HL7SocketStream.logger.trace(traceHeader);
-      HL7SocketStream.logger.trace(ack.toString());
+      HL7SocketStream.logger.trace(ack.toHL7String());
 
       return(msg);
    } // read
@@ -401,6 +401,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
          ;
 
       // * If sent msg has no encoding characters then the ack will have no encoders either.
+      logger.trace("read:" + hl7MsgStr);
       HL7Message reply = new HL7Message(hl7MsgStr);
       String ackCode = reply.get("MSA.1");
       String replyCtlID = reply.get("MSA.2");

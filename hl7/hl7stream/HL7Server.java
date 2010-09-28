@@ -113,8 +113,8 @@ class HL7ServiceWorker  implements Runnable {
                ++this.msgCount;
             } // if
           } // while
-      } catch (IOException ioEx) {
-          logger.error(this.logHeader() + "IOException: ", ioEx);
+      } catch (Exception ex) {
+          logger.error(this.logHeader() + "Exception: ", ex);
       } // try - catch
    } // run
 

@@ -129,3 +129,7 @@ HL7SocketStream class into secured socket i/o without disrupting mllp functional
 * $Revision$, $Date$, $Author$
 - HL7SocketStream.read():Corrected log trace message to display HL7Message object using toHL7String()
 instead of toString(), which only gave an object instance reference.
+
+* $Revision$, $Date$, $Author$
+- HL7SocketStream.read(), .write():More corrections, like last change.
+HL7Server/HL7ServiceWorker.run():Catch and log all exceptions.
