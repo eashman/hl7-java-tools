@@ -343,7 +343,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
                               .append("].[")
                               .append(ack.get("MSH.10"))
                               .append( "]:").toString();
-      this.writeMsg(ack.toString());
+      this.writeMsg(ack.toHL7String());
       HL7SocketStream.logger.trace(traceHeader);
       HL7SocketStream.logger.trace(ack.toHL7String());
 
