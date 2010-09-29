@@ -108,10 +108,16 @@ public class HL7Message {
 
 
    public String toHL7String() {
-      return this.toHL7String(this.encoders);
+      return this.toHL7String(encoders);
    } // toHL7String
 
 
+   @Override
+   public String toString() {
+      return toHL7String();
+   } // toString
+
+   
    private HL7Segment pickSegment(String segID, int segIndex, boolean create) {
       ArrayList<HL7Segment> segs = segmentMap.get(segID);
 

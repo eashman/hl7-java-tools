@@ -16,5 +16,8 @@ Updated documentation, licensing, and copyright on all classes.
 - HL7Component.set():Modified to address security concerns.
 - HL7Designator:General clean up of bad practices.
 
-* $Revision$, $Date$, $Author$
+* Revision: 64, Date: 2010-09-23 15:32:18 -0700 (Thu, 23 Sep 2010), Author: scott.herman@unconxio.us
 - HL7Message.pickSegment():Corrected to add missing segment when create option is specified.
+
+* $Revision$, $Date$, $Author$
+- HL7Message.toString():Provided override for compatability with HL7-1.5.
