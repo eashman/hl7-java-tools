@@ -188,7 +188,7 @@ public class HL7Message {
       return this.pick( designator.getSegID(),
                         designator.getSegIndex(),
                         designator.getSequence(),
-                        designator.getRepetition(),
+                        designator.getRepetitionIndex(),
                         designator.getComponent(),
                         designator.getSubComponent(),
                         false);
@@ -199,7 +199,7 @@ public class HL7Message {
       return this.pick( designator.getSegID(),
                         designator.getSegIndex(),
                         designator.getSequence(),
-                        designator.getRepetition(),
+                        designator.getRepetitionIndex(),
                         designator.getComponent(),
                         designator.getSubComponent(),
                         create);

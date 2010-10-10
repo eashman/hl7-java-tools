@@ -25,13 +25,14 @@
 
 package us.conxio.hl7.hl7message;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
  *
  * @author scott
  */
-public class HL7ElementLevel {
+public class HL7ElementLevel implements Iterator {
    public static final int SEGMENT      = 1,
                            FIELD        = 2,
                            REPETITION   = 3,
@@ -40,7 +41,7 @@ public class HL7ElementLevel {
    private int value;
 
    public HL7ElementLevel(int level) {
-      this._set(level);
+      _set(level);
    } // HL7ElementLevel
    
    private void _set(int level) {
@@ -54,23 +55,22 @@ public class HL7ElementLevel {
    public void set(int level) { this._set(level); }
 
    public int get() {
-      return this.value;
+      return value;
    } // get
 
    public boolean hasNext() {
-      if (this.value > COMPONENT) {
-         return false;
-      } // if
-
+      if (value > COMPONENT) return false;
       return true;
    } // hasNext
 
    public HL7ElementLevel next() throws NoSuchElementException {
-      if (this.hasNext()) {
-         return new HL7ElementLevel(this.value + 1);
-      } // if
-
+      if (hasNext()) return new HL7ElementLevel(value + 1);
       throw new NoSuchElementException();
    } // next
+
+   public void remove() {
+      throw new UnsupportedOperationException("Not supported.");
+   } // remove
+
 } // HL7ElementLevel
 

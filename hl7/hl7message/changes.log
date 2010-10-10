@@ -21,3 +21,8 @@ Updated documentation, licensing, and copyright on all classes.
 
 * $Revision$, $Date$, $Author$
 - HL7Message.toString():Provided override for compatability with HL7-1.5.
+
+* $Revision$, $Date$, $Author$
+- HL7Designator:Modified to use colon (':') instead of brackets to indicate segment index
+and repetition index.
+- HL7ElementLevel:Modified to implement Iterator.
