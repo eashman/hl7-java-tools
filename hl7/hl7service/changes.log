@@ -8,3 +8,6 @@ Created this package for hl7-2.0.
 * $Revision$, $Date$, $Author$
 - HL7MessageTransformOperation.translate():Added this function to facilitate table driven translation of message elements.
 - TranslationTable, TranslationTableDirectory:Added to support HL7MessageTransformOperation.translate().
+
+* $Revision$, $Date$, $Author$
+- HL7Transform:removed unused imports.
