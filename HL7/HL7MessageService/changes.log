@@ -138,6 +138,9 @@ HL7SpecificationElement.initialization.
 - HL7Transform.java : Added "freshen " operation.
                       Trapped null pointers in assign() and appoint().
                       Updated javadocs.
-* $Revision$
+* Revision: 29
 20100408:
 - HL7Route.java : Fixed isOpen() to check the stream more thoroughly.
+
+* $Revision$
+- HL7Transform : Added freshen(), and minor housekeeping, just prior to deprecation.

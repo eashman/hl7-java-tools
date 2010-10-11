@@ -54,13 +54,13 @@ class Operand {
    public Operand() {}
    
    public Operand(String type, String value) {
-      this.typeStr = new String(type);
-      this.value = new String(value);
+      this.typeStr = type;
+      this.value = value;
    } // Operand
    
    
    String dumpString() {
-      return new String("Operand:" + this.typeStr + ", " + this.value);
+      return "Operand:" + this.typeStr + ", " + this.value;
    } // Dump
 } // Operand
 
@@ -83,8 +83,8 @@ class HL7Operation {
    public HL7Operation() { }
    
    public HL7Operation(String name, String designator) {
-      this.opName = new String(name);
-      this.resultDesignator = new String(designator);
+      this.opName = name;
+      this.resultDesignator = designator;
       HL7Operation.logger = Logger.getLogger(this.getClass());
       HL7Operation.logger.setLevel(Level.TRACE);
    } // HL7Operation
