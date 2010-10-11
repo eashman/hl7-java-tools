@@ -39,7 +39,7 @@ import java.net.URISyntaxException;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7StreamURI {
-   URI   uri;
+   private URI   uri;
 
 
    /**
@@ -254,7 +254,7 @@ public class HL7StreamURI {
     * @return 0 or the specified port number for the context server URI.
     * @return the port number specified in the context URI.
     */
-   public int uriPortNo() {
+   public int getPortNo() {
       int portNo = 0;
       if ( (portNo = this.uri.getPort()) < 0) {
          String schemeStr = uri.getScheme();
@@ -264,11 +264,11 @@ public class HL7StreamURI {
       } // if
 
       return portNo;
-   } // uriPortNo
+   } // getPortNo
 
 
    /**
-    * Creates and returns an apppropriate stream reader based on the context URI.
+    * Creates and returns an appropriate stream reader based on the context URI.
     * @return the reader as a HL7Stream implementation.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
@@ -276,7 +276,7 @@ public class HL7StreamURI {
       if (this.isFileURI() && !this.isFileWriterURI()) {
          return new HL7FileReader(this.fileURIOf());
       } else if (this.isServerURI()) {
-         return new HL7Server(this.uriPortNo(), this.uriServerPoolSize());
+         return new HL7Server(this.getPortNo(), this.uriServerPoolSize());
       } // if - else if
 
       throw new HL7IOException(  "HL7StreamURI.getHL7StreamReader():Uninterpreable URI:"
@@ -294,7 +294,7 @@ public class HL7StreamURI {
       if (this.isFileWriterURI() || this.isFileAppenderURI()) {
          return new HL7FileWriter(this.uri);
       } else if (this.isSocketURI()) {
-         return new HL7SocketStream(this.uri.getHost(), this.uriPortNo());
+         return new HL7SocketStream(this.getHost(), this.getPortNo());
       } else if (this.isXMLURI()) {
          return new HL7XMLFileWriter(this.uri);
       } // if - else if
@@ -303,6 +303,10 @@ public class HL7StreamURI {
                                  + this.uri.toString(),
                                  HL7IOException.UNINTERPERABLE_URI);
    } // getHL7StreamWriter
+
+   public String getHost() {
+      return this.uri.getHost();
+   } // getHost
 
 
 } // HL7StreamURI

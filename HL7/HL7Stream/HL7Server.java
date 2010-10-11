@@ -199,7 +199,7 @@ public class HL7Server implements Runnable, HL7Stream {
                                           + "):Not a valid HL7 server URI.");
       } // if
 
-      this.serverPort = streamURI.uriPortNo();
+      this.serverPort = streamURI.getPortNo();
       int uriPoolSize = streamURI.uriServerPoolSize();
       this.poolSize = (uriPoolSize < 2) ? 2 : uriPoolSize;
       this.threadPool = Executors.newFixedThreadPool(this.poolSize);

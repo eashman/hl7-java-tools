@@ -113,7 +113,11 @@ HL7StreamURI.java : Updated javadocs.
 - HL7SocketStream.java : Cleaning up stream closure.
 - HL7FileReader.java, HL7FileWriter.java : Cleaning up file closure and IOException handling.
 
-* $Revision$
+* Revision: 30
 20100409:
 - HL7Server.java : Fixed logging
 - Updated license.
+
+* $Revision$
+- HL7Server.java : Fixed aport assignment issue.
+- HL7StreamURI.getHL7StreamWriter(), .getHost():Fixed port assignment issue.
