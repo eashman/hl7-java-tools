@@ -371,17 +371,29 @@ public class HL7Designator {
    /**
     * @return the componentIndex
     */
-   public int getComponent() {
-      return componentIndex + 1;
-   }
+   public int getComponentIndex() { return componentIndex; }
+
+
+    /**
+    * @return the component
+    */
+  public int getComponent() {
+      return componentIndex >= 0 ? componentIndex + 1 : componentIndex;
+   } // getComponent
 
    /**
     * @return the subComponentIndex
     */
-   public int getSubComponent() {
-      return subComponentIndex + 1;
-   }
+   public int getSubComponentIndex() {  return subComponentIndex; }
 
+   /**
+    * @return the subComponent
+    */
+   public int getSubComponent() {
+      return subComponentIndex >= 0 ? subComponentIndex + 1 : subComponentIndex;
+   } // getSubComponent
+
+   
    public boolean isSpecifiedSegmentIndex() {
       return (this.segIndex != -3);
    } // isSpecifiedSegmentIndex

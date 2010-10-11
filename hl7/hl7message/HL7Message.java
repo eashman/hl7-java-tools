@@ -189,8 +189,8 @@ public class HL7Message {
                         designator.getSegIndex(),
                         designator.getSequence(),
                         designator.getRepetitionIndex(),
-                        designator.getComponent(),
-                        designator.getSubComponent(),
+                        designator.getComponentIndex(),
+                        designator.getSubComponentIndex(),
                         false);
    } // pick
 
@@ -200,8 +200,8 @@ public class HL7Message {
                         designator.getSegIndex(),
                         designator.getSequence(),
                         designator.getRepetitionIndex(),
-                        designator.getComponent(),
-                        designator.getSubComponent(),
+                        designator.getComponentIndex(),
+                        designator.getSubComponentIndex(),
                         create);
    } // pick
 

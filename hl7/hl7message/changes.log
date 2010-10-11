@@ -19,10 +19,14 @@ Updated documentation, licensing, and copyright on all classes.
 * Revision: 64, Date: 2010-09-23 15:32:18 -0700 (Thu, 23 Sep 2010), Author: scott.herman@unconxio.us
 - HL7Message.pickSegment():Corrected to add missing segment when create option is specified.
 
-* $Revision$, $Date$, $Author$
+* Revision: 68, Date: 2010-09-28 00:34:18 -0700 (Tue, 28 Sep 2010), Author: scott.herman@unconxio.us
 - HL7Message.toString():Provided override for compatability with HL7-1.5.
 
-* $Revision$, $Date$, $Author$
+* Revision: 69, Date: 2010-10-10 00:34:18 -0700 (Sun, 10 Oct 2010), Author: scott.herman@unconxio.us
 - HL7Designator:Modified to use colon (':') instead of brackets to indicate segment index
 and repetition index.
 - HL7ElementLevel:Modified to implement Iterator.
+
+* $Revision$, $Date$, $Author$
+- HL7Designator.getComponentIndex(), .getSubComponentIndex():Added to clarify bimodal indexing.
+- HL7Designator.pick():Corrected HL7Designator translations.
