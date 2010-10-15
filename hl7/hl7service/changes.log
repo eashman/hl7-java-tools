@@ -5,9 +5,13 @@ Created this package for hl7-2.0.
 - HL7Route.addDeliveryURI():Added to allow addition of URIs after construction.
 - HL7ServiceElement.getElements():Made public.
 
-* $Revision$, $Date$, $Author$
+* Revision: 63, Date: 2010-09-21 00:35:55 -0700 (Tue, 21 Sep 2010), Author: scott.herman@unconxio.us
 - HL7MessageTransformOperation.translate():Added this function to facilitate table driven translation of message elements.
 - TranslationTable, TranslationTableDirectory:Added to support HL7MessageTransformOperation.translate().
 
-* $Revision$, $Date$, $Author$
+* Revision: 70, Date: 2010-10-10 00:35:55 -0700 (Sun, 10 Oct 2010), Author: scott.herman@unconxio.us
 - HL7Transform:removed unused imports.
+
+* $Revision$, $Date$, $Author$
+- HL7MessageTransformOperation:Docuemntation and minor refactoring.
+- HL7Transform.NAME_HL7TRANSFORM:Added this public reference declaration of the item name.

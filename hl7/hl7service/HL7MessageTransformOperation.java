@@ -56,25 +56,25 @@ import us.conxio.hl7.hl7message.HL7Message;
  * <li>a type identifier string. <li>a value string.</ul>
  */
 class Operand {
-   String  typeStr,
+   String  type,
            value;
 
 
    public Operand() {}
 
-   public Operand(String type, String value) {
-      this.typeStr = type;
-      this.value = value;
+   public Operand(String typeStr, String valueStr) {
+      type = typeStr;
+      value = valueStr;
    } // Operand
 
 
    String dumpString() {
-      return "Operand:" + this.typeStr + ", " + this.value;
+      return "Operand:" + type + ", " + value;
    } // Dump
 
    boolean isType(String name) {
-      return StringUtils.equals( this.typeStr.toLowerCase(),
-                                 (name != null) ? name.toLowerCase() : name);
+      if (StringUtils.isEmpty(name)) return false;
+      return type.equalsIgnoreCase(name);
    } // isType
 } // Operand
 
@@ -114,17 +114,17 @@ public class HL7MessageTransformOperation {
    public HL7MessageTransformOperation() { }
 
    public HL7MessageTransformOperation(String name, String designator) {
-      this.opName = name;
-      this.resultDesignator = designator;
-      this.setMethod();
+      opName = name;
+      resultDesignator = designator;
+      setMethod();
    } // HL7MessageTransformOperation
 
 
    public HL7MessageTransformOperation(String name, String designator, String operandType, String operandValue) {
-      this.opName = name;
-      this.resultDesignator = designator;
-      this.setMethod();
-      this._addOperand(new Operand(operandType, operandValue));
+      opName = name;
+      resultDesignator = designator;
+      setMethod();
+      _addOperand(new Operand(operandType, operandValue));
    } // HL7MessageTransformOperation
 
 
@@ -160,15 +160,15 @@ public class HL7MessageTransformOperation {
          String[] operandsArray = nodeText.split(", ?", -2);
          int opsLength = operandsArray.length;
          for (int index = 0; index < opsLength; ++index) {
-            this._addOperand(new Operand("string", operandsArray[index]));
+            _addOperand(new Operand(OPERAND_TYPE_STRING, operandsArray[index]));
          } // for
       } // if
    } // HL7MessageTransformOperation
 
 
    private void _addOperand(Operand operand) {
-      if (this.operands == null) this.operands = new ArrayList<Operand>();
-      this.operands.add(operand);
+      if (operands == null) operands = new ArrayList<Operand>();
+      operands.add(operand);
    } // _addOperand
 
 
@@ -176,22 +176,22 @@ public class HL7MessageTransformOperation {
 
    /**
     * Add an operand to the context operation.
-    * @param typeStr
-    * @param valueStr
-    * @return
+    * @param typeStr A String representation of the operand type
+    * @param valueStr A String representation of the operand value.
+    * @return The context HL7MessageTransformOperation object.
     */
    public HL7MessageTransformOperation addOperand(String typeStr, String valueStr) {
-      this.addOperand(new Operand(typeStr, valueStr));
+      addOperand(new Operand(typeStr, valueStr));
       return this;
    } // addOperand
 
 
    void dump() {
       logger.debug(  "HL7Operation name:"
-                   + this.getOpName()
+                   + getOpName()
                    + ", ResultDesignator:"
-                   + this.getResultDesignator());
-      for (Operand operand : this.operands) logger.debug(operand.dumpString());
+                   + getResultDesignator());
+      for (Operand operand : operands) logger.debug(operand.dumpString());
    } // dump
 
 
@@ -211,20 +211,20 @@ public class HL7MessageTransformOperation {
 
 
    private TranslationTable loadTranslationTable() throws FileNotFoundException, IOException {
-      return TranslationTable.make(this.resourceURI);
+      return TranslationTable.make(resourceURI);
    } // loadTranslationTable
 
 // Operation handlers:
 
    boolean qualify(HL7Message msg) {
       if (!hasPattern() && hasStringOperandAt(0)) opPattern = Pattern.compile(stringOperandValueAt(0));
-      return this.messageMatches(msg);
+      return messageMatches(msg);
    } // qualify
 
 
    boolean exclude(HL7Message msg) {
       if (!hasPattern() && hasStringOperandAt(0)) opPattern = Pattern.compile(stringOperandValueAt(0));
-      return this.messageMatches(msg);
+      return messageMatches(msg);
    } // exclude
 
    private boolean messageMatches(HL7Message msg) {
@@ -249,7 +249,7 @@ public class HL7MessageTransformOperation {
       String segStr = null;
       String arg = stringOperandValueAt(0);
       if (hasDesignator() && resultDesignator.length() > 2) {
-         segStr = this.resultDesignator.substring(0, 3);
+         segStr = resultDesignator.substring(0, 3);
       } // if
 
       if (StringUtils.isNotEmpty(segStr)
@@ -272,7 +272,7 @@ public class HL7MessageTransformOperation {
     * @param msg
     * @return
     */
-   private String normalizeDesignator(String designatorStr, HL7Message msg) {
+   private String selectLastSegmentOfWildCard(String designatorStr, HL7Message msg) {
       String returnStr = designatorStr;
       HL7Designator hl7Designator = new HL7Designator(designatorStr);
       if (hl7Designator.getSegIndex() <= 0) {
@@ -281,12 +281,12 @@ public class HL7MessageTransformOperation {
       } // if
 
       return returnStr;
-   } // normalizeDesignator
+   } // selectLastSegmentOfWildCard
 
 
    boolean appoint(HL7Message msg) {    
       if (hasDesignator() && hasStringOperandAt(0)) {
-         msg.set(normalizeDesignator(resultDesignator, msg), stringOperandValueAt(0));
+         msg.set(selectLastSegmentOfWildCard(resultDesignator, msg), stringOperandValueAt(0));
          return true;
       } // if
 
@@ -308,10 +308,10 @@ public class HL7MessageTransformOperation {
 
       String replacement = null;
 
-      for (Operand op : this.operands) {
+      for (Operand op : operands) {
          if (op.isType(OPERAND_TYPE_SEARCH)) {
-            if (!this.hasPattern() && StringUtils.isNotEmpty(op.value)) {
-               this.opPattern = Pattern.compile(op.value);
+            if (!hasPattern() && StringUtils.isNotEmpty(op.value)) {
+               opPattern = Pattern.compile(op.value);
             } // if
          } else {
             replacement = op.value;
@@ -321,7 +321,7 @@ public class HL7MessageTransformOperation {
       if (!hasPattern()) return false;
       if (replacement == null) replacement = "";
 
-      Matcher matcher = this.opPattern.matcher(subject);
+      Matcher matcher = opPattern.matcher(subject);
       String result = matcher.replaceAll(replacement);
 
 
@@ -338,7 +338,7 @@ public class HL7MessageTransformOperation {
 
 
    boolean scrub(HL7Message msg) {
-      if (!this.hasDesignator()) return false;
+      if (!hasDesignator()) return false;
 
       String toBeScrubbed = msg.get(resultDesignator);
       if (StringUtils.isNotEmpty(toBeScrubbed)) {
@@ -354,11 +354,11 @@ public class HL7MessageTransformOperation {
 
 
    boolean copy(HL7Message msg) {
-      if (!this.hasDesignator()) return false;
+      if (!hasDesignator()) return false;
 
       String fromDesignator = null;
-      if (this.hasStringOperandAt(0) || this.hasDesignatorOperandAt(0)) {
-         fromDesignator = this.operands.get(0).value;
+      if (hasStringOperandAt(0) || hasDesignatorOperandAt(0)) {
+         fromDesignator = operands.get(0).value;
       } // if
 
       if (StringUtils.isEmpty(fromDesignator)) return false;
@@ -371,7 +371,7 @@ public class HL7MessageTransformOperation {
 
 
    boolean remove(HL7Message msg) {
-      if (!this.hasDesignator()) return false;
+      if (!hasDesignator()) return false;
       msg.remove(resultDesignator);
       return(true);
    } // remove
@@ -386,10 +386,10 @@ public class HL7MessageTransformOperation {
       if (StringUtils.isEmpty(subject)) return false;
 
       String replacement = null;
-      if (!hasTranslationTable()) xlateTable = this.loadTranslationTable();
+      if (!hasTranslationTable()) xlateTable = loadTranslationTable();
       if (!hasTranslationTable()) return false;
       
-      replacement = this.xlateTable.get(subject);
+      replacement = xlateTable.get(subject);
       msg.set(resultDesignator, replacement);
       return true;
    } // translate
@@ -397,8 +397,8 @@ public class HL7MessageTransformOperation {
    // operation "aliases"
    
    boolean isQualified(HL7Message msg) {
-      if (this.opName.equalsIgnoreCase(OPERATION_NAME_QUALIFY)) return this.qualify(msg);
-      if (this.opName.equalsIgnoreCase(OPERATION_NAME_EXCLUDE)) return !this.exclude(msg);
+      if (opName.equalsIgnoreCase(OPERATION_NAME_QUALIFY)) return qualify(msg);
+      if (opName.equalsIgnoreCase(OPERATION_NAME_EXCLUDE)) return !exclude(msg);
       return false;
    } // isQualified
 
@@ -406,9 +406,9 @@ public class HL7MessageTransformOperation {
    HL7Message transform(HL7Message msg) {
       if (msg == null) return null;
 
-      if (!this.hasMethod()) this.setMethod();
+      if (!hasMethod()) setMethod();
       try {
-         Object retnObj = this.method.invoke(this, msg);
+         Object retnObj = method.invoke(this, msg);
          return  ((Boolean)retnObj).booleanValue()
                  ? msg
                  : null;
@@ -426,7 +426,7 @@ public class HL7MessageTransformOperation {
    private void setMethod() {
       Class parms[] = { HL7Message.class };
       try {
-         this.method = this.getClass().getDeclaredMethod(getOpName().toLowerCase(), parms);
+         method = getClass().getDeclaredMethod(getOpName().toLowerCase(), parms);
       } catch (NoSuchMethodException ex) {
          logger.error("opName:" + getOpName(), ex);
       } catch (SecurityException ex) {
@@ -435,7 +435,7 @@ public class HL7MessageTransformOperation {
    } // setMethod
 
    private boolean hasMethod() {
-      return this.method != null;
+      return method != null;
    } //hasMethod
 
    /**
@@ -449,7 +449,7 @@ public class HL7MessageTransformOperation {
     * @param opName the opName to set
     */
    public void setOpName(String opName) {
-      this.opName = opName;
+      opName = opName;
    }
 
    /**
@@ -463,37 +463,37 @@ public class HL7MessageTransformOperation {
     * @param resultDesignator the resultDesignator to set
     */
    public void setResultDesignator(String resultDesignator) {
-      this.resultDesignator = resultDesignator;
+      resultDesignator = resultDesignator;
    }
 
    private boolean hasOperand(int index) {
-      return this.hasOperands() && this.operands.size() > index;
+      return hasOperands() && this.operands.size() > index;
    } // hasOperand
 
    private boolean hasOperands() {
-      return this.operands != null && !this.operands.isEmpty();
+      return operands != null && !this.operands.isEmpty();
    } // hasOperands
 
    private boolean hasStringOperandAt(int index) {
-      return this.hasTypeOperandAt(OPERAND_TYPE_STRING, index);
+      return hasTypeOperandAt(OPERAND_TYPE_STRING, index);
    } // hasStringOperandAt
 
    private String stringOperandValueAt(int index) {
-      return (this.hasStringOperandAt(index)) ? this.operands.get(index).value : null;
+      return (hasStringOperandAt(index)) ? operands.get(index).value : null;
    } // stringOperandValueAt
 
    private boolean hasPattern() {
-      return this.opPattern != null;
+      return opPattern != null;
    } // hasPattern
 
    private boolean hasDesignatorOperandAt(int index) {
-      return this.hasTypeOperandAt(OPERAND_TYPE_DESIGNATOR, index);
+      return hasTypeOperandAt(OPERAND_TYPE_DESIGNATOR, index);
    } // hasDesignatorOperandAt
 
    private boolean hasTypeOperandAt(String typeStr, int index) {
-      return this.hasOperand(index)
-      &&     this.operands.get(index).isType(typeStr)
-      &&     StringUtils.isNotEmpty(this.operands.get(index).value);
+      return hasOperand(index)
+      &&     operands.get(index).isType(typeStr)
+      &&     StringUtils.isNotEmpty(operands.get(index).value);
    } // hasTypeOperandAt
 
    private boolean hasDesignator() {
@@ -503,7 +503,7 @@ public class HL7MessageTransformOperation {
    private boolean haveThisMethod() {
       Class parms[] = { HL7Message.class };
       try {
-         method = this.getClass().getDeclaredMethod(opName.toLowerCase(), parms);
+         method = getClass().getDeclaredMethod(opName.toLowerCase(), parms);
          return true;
       } catch (NoSuchMethodException ex) {
          return false;

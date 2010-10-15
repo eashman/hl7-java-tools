@@ -66,6 +66,8 @@ public class HL7Transform extends HL7ServiceElement {
    private ArrayList<HL7MessageTransformOperation> operations = null;
    private AttributeMap                            attributes = null;
    // private static Logger   logger = null;
+
+   public static final String NAME_HL7TRANSFORM = "hl7transform";
    
    /**
     * Reads the argument DOM node and creates an appropriate HL7Transform.
