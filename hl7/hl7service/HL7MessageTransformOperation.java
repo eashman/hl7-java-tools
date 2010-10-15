@@ -206,7 +206,7 @@ public class HL7MessageTransformOperation {
          throw new IllegalArgumentException("URI schemes other than file/// not handled.");
       } // if
 
-      xlateTable = this.loadTranslationTable();
+      xlateTable = loadTranslationTable();
    } // initializeMap
 
 
@@ -232,7 +232,7 @@ public class HL7MessageTransformOperation {
       if (opPattern == null) return false;
       String subject = msg.get(resultDesignator);
       if (StringUtils.isEmpty(subject)) return false;
-      return this.opPattern.matcher(subject).matches();
+      return opPattern.matcher(subject).matches();
    } // messageMatches
 
    boolean assign(HL7Message msg) {
@@ -448,8 +448,8 @@ public class HL7MessageTransformOperation {
    /**
     * @param opName the opName to set
     */
-   public void setOpName(String opName) {
-      opName = opName;
+   public void setOpName(String opNameStr) {
+      opName = opNameStr;
    }
 
    /**
@@ -462,16 +462,16 @@ public class HL7MessageTransformOperation {
    /**
     * @param resultDesignator the resultDesignator to set
     */
-   public void setResultDesignator(String resultDesignator) {
-      resultDesignator = resultDesignator;
+   public void setResultDesignator(String rltDesignator) {
+      resultDesignator = rltDesignator;
    }
 
    private boolean hasOperand(int index) {
-      return hasOperands() && this.operands.size() > index;
+      return hasOperands() && operands.size() > index;
    } // hasOperand
 
    private boolean hasOperands() {
-      return operands != null && !this.operands.isEmpty();
+      return operands != null && !operands.isEmpty();
    } // hasOperands
 
    private boolean hasStringOperandAt(int index) {

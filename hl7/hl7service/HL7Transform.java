@@ -65,7 +65,6 @@ import us.conxio.hl7.hl7message.HL7Message;
 public class HL7Transform extends HL7ServiceElement {
    private ArrayList<HL7MessageTransformOperation> operations = null;
    private AttributeMap                            attributes = null;
-   // private static Logger   logger = null;
 
    public static final String NAME_HL7TRANSFORM = "hl7transform";
    
@@ -98,13 +97,13 @@ public class HL7Transform extends HL7ServiceElement {
     */
    public HL7Transform(URI uri) throws Exception {
       this.initialize("HL7Transform", uri);
-      initializeHL7Transform(this.root);
+      initializeHL7Transform(root);
    } // HL7Transform
 
 
    public HL7Transform(String xmlString) throws Exception {
       this.initialize("HL7Transform", xmlString);
-      initializeHL7Transform(this.root);
+      initializeHL7Transform(root);
    } // HL7Transform
 
    
@@ -186,15 +185,15 @@ public class HL7Transform extends HL7ServiceElement {
 
 
          if (HL7MessageTransformOperation.haveMethod(kidName)) {
-            this.addOperation(new HL7MessageTransformOperation(kid) );
+            addOperation(new HL7MessageTransformOperation(kid) );
          } // if
       } // for
    } // parseChildElements
 
 
    public void addOperation(HL7MessageTransformOperation opern) {
-      if (this.operations == null) this.operations = new ArrayList<HL7MessageTransformOperation>();
-      this.operations.add(opern);
+      if (operations == null) operations = new ArrayList<HL7MessageTransformOperation>();
+      operations.add(opern);
    } // addOperation
    
 
@@ -202,8 +201,8 @@ public class HL7Transform extends HL7ServiceElement {
     * Creates a formatted dump of the context HL7Transform.
     */
    public void dump() {
-      getLogger().debug("idStr:" + this.idString);
-      for (HL7MessageTransformOperation op : this.operations) op.dump();
+      getLogger().debug("idStr:" + idString);
+      for (HL7MessageTransformOperation op : operations) op.dump();
    } // dump
    
    
@@ -235,7 +234,7 @@ public class HL7Transform extends HL7ServiceElement {
 
       HL7Message opMsg = new HL7Message(msg.toHL7String());
 
-      for (HL7MessageTransformOperation op : this.operations) {
+      for (HL7MessageTransformOperation op : operations) {
          if (op.isQualificationOperation()) continue;
 
          op.transform(opMsg);

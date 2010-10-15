@@ -13,5 +13,5 @@ Created this package for hl7-2.0.
 - HL7Transform:removed unused imports.
 
 * $Revision$, $Date$, $Author$
-- HL7MessageTransformOperation:Docuemntation and minor refactoring.
+- HL7MessageTransformOperation:Documentation and minor refactoring.
 - HL7Transform.NAME_HL7TRANSFORM:Added this public reference declaration of the item name.
