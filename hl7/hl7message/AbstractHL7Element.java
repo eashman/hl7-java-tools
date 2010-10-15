@@ -29,6 +29,7 @@ package us.conxio.hl7.hl7message;
 import java.util.ArrayList;
 
 /**
+ * Note: This class is currently unused.
  *
  * @author scott
  */
@@ -39,41 +40,41 @@ abstract class AbstractHL7Element implements HL7Element {
    private boolean                  touched;
 
    
-   public AbstractHL7Element(int level) {
-      this.level = new HL7ElementLevel(level);
+   AbstractHL7Element(int levelArg) {
+      level = new HL7ElementLevel(levelArg);
    } // AbstractHL7Element
 
 
-   public void setLevel(int level) {
-      this.level.set(level);
+   void setLevel(int levelArg) {
+      level.set(levelArg);
    } // setLevel
 
 
-   public int getLevel() {
-      return this.level.get();
+   int getLevel() {
+      return level.get();
    } // getLevel
 
 
-   public boolean wasTouched() {
-      return this.touched;
+   boolean wasTouched() {
+      return touched;
    } // wasTouched
 
 
    public void set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = null;
-      if (this.level.hasNext() ) {
-         nextLevel = this.level.next();
+      if (level.hasNext() ) {
+         nextLevel = level.next();
       } else {
-         this.content = msgText;
+         content = msgText;
          return;
       } // if - else
 
       ArrayList<String>  elements = encoders.hl7Split(msgText, nextLevel);
-      this.constituents = new ArrayList<HL7Element>();
+      constituents = new ArrayList<HL7Element>();
       for (String elementStr : elements) {
-         HL7Element element = new GenericHL7Element(nextLevel);
+         HL7Element element = HL7ElementLevel.newElementAt(nextLevel);
          element.set(elementStr, encoders);
-         this.constituents.add(element);
+         constituents.add(element);
       } // for
    } // set
 

@@ -34,17 +34,24 @@ import org.apache.commons.lang.StringUtils;
  * An interpreted string class representing the lexical location of an item in an HL7 message. 
  * The normalized string takes the form:<br><br><b>
  * {@code
- *       <segID>[index].<sequence>[index].<componentIndex>.<subcomponent>
+ *       <segID>:[index].<sequence>:[index].<componentIndex>.<subcomponent>
  * }
  * </b><br><br>
  * Note that all items below the segment ID level are optional, however the dot pre-fixed specifiers above the
- * most subordinate level specified are required. Bracket enclosed specifiers are optional, with the default 
- * being all (??? I don't think so, although it should be.), in the case of multiples.
+ * most subordinate level specified are required. Repetition indices (those values preceded by a colon (':'))
+ * are optional, with the default being 0, in the case of multiples.
+ * <p>
+ * Note also that this designation syntax reflects a commonly practiced ambiguity in specifying
+ * components and sub-components using ordinal indexing, while specifications for segment repetitions,
+ * field sequences, and field repetitions use zero based indexing. Thus the first segment, field or
+ * repetition index is 0, while the first component or sub-component index is 1. This implementation
+ * attempts to clarify this ambiguity by referring to indices as such, and differentiating the
+ * component and sub-component position values from their indices.
  * <br><br>
  * eg;<ul>
  * <li> <b>PID.3.1</b> is the 1st componentIndex of the 3rd sequence in the PID segment.
- * <li> <b>PID[1].3.1</b> is the 1st componentIndex of the 3rd sequence in the 2nd PID segment.
- * <li> <b>PID.3[2].1</b> is the 1st componentIndex of the 3rd repetitionIndex of the 3rd sequence in the PID segment.
+ * <li> <b>PID:1.3.1</b> is the 1st componentIndex of the 3rd sequence in the 2nd PID segment.
+ * <li> <b>PID.3:2.1</b> is the 1st componentIndex of the 3rd repetitionIndex of the 3rd sequence in the PID segment.
  * </ul>
  * @author scott herman <scott.herman@unconxio.us>
  */
@@ -95,7 +102,7 @@ public class HL7Designator {
    /**
     * Creates a HL7Designator from the argument string.
     * @param argStr A designator of the form:<br><b>
-    * nbsp;&nbsp;&nbsp; &lt;segID&gt;[index].&lt;sequence&gt;[index].&lt;componentIndex&gt;.&lt;subcomponent&gt; </b><br>
+    * nbsp;&nbsp;&nbsp; &lt;segID&gt;:[index].&lt;sequence&gt;:[index].&lt;componentIndex&gt;.&lt;subcomponent&gt; </b><br>
     */
    public HL7Designator(String argStr) {
       parse(argStr);
@@ -341,85 +348,94 @@ public class HL7Designator {
    } // spawn
    
    /**
+    * Retrieve the segment ID value.
     * @return the segID
     */
    public String getSegID() {
       return segID;
-   }
+   } // getSegID
 
    /**
-    * @return the segIndex
+    * Retrieve the segment index value.
+    * @return the segment index value.
     */
    public int getSegIndex() {
       return segIndex;
-   }
+   } // getSegIndex
 
    /**
     * @return the sequence
     */
-   public int getSequence() {
+   int getSequence() {
       return sequence;
    }
 
    /**
     * @return the repetitionIndex
     */
-   public int getRepetitionIndex() {
+   int getRepetitionIndex() {
       return repetitionIndex;
-   }
+   } // getRepetitionIndex
 
    /**
     * @return the componentIndex
     */
-   public int getComponentIndex() { return componentIndex; }
+   int getComponentIndex() { return componentIndex; }
 
 
-    /**
-    * @return the component
+   /**
+    * Returns the component position, as an int value. Note that this is
+    * the value that is actually specified, which is, in general, one more than
+    * the component index.
+    * @return the component position.
     */
-  public int getComponent() {
+   int getComponent() {
       return componentIndex >= 0 ? componentIndex + 1 : componentIndex;
    } // getComponent
 
    /**
     * @return the subComponentIndex
     */
-   public int getSubComponentIndex() {  return subComponentIndex; }
+   int getSubComponentIndex() {  return subComponentIndex; }
+
 
    /**
+    * Returns the sub-component position, as an int value. Note that this is
+    * the value that is actually specified, which is, in general, one more than
+    * the sub-component index value.
     * @return the subComponent
     */
-   public int getSubComponent() {
+   int getSubComponent() {
       return subComponentIndex >= 0 ? subComponentIndex + 1 : subComponentIndex;
    } // getSubComponent
 
    
    public boolean isSpecifiedSegmentIndex() {
-      return (this.segIndex != -3);
+      return segIndex != UNSPECIFIED;
    } // isSpecifiedSegmentIndex
 
    public boolean isSpecifiedSequence() {
-      return (this.sequence != -3);
+      return sequence != UNSPECIFIED;
    } // isSpecifiedSequence
 
    
    public boolean isSpecifiedRepetition() {
-      return (this.repetitionIndex != -3);
+      return repetitionIndex != UNSPECIFIED;
    } // isSpecifiedRepetition
 
 
    public boolean isSpecifiedComponent() {
-      return (this.componentIndex != -3);
+      return componentIndex != UNSPECIFIED;
    } // isSpecifiedComponent
 
 
    public boolean isSpecifiedSubComponent() {
-      return (this.subComponentIndex != -3);
+      return subComponentIndex != UNSPECIFIED;
    } // isSpecifiedSubComponent
 
 
-   public HL7ElementLevel getLevel() {
-      return this.level;
+   HL7ElementLevel getLevel() {
+      return level;
    } // HL7ElementLevel
 
    private boolean hasColon() {

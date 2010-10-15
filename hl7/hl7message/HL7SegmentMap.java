@@ -30,27 +30,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- *
+ * A hashed multi map class for indexing HL7 segments by ID.
  * @author scott
  */
-public class HL7SegmentMap {
+class HL7SegmentMap {
    private HashMap segmentHash;
 
-   public HL7SegmentMap() {
-      this.segmentHash = new HashMap();
+   HL7SegmentMap() {
+      segmentHash = new HashMap();
    } // HL7SegmentMap
 
 
-   public ArrayList<HL7Segment> get(String argStr) {
-      return (ArrayList<HL7Segment>)this.segmentHash.get(argStr.substring(0, 3));
+   /**
+    * Retrieves the entry corresponding to the argument string.
+    * @param argStr A segment ID string
+    * @return the entry corresponding to the argument string.
+    */
+   ArrayList<HL7Segment> get(String argStr) {
+      return (ArrayList<HL7Segment>)segmentHash.get(argStr.substring(0, 3));
    } // get
 
 
-   public void put(HL7Segment segment) {
-      if (segment == null) { return; }
+   /**
+    * Indexes the argument HL7Segment in the map.
+    * @param segment The HL7Segment object to be indexed.
+    */
+   void put(HL7Segment segment) {
+      if (segment == null) return; 
 
       String idStr = segment.getID();
-      ArrayList<HL7Segment> segments = this.get(idStr);
+      ArrayList<HL7Segment> segments = get(idStr);
       if (segments != null && !segments.isEmpty()) {
          segments.add(segment);
          return;
@@ -58,8 +67,28 @@ public class HL7SegmentMap {
 
       segments = new ArrayList<HL7Segment>();
       segments.add(segment);
-      this.segmentHash.put(idStr, segments);
+      segmentHash.put(idStr, segments);
    } // put
 
+
+   /**
+    * Determines whether the map contains one or more entries corresponding to
+    * the argument key.
+    * @param key The segment ID key.
+    * @return true if the map contains one or more entries corresponding to the
+    * argument key. Otherwise false.
+    */
+   boolean has(String key) {
+      return segmentHash.containsKey(key);
+   } // has
+
+
+   /**
+    * Determines whether the map has any entries.
+    * @return true if the map contains one or more entries. Otherwise false.
+    */
+   boolean isEmpty() {
+      return segmentHash.isEmpty();
+   } // isEmpty
 
 } // HL7SegmentMap

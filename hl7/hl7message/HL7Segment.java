@@ -28,8 +28,10 @@ package us.conxio.hl7.hl7message;
 
 
 import java.util.ArrayList;
+
+
 /**
- *
+ * A HL7 element class for segment level items.
  * @author scott
  */
 public class HL7Segment implements HL7Element {
@@ -39,20 +41,31 @@ public class HL7Segment implements HL7Element {
    private boolean               touched;
 
 
-   
+   /**
+    * Creates a new empty HL7Segment object at the segment level.
+    */
    public HL7Segment() {
-      this.level = new HL7ElementLevel(HL7ElementLevel.SEGMENT);
+      level = new HL7ElementLevel(HL7ElementLevel.SEGMENT);
    } // HL7Segment
 
 
+   /**
+    * Creates a HL7Segment object form the argument string, using the argument
+    * set of HL7 encoding characters.
+    * @param segmentStr The segment to be parsed, as a String object.
+    * @param encoders The HL7 encoding character set to use in parsing this segment.
+    */
    public HL7Segment(String segmentStr, HL7Encoding encoders) {
       this();
-      this.idStr = segmentStr.substring(0, 3);
-      this._set(segmentStr, encoders);
+      idStr = segmentStr.substring(0, 3);
+      _set(segmentStr, encoders);
    } // HL7Segment
 
 
-   private String getIDString(HL7Element element) {
+   /**
+    * @return A String representation of the 3 character segment ID
+    */
+   private String getIDString() {
       return this .getField(0)
                   .getRepetition(0)
                   .getComponent(0)
@@ -61,64 +74,68 @@ public class HL7Segment implements HL7Element {
    } // getIDString
 
 
+   /**
+    * Retrieves the segment ID, that is the content of field(0).
+    * @return The 3 character segment ID string.
+    */
    public String getID() {
-      if (this.idStr == null || this.idStr.isEmpty()) {
-         this.idStr = getIDString(this);
-      } // if
-      
-      return this.idStr;
+      if (idStr == null || idStr.isEmpty()) idStr = getIDString();  
+      return idStr;
    } // getID
 
 
+   /**
+    * Retrieves the field corresponding to the argument index.
+    * @param index The index of the field to retrieve.
+    * @return The field at the argument index, or null if the field does not exist.
+    */
    public HL7Field getField(int index) {
-      if (!this.hasFields() || !this.hasField(index)) {
-         return null;
-      } // if
-
-      return this.fields.get(index);
+      if (!hasFields() || !hasField(index)) return null;
+      return fields.get(index);
    } // getField
 
 
-   public void setLevel(int level) {
-      this.level.set(level);
-   } // setLevel
-
-
-   public int getLevel() {
-      return this.level.get();
-   } // getLevel
-
-
+   /**
+    * Returns the state of the touched flag.
+    * @return the state of the touched flag, true or false.
+    */
    public boolean wasTouched() {
-      return this.touched;
+      return touched;
    } // wasTouched
 
 
    private void _set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.FIELD);
       ArrayList<String>  elements = encoders.hl7Split(msgText, nextLevel);
-      this.fields = new ArrayList<HL7Field>();
-      for (String elementStr : elements) {
-         this.fields.add(new HL7Field(elementStr, encoders));
-      } // for
-
-      this.touched = true;
+      fields = new ArrayList<HL7Field>();
+      for (String elementStr : elements) fields.add(new HL7Field(elementStr, encoders));
+      touched = true;
    } // set
 
 
-   public void set(String msgText, HL7Encoding encoders) { this._set(msgText, encoders); }
-   
+   /**
+    * Parses the argument segment text into the segment using the argument HL7 encoding
+    * character set.
+    * @param segText The segment text to be parsed.
+    * @param encoders The HL7 encoding character set to be used to parse the segment text.
+    * Note that this method will dispose of any prior data residing in the segment.
+    */
+   public void set(String segText, HL7Encoding encoders) { _set(segText, encoders); }
+
+
+   /**
+    * Formulates and returns the context segment as a String of HL7 text, using
+    * the argument HL7 encoding character set.
+    * @param encoders The HL7 encoding character set to use to delimit the segment text.
+    * @return The segment text as a HL7 String.
+    */
    public String toHL7String(HL7Encoding encoders) {
-      if (!this.hasFields()) {
-         return "";
-      } // if
+      if (!hasFields()) return "";
 
       ArrayList<String> fieldStrings = new ArrayList<String>();
-      for (HL7Element element : this.fields) {
-         fieldStrings.add(element.toHL7String(encoders));
-      } // for
+      for (HL7Field field : fields) fieldStrings.add(field.toHL7String(encoders));
       
-      if (this.idStr.equals("MSH") || this.idStr.equals("BHS") ) {
+      if (idStr.equals("MSH") || idStr.equals("BHS") ) {
          // special handling for encoding charcters.
          // remove 2nd field and replace with encoding characters
          // as a field.
@@ -126,14 +143,27 @@ public class HL7Segment implements HL7Element {
          fieldStrings.add(1, encoders.toString().substring(1));
       } // if
 
-      return encoders.hl7Join(fieldStrings, this.level.next());
+      return encoders.hl7Join(fieldStrings, level.next());
    } // toHL7String
 
 
+   /**
+    * Formulates and returns a XML String representation of the context HL7 segment.
+    * @return A XML String representation of the context HL7 segment.
+    */
    public String toXMLString() {
-      return this.toXMLString(null);
+      return toXMLString(null);
    } // toXMLString
 
+
+   /**
+    * Formulates and returns a XML String representation of the context HL7 
+    * segment, using the argument HL7 encoding character set, if the segment is 
+    * a MSHG segment.
+    * @param encoders The HL7 encoding character set to be represented, if the 
+    * segment is a MSH segment.
+    * @return A XML String representation of the context HL7 segment.
+    */
    public String toXMLString(HL7Encoding encoders) {
       String tag = "Segment";
       StringBuffer returnBuffer =  new StringBuffer("<")
@@ -144,19 +174,15 @@ public class HL7Segment implements HL7Element {
 
 
       int fieldOffset = 0;
-      if (this.idStr.equals("MSH")) {
+      if (idStr.equals("MSH")) {
          fieldOffset = 1;
-         if (encoders != null) {
-            returnBuffer.append(encoders.toXMLString());
-         } // if
+         if (encoders != null) returnBuffer.append(encoders.toXMLString());
       } // if
 
       int fieldIndex = 0;
-      for (HL7Field field : this.fields) {
-         if (fieldIndex > 0) {
-            if (field.hasContent() ) {
-               returnBuffer.append(field.toXMLString(fieldIndex + fieldOffset));
-            } // if
+      for (HL7Field field : fields) {
+         if (fieldIndex > 0 && field.hasContent()) {
+            returnBuffer.append(field.toXMLString(fieldIndex + fieldOffset));
          } // if
          ++fieldIndex;
       } // for
@@ -165,76 +191,93 @@ public class HL7Segment implements HL7Element {
       return returnBuffer.toString();
    } // toXMLString
 
+
+   /**
+    * An alias for getField()
+    * @param index The index of the field to retrieve.
+    * @return The HL7Filed at the argument index, or null, if the operation fails.
+    */
    public HL7Element getElement(int index) {
-      return this.getField(index);
+      return getField(index);
    } // getElement
 
 
+   /**
+    * @return Always returns false
+    */
    public boolean hasContent() {
       return false;
    } // hasContent
 
 
+   /**
+    * @return true if the context HL7Segment contains one or more fields.
+    * Otherwise false.
+    */
    public boolean hasFields() {
-      if (this.fields == null || this.fields.isEmpty()) {
-         return false;
-      } // if
-
-      return true;
+      return fields != null && !fields.isEmpty();
    } // hasFields
 
 
+   /**
+    * @param index The index at which to check for the existence of a field.
+    * @return true if the context HL7Segment contains a filed at the argument index.
+    * Otherwise false.
+    */
    public boolean hasField(int index) {
-      if (  this.fields == null
-      ||    index < 0
-      ||    index >= this.fields.size()) {
-         return false;
-      } // if
-
-      return true;
+      return hasFields() && index >= 0 && index < fields.size();
    } // hasField
 
 
+   /**
+    * @return A count of fields contained in the context HL7Segment.
+    */
    int fieldCount() {
-      if (!this.hasFields()) {
-         return 0;
-      } // if
-
-      return this.fields.size();
+      return hasFields() ? fields.size() : 0;
    } // fieldCount
 
+
+   /**
+    * Adds an empty field to the context HL7Segment.
+    */
    private void addField() {
       HL7Field field = new HL7Field();
       field.addRepetition();
 
-      if (!this.hasFields()) {
-         this.fields = new ArrayList<HL7Field>();
-      } // if
-
-      this.fields.add(field);
+      if (!hasFields()) fields = new ArrayList<HL7Field>();
+      fields.add(field);
    } // addField
 
 
-   HL7Field pickSequence(int sequence, boolean create) {
-      if (!this.hasField(sequence)) {
-         if (!create) {
-            return null;
-         } // if
-
-         for (int newIndex = this.fieldCount(); newIndex <= sequence; ++newIndex) {
-            this.addField();
-         } // for
+   /**
+    * Returns the field from the context HL7Segment, which is located at the
+    * argument sequence index.
+    * @param sequence The sequence index specifying the field to retrieve.
+    * @param create A boolean indicating whether the field should be created
+    * if it does not exist.
+    * @return the specified field
+    */
+   HL7Field pickField(int sequence, boolean create) {
+      if (!hasField(sequence)) {
+         if (!create) return null;
+         for (int newIndex = fieldCount(); newIndex <= sequence; ++newIndex) addField();
       } // if
 
-      return this.getField(sequence);
-   } // pickSequence
+      return getField(sequence);
+   } // pickField
 
+
+   /**
+    * Adds an empty field at the argument index, which implies, correctly that any
+    * missing fields at lesser indices are also added.
+    * @param index The index of the field to add.
+    */
    public void addField(int index) {
-      if (this.hasField(index)) return;
+      if (hasField(index)) return;
 
-      if (this.fields == null) this.fields = new ArrayList<HL7Field>();
-      if (index >= this.fields.size()) {
-         while (index >= this.fields.size()) this.fields.add(new HL7Field());
+      if (fields == null) fields = new ArrayList<HL7Field>();
+      if (index >= fields.size()) {
+         while (index >= fields.size()) fields.add(new HL7Field());
       } // if
    } // addField
 

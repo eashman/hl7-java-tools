@@ -39,69 +39,50 @@ public class HL7Component implements HL7Element {
 
 
    public HL7Component() {
-      this.level = new HL7ElementLevel(HL7ElementLevel.COMPONENT);
+      level = new HL7ElementLevel(HL7ElementLevel.COMPONENT);
    } // HL7Component
 
 
    public HL7Component(String componentStr, HL7Encoding encoders) {
       this();
-      this._set(componentStr, encoders);
+      _set(componentStr, encoders);
    } // HL7Component
 
 
-   public void setLevel(int level) {
-      this.level.set(level);
-   } // setLevel
-
-
-   public int getLevel() {
-      return this.level.get();
-   } // getLevel
-
-
    public boolean wasTouched() {
-      return this.touched;
+      return touched;
    } // wasTouched
 
 
    private void _set(String msgText, HL7Encoding encoders) {
-      this.subComponents = new ArrayList<HL7SubComponent>();
-      this.touched = true;
+      subComponents = new ArrayList<HL7SubComponent>();
+      touched = true;
 
       if (StringUtils.isEmpty(msgText)) return;
 
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.SUBCOMPONENT);
-      ArrayList<String>  subComps = encoders.hl7Split(msgText, nextLevel);
-      
-      for (String elementStr : subComps) {
-         HL7SubComponent element = new HL7SubComponent();
-         element.set(elementStr, encoders);
-         this.subComponents.add(element);
-      } // for
+      ArrayList<String>  subComps = encoders.hl7Split(msgText, nextLevel);   
+      for (String subCompStr : subComps) subComponents.add(new HL7SubComponent(subCompStr));
    } // set
 
 
    public void set(String msgText, HL7Encoding encoders) {
-      this._set(msgText, encoders);
+      _set(msgText, encoders);
    } // set
 
 
    public String toHL7String(HL7Encoding encoders) {
-      if (!this.hasConstituents()) {
-         return "";
-      } // if
+      if (!hasSubComponents()) return "";
 
       ArrayList<String> elementStrings = new ArrayList<String>();
-      for (HL7Element element : this.subComponents) {
-         elementStrings.add(element.toHL7String(encoders));
-      } // for
+      for (HL7Element element : subComponents) elementStrings.add(element.toHL7String(encoders));
 
-      return encoders.hl7Join(elementStrings, this.level.next());
+      return encoders.hl7Join(elementStrings, level.next());
    } // toString
 
 
    public String toXMLString(int componentIndex) {
-      if (!this.hasContent())    return "";
+      if (!hasContent())    return "";
 
       String tag = "Component";
       StringBuffer returnBuffer =  new StringBuffer("<")
@@ -110,11 +91,11 @@ public class HL7Component implements HL7Element {
               .append(Integer.toString(componentIndex))
               .append("\">");
 
-      if (this.hasSimpleContent()) {
-         returnBuffer.append(this.getSimpleContent());
+      if (hasSimpleContent()) {
+         returnBuffer.append(getSimpleContent());
       } else {
          int subComponentIndex = 1;
-         for (HL7SubComponent subComponent : this.subComponents) {
+         for (HL7SubComponent subComponent : subComponents) {
             if (subComponent.hasContent() ) {
                returnBuffer.append(subComponent.toXMLString(subComponentIndex));
             } // if
@@ -128,17 +109,13 @@ public class HL7Component implements HL7Element {
 
 
    public HL7Element getElement(int index) {
-      return this.getSubComponent(index);
+      return getSubComponent(index);
    } // getElement
 
 
    public boolean hasContent() {
-      if (this.hasConstituents()) {
-         for (HL7SubComponent subComp : this.subComponents) {
-            if (subComp.hasContent()) {
-               return true;
-            } // if
-         } // if
+      if (hasSubComponents()) {
+         for (HL7SubComponent subComp : subComponents) if (subComp.hasContent()) return true;
       } // if
 
       return false;
@@ -146,8 +123,9 @@ public class HL7Component implements HL7Element {
 
 
    public boolean hasSimpleContent() {
-      if (this.hasConstituents() ) {
-         if (this.subComponents.size() < 2 && this.subComponents.get(0).hasContent()) {
+      if (hasSubComponents() ) {
+         if (  subComponents.size() < 2
+         &&    subComponents.get(0).hasContent()) {
             return true;
          } // if
       } // if
@@ -157,78 +135,51 @@ public class HL7Component implements HL7Element {
 
 
    public String getSimpleContent() {
-      if (this.hasSimpleContent()) {
-         return this.subComponents.get(0).getContent();
-      } // if
-
+      if (hasSimpleContent()) return subComponents.get(0).getContent();
       return "";
-   }
+   } // getSimpleContent
 
 
-   public boolean hasConstituents() {
-      if (this.subComponents == null || this.subComponents.isEmpty()) {
-         return false;
-      } // if
-
-      return true;
-   } // hasConstituents
-
-
-   public String getContent() {
-      return null;
-   } // getContent
+   public boolean hasSubComponents() {
+      return subComponents != null && !subComponents.isEmpty();
+   } // hasSubComponents
 
 
    public boolean hasSubComponent(int index) {
-      if (  this.subComponents == null
-      ||    index < 0
-      ||    index >= this.subComponents.size()) {
-         return false;
-      } // if
-
-      return true;
+      return hasSubComponents()
+          && index >= 0
+          && index < subComponents.size();
    } // hasSubComponent
 
 
    public HL7SubComponent getSubComponent(int index) {
-      if (this.hasSubComponent(index)) {
-         return this.subComponents.get(index);
-      } // if
-
+      if (hasSubComponent(index)) return subComponents.get(index);
       return null;
    } // getSubComponent
 
 
-   HL7Element pickSubComponent(int subComponent, boolean create) {
-      if (!this.hasSubComponent(subComponent)) {
-         if (!create) {
-            return null;
-         } // if
+   HL7SubComponent pickSubComponent(int subComponentIndex, boolean create) {
+      if (!hasSubComponent(subComponentIndex)) {
+         if (!create) return null;
 
-         for (int index = this.subComponentCount(); index <= subComponent; ++index) {
-            this.addSubComponent();
+         for (int index = subComponentCount(); index <= subComponentIndex; ++index) {
+            addSubComponent();
          } // for
       } // if
 
-      return this.getSubComponent(subComponent);
+      return getSubComponent(subComponentIndex);
    } // pickSubComponent
 
 
    private int subComponentCount() {
-      if (this.subComponents == null) {
-         return 0;
-      } // if
-
-      return this.subComponents.size();
+      if (subComponents == null) return 0;
+      return subComponents.size();
    } // subComponentCount
    
 
    private void addSubComponent() {
-      if (this.subComponents == null) {
-         this.subComponents = new ArrayList<HL7SubComponent>();
-      } // if
-
-      this.subComponents.add(new HL7SubComponent());
+      if (subComponents == null) subComponents = new ArrayList<HL7SubComponent>();
+      subComponents.add(new HL7SubComponent());
    } // addSubComponent
 
 } // HL7Component

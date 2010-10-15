@@ -31,7 +31,9 @@ import java.text.SimpleDateFormat;
 
 
 /**
- *
+ * A small utility class to handle HL7 date time formats.
+ * Note that the time zone, if expressed is derived from the arguments, if any,
+ * and may be controlled externally.
  * @author scott
  */
 public class HL7Time {
@@ -39,7 +41,7 @@ public class HL7Time {
    private static final SimpleDateFormat hl7DTFormat = new SimpleDateFormat(hl7DTFormatStr);
    private static final SimpleDateFormat hl7DateFormat = new SimpleDateFormat(hl7DTFormatStr.substring(0, 8));
 
-   public HL7Time() { }
+   private HL7Time() { }
 
    private static String trimTime(String ts) {
       if (ts.substring(8, 10).equals("24")) return ts.substring(0, 8);
@@ -47,21 +49,36 @@ public class HL7Time {
    } // trimTime
 
 
+   /**
+    * @param dateTime A java.util.Date object representing the date-time to be expressed.
+    * @return A string representing the argument date-time in HL7 format.
+    */
    public static String get(Date dateTime) {
       return(trimTime(hl7DTFormat.format(dateTime)));
    } // get
 
 
+   /**
+    * @return A string representing the current date-time in HL7 format.
+    */
    public static String get() {
       Date dateTime = new Date();
       return(trimTime(hl7DTFormat.format(dateTime)));
    } // get
 
-   public static String getDate(Date dateTime) {
-      return(hl7DateFormat.format(dateTime));
+
+   /**
+    * @param date A java.util.Date object representing the date to be expressed.
+    * @return A string representing the argument date in HL7 format.
+    */
+   public static String getDate(Date date) {
+      return(hl7DateFormat.format(date));
    } // getDate
 
 
+   /**
+    * @return A string representing the current date in HL7 format.
+    */
    public static String getDate() {
       Date dateTime = new Date();
       return(hl7DateFormat.format(dateTime));

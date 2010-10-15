@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
  *
  * @author scott
  */
-public class HL7ElementLevel implements Iterator {
+class HL7ElementLevel implements Iterator {
    public static final int SEGMENT      = 1,
                            FIELD        = 2,
                            REPETITION   = 3,
@@ -52,9 +52,9 @@ public class HL7ElementLevel implements Iterator {
       value = level;
    } // set
 
-   public void set(int level) { this._set(level); }
+   void set(int level) { _set(level); }
 
-   public int get() {
+   int get() {
       return value;
    } // get
 
@@ -71,6 +71,18 @@ public class HL7ElementLevel implements Iterator {
    public void remove() {
       throw new UnsupportedOperationException("Not supported.");
    } // remove
+
+   static HL7Element newElementAt(HL7ElementLevel level) {
+      switch (level.value) {
+         case SEGMENT      : return new HL7Segment();
+         case FIELD        : return new HL7Field();
+         case REPETITION   : return new HL7FieldRepetition();
+         case COMPONENT    : return new HL7Component();
+         case SUBCOMPONENT : return new HL7SubComponent();
+         default: throw new IllegalArgumentException("No such HL7 element level:"
+                                                   + Integer.toString(level.value));
+      } // switch
+   } // newElementAt
 
 } // HL7ElementLevel
 

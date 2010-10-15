@@ -27,7 +27,7 @@
 package us.conxio.hl7.hl7message;
 
 /**
- *
+ * A HL7 element class for sub-component level items.
  * @author scott
  */
 public class HL7SubComponent implements HL7Element {
@@ -35,75 +35,104 @@ public class HL7SubComponent implements HL7Element {
    protected String                 content;
    private boolean                  touched;
 
+
+   /**
+    * Creates a new empty HL7SubComponent object.
+    */
    public HL7SubComponent() {
-      this.level = new HL7ElementLevel(HL7ElementLevel.SUBCOMPONENT);
+      level = new HL7ElementLevel(HL7ElementLevel.SUBCOMPONENT);
    } // HL7SubComponent
 
 
-   public HL7SubComponent(String subCompStr, HL7Encoding encoders) {
+   /**
+    * Creates a new HL7SubComponent object and populates it with the argument content.
+    * @param subCompStr The content with which to populate the HL7SubComponent.
+    */
+   public HL7SubComponent(String subCompStr) {
       this();
-      this.content = subCompStr;
+      content = subCompStr;
    } // HL7SubComponent
 
 
+   /**
+    * Determines whether the context HL7SubComponent contains any content.
+    * @return true if the HL7SubComponent has content. Otherwise false.
+    */
    public boolean hasContent() {
-      if (this.content != null && !this.content.isEmpty()) {
-         return true;
-      } // if
-
-      return false;
-   } // hasContent
+      return content != null && !content.isEmpty();
+  } // hasContent
 
 
+   /**
+    * Always returns false.
+    * @return false
+    */
    public boolean hasConstituents() {
       return false;
    } // hasConstituents
 
-   
+
+   /**
+    * Retrieves the content of the context HL7SubComponent.
+    * @return A String representation of the content of the context HL7SubComponent.
+    */
    public String getContent() {
-      return this.content;
+      return content;
    } // getContent
 
 
+   /**
+    * @return The level of the context HL7SubComponent.
+    */
    public int getLevel() {
-      return this.level.get();
+      return level.get();
    } // getLevel
 
 
+   /**
+    * Always returns null
+    * @param index
+    * @return null
+    */
    public HL7Element getElement(int index) {
       return null;
    } // getElement
 
 
+   /**
+    * Sets the content of the context HL7SubComponent to the argument text.
+    * @param msgText The text to set the content to.
+    * @param encoders ignored.
+    */
    public void set(String msgText, HL7Encoding encoders) {
-      this.content = msgText;
+      content = msgText;
       touched = true;
    } // set
 
 
+   /**
+    * @param encoders ignored.
+    * @return The content of the context HL7SubComponent.
+    */
    public String toHL7String(HL7Encoding encoders) {
-      if (this.content == null) {
-         return "";
-      } // if
-
-      return this.content;
+      if (content == null) return "";
+      return encoders.escape(content);
    } // if
 
-   
-   public String toXMLString(int subComponentIndex) {
+
+   /**
+    * @param subComponentDesignator An integral sub-component designator.
+    * @return A XML String representation of the content of the context HL7SubComponent.
+    */
+   public String toXMLString(int subComponentDesignator) {
       String tag = "subComponent";
       StringBuffer returnBuffer =  new StringBuffer("<")
               .append(tag)
               .append(" id=\"")
-              .append(Integer.toString(subComponentIndex))
+              .append(Integer.toString(subComponentDesignator))
               .append("\">");
 
-      if (this.content == null) {
-         returnBuffer.append("");
-      } else {
-         returnBuffer.append(this.content);
-      } // if - else
-
+      returnBuffer.append(content == null ? "" : content);
       returnBuffer.append("</").append(tag).append(">");
       return returnBuffer.toString();
    } // toXMLString

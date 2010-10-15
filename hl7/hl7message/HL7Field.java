@@ -38,54 +38,50 @@ public class HL7Field implements HL7Element {
 
 
    public HL7Field() {
-      this.level = new HL7ElementLevel(HL7ElementLevel.FIELD);
+      level = new HL7ElementLevel(HL7ElementLevel.FIELD);
    } // HL7Field
 
 
    public HL7Field(String fieldStr, HL7Encoding encoders) {
       this();
-      this._set(fieldStr, encoders);
+      _set(fieldStr, encoders);
    } // HL7Field
 
    public int getLevel() {
-      return this.level.get();
+      return level.get();
    } // getLevel
 
 
    public boolean wasTouched() {
-      return this.touched;
+      return touched;
    } // wasTouched
 
 
    private void _set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.REPETITION);
       ArrayList<String>  elements = encoders.hl7Split(msgText, nextLevel);
-      this.repetitions = new ArrayList<HL7FieldRepetition>();
+      repetitions = new ArrayList<HL7FieldRepetition>();
       for (String elementStr : elements) {
          HL7FieldRepetition element = new HL7FieldRepetition(elementStr, encoders);
-         this.repetitions.add(element);
+         repetitions.add(element);
       } // for
 
-      this.touched = true;
+      touched = true;
    } // set
 
    public void set(String msgText, HL7Encoding encoders) { this._set(msgText, encoders); }
    
    public String toHL7String(HL7Encoding encoders) {
-      if (!this.hasConstituents()) {
-         return "";
-      } // if
+      if (!hasRepetitions()) return "";
 
-      ArrayList<String> elementStrings = new ArrayList<String>();
-      for (HL7Element element : this.repetitions) {
-         elementStrings.add(element.toHL7String(encoders));
-      } // for
-
-      return encoders.hl7Join(elementStrings, this.level.next());
+      ArrayList<String> repStrings = new ArrayList<String>();
+      for (HL7FieldRepetition rep : repetitions) repStrings.add(rep.toHL7String(encoders));
+      return encoders.hl7Join(repStrings, level.next());
    } // toHL7String
 
+   
    public String toXMLString(int fieldIndex) {
-      if (!this.hasContent()) return "";
+      if (!hasContent()) return "";
       
       String tag = "Field";
       StringBuffer returnBuffer =  new StringBuffer("<")
@@ -94,11 +90,11 @@ public class HL7Field implements HL7Element {
               .append(Integer.toString(fieldIndex))
               .append("\">");
 
-      if (this.hasSimpleContent()) {
-         returnBuffer.append(this.getSimpleContent());
+      if (hasSimpleContent()) {
+         returnBuffer.append(getSimpleContent());
       } else {
          int repetitionIndex = 0;
-         for (HL7FieldRepetition fieldRep : this.repetitions) {
+         for (HL7FieldRepetition fieldRep : repetitions) {
             if (fieldRep.hasContent() ) {
                returnBuffer.append(fieldRep.toXMLString(repetitionIndex));
             } // if
@@ -112,21 +108,13 @@ public class HL7Field implements HL7Element {
 
 
    public HL7Element getElement(int index) {
-      if (this.repetitions == null || this.repetitions.isEmpty()) {
-         return null;
-      } // if
-
-      return this.repetitions.get(index);
+      return getRepetition(index);
    } // getElement
 
 
    public boolean hasContent() {
-      if (this.hasConstituents()) {
-         for (HL7FieldRepetition rep : this.repetitions) {
-            if (rep.hasContent()) {
-               return true;
-            } // if
-         } // if
+      if (hasRepetitions()) {
+         for (HL7FieldRepetition rep : repetitions) if (rep.hasContent()) return true;
       } // if
       
       return false;
@@ -134,8 +122,9 @@ public class HL7Field implements HL7Element {
 
 
    public boolean hasSimpleContent() {
-      if (this.hasConstituents() ) {
-         if (this.repetitions.size() < 2 && this.repetitions.get(0).hasSimpleContent()) {
+      if (hasRepetitions() ) {
+         if (  repetitions.size() < 2
+         &&    repetitions.get(0).hasSimpleContent()) {
             return true;
          } // if
       } // if
@@ -145,80 +134,51 @@ public class HL7Field implements HL7Element {
 
 
    public String getSimpleContent() {
-      if (this.hasSimpleContent()) return this.repetitions.get(0).getSimpleContent();
+      if (hasSimpleContent()) return repetitions.get(0).getSimpleContent();
 
       return "";
    } // getSimpleContent
 
 
-   public boolean hasConstituents() {
-      if (this.repetitions == null || this.repetitions.isEmpty()) {
-         return false;
-      } // if
+   public boolean hasRepetitions() {
+      return repetitions != null && !repetitions.isEmpty();
+   } // hasRepetitions
 
-      return true;
-   } // hasConstituents
 
-   public String getContent() {
-      if (this.hasSimpleContent()) {
-         return this.toHL7String(null);
-      } // if
-
-      return null;
-   } // getContent
-
-   
    public boolean hasRepetition(int index) {
-      if (this.repetitions == null || this.repetitions.isEmpty()) {
-         return false;
-      } // if
-
-      if (index >= this.repetitions.size() ) return false;
-      return true;
+      return hasRepetitions()
+          && index >= 0
+          && index < repetitions.size();
    } // hasRepetition
 
    public HL7FieldRepetition getRepetition(int index) {
-      if (this.hasRepetition(index)) {
-         return this.repetitions.get(index);
-      } // if
-
+      if (hasRepetition(index)) return repetitions.get(index);
       return null;
    } // getRepetition
 
    public void addRepetition() {
-      if (this.repetitions == null) {
-         this.repetitions = new ArrayList<HL7FieldRepetition>();
-      } // if
-
-      this.repetitions.add(new HL7FieldRepetition());
+      if (repetitions == null) repetitions = new ArrayList<HL7FieldRepetition>();
+      repetitions.add(new HL7FieldRepetition());
    } // addRepetition
 
 
    HL7FieldRepetition pickRepetition(int repetition, boolean create) {
-      if (repetition == HL7Designator.UNSPECIFIED) {
-         repetition = 0;
-      } // if
+      if (repetition == HL7Designator.UNSPECIFIED) repetition = 0;
 
-      if (!this.hasRepetition(repetition)) {
-         if (!create) {
-            return null;
-         } // if
+      if (!hasRepetition(repetition)) {
+         if (!create) return null;
 
-         for (int newIndex = this.repCount(); newIndex <= repetition; ++newIndex) {
-            this.addRepetition();
+         for (int newIndex = repCount(); newIndex <= repetition; ++newIndex) {
+            addRepetition();
          } // for
       } // if - else
 
-      return this.getRepetition(repetition);
+      return getRepetition(repetition);
    } // pickRepetition
    
 
    private int repCount() {
-      if (this.repetitions == null) {
-         return 0;
-      } // if
-
-      return this.repetitions.size();
+      return repetitions == null ? 0 : repetitions.size();
    } // repCount;
 
 } // HL7Field

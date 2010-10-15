@@ -28,6 +28,7 @@
 package us.conxio.hl7.hl7message;
 
 import java.util.ArrayList;
+import org.apache.commons.lang.StringUtils;
 import us.conxio.XMLUtilities.XMLUtils;
 
 /**
@@ -42,6 +43,7 @@ public class HL7Encoding {
                         subComponentSeparator,
                         escapeChar;
 
+   public static final String SEGMENT_TERMINATOR = HL7Message.SEGMENT_TERMINATOR;
 
    // * constructors *
    /**
@@ -57,7 +59,7 @@ public class HL7Encoding {
     * alpha-numeric or whitespace.
     */
    public HL7Encoding(int[] chars) {
-      this.initialize(chars);
+      initialize(chars);
    } // HL7Encoding
 
    /**
@@ -72,7 +74,7 @@ public class HL7Encoding {
     */
    public HL7Encoding(int fs, int cs, int rs, int ec, int ss) {
       int[] ints = { fs, cs, rs, ec, ss };
-      this.initialize(ints);
+      initialize(ints);
    } // HL7Encoding
 
 
@@ -102,16 +104,16 @@ public class HL7Encoding {
 
    // * construction utilities *
    private void initialize(int[] chars) {
-      if (!this.isUnambiguous(chars)) {
+      if (!isUnambiguous(chars)) {
          throw new IllegalArgumentException(
                  new StringBuffer("Ambiguous encoding characters:")
-                     .append(this.infoString(chars))
+                     .append(infoString(chars))
                      .append(".").toString());
       } // if
 
       int len = chars.length;
       for (int index = 0; index < len; ++index) {
-         if (!this.isValidEncoder(chars[index])) {
+         if (!isValidEncoder(chars[index])) {
             throw new IllegalArgumentException( "Not a valid encoding character:"
                                              +  Character.toString((char)chars[index])
                                              +  "("
@@ -120,12 +122,12 @@ public class HL7Encoding {
          } // if
       } // for
 
-      this.fieldSeparator = chars[0];
-      this.componentSeparator = chars[1];
-      this.repetitionSeparator = chars[2];
-      this.escapeChar = chars[3];
-      this.subComponentSeparator = chars[4];
-      this.toString();
+      fieldSeparator = chars[0];
+      componentSeparator = chars[1];
+      repetitionSeparator = chars[2];
+      escapeChar = chars[3];
+      subComponentSeparator = chars[4];
+      toString();
    } // initialize
 
 
@@ -169,7 +171,7 @@ public class HL7Encoding {
 
 
    /**
-    * Creates an arguemtn information string for error logging.
+    * Creates an argument information string for error logging.
     * @param chars
     * @return
     */
@@ -190,19 +192,19 @@ public class HL7Encoding {
    // Utilities
    String NextSeparator(String separator) {
       if (separator.equals("\r")) {
-         return(this.getFieldSeparator());
+         return(getFieldSeparator());
       } // if 
 
       if (separator.equals(getFieldSeparator())) {
-            return(this.getRepetitionSeparator());
+            return(getRepetitionSeparator());
       } // if
 
       if (separator.equals(getRepetitionSeparator())) {
-            return(this.getComponentSeparator());
+            return(getComponentSeparator());
       } // if
 
       if (separator.equals(getComponentSeparator()) ) {
-            return(this.getSubComponentSeparator());
+            return(getSubComponentSeparator());
       } // if
 
       // fall through 
@@ -217,11 +219,11 @@ public class HL7Encoding {
    @Override
    public String toString() {
       return(new StringBuffer()
-              .append((char)this.fieldSeparator)
-              .append((char)this.componentSeparator)
-              .append((char)this.repetitionSeparator)
-              .append((char)this.escapeChar)
-              .append((char)this.subComponentSeparator)
+              .append((char)fieldSeparator)
+              .append((char)componentSeparator)
+              .append((char)repetitionSeparator)
+              .append((char)escapeChar)
+              .append((char)subComponentSeparator)
               .toString());
    } // toString
 
@@ -230,19 +232,19 @@ public class HL7Encoding {
       StringBuilder contentBuffer = new StringBuilder();
       contentBuffer.append(XMLUtils.elementString( "FieldSeparator",
                                                    "&#"
-                                                 + Integer.toString(this.fieldSeparator)));
+                                                 + Integer.toString(fieldSeparator)));
       contentBuffer.append(XMLUtils.elementString( "ComponentSeparator",
                                                    "&#"
-                                                 + Integer.toString(this.componentSeparator)));
+                                                 + Integer.toString(componentSeparator)));
       contentBuffer.append(XMLUtils.elementString( "RepetitionSeparator",
                                                    "&#"
-                                                 + Integer.toString(this.repetitionSeparator)));
+                                                 + Integer.toString(repetitionSeparator)));
       contentBuffer.append(XMLUtils.elementString( "EscapeCharacter",
                                                    "&#"
-                                                 + Integer.toString(this.escapeChar)));
+                                                 + Integer.toString(escapeChar)));
       contentBuffer.append(XMLUtils.elementString( "SubComponentSeparator",
                                                    "&#"
-                                                 + Integer.toString(this.subComponentSeparator)));
+                                                 + Integer.toString(subComponentSeparator)));
       return XMLUtils.elementString("HL7Encoding", contentBuffer.toString());
    } // toXMLString
 
@@ -255,38 +257,42 @@ public class HL7Encoding {
    } // getFieldSeparator
 
    /**
-    * @param fieldSeparator the fieldSeparator to set
+    * Set the field separator.
+    * @param fieldSep the field separator value to set
     */
    public void setFieldSeparator(String fieldSep) {
-      this.fieldSeparator = fieldSep.charAt(0);
-   } // setFieldSeparator
-
-    /**
-    * @param fieldSeparator the fieldSeparator to set
-    */
-   public void setFieldSeparator(int fieldSep) {
-      this.fieldSeparator = fieldSep;
+      fieldSeparator = fieldSep.charAt(0);
    } // setFieldSeparator
 
   /**
-    * @return the componentSeparator
-    */
+   * Set the field separator.
+   * @param fieldSep the field separator value to set, as an int value.
+   */
+   public void setFieldSeparator(int fieldSep) {
+      fieldSeparator = fieldSep;
+   } // setFieldSeparator
+
+  /**
+   * Retrieve the component separator value.
+   * @return the componentSeparator
+   */
    public String getComponentSeparator() {
       return Character.toString((char)componentSeparator);
    } // getComponentSeparator
 
    /**
-    * @param componentSeparator the componentSeparator to set
+    * Set the component separator value.
+    * @param componentSep the component separator value to set
     */
    public void setComponentSeparator(String componentSep) {
-      this.componentSeparator = componentSep.charAt(0);
+      componentSeparator = componentSep.charAt(0);
    } // setComponentSeparator
 
    /**
     * @param componentSeparator the componentSeparator to set
     */
    public void setComponentSeparator(int componentSep) {
-      this.componentSeparator = componentSep;
+      componentSeparator = componentSep;
    } // setComponentSeparator
 
    /**
@@ -300,14 +306,14 @@ public class HL7Encoding {
     * @param repetitionSeparator the repetitionSeparator to set
     */
    public void setRepetitionSeparator(String repetitionSep) {
-      this.repetitionSeparator = repetitionSep.charAt(0);
+      repetitionSeparator = repetitionSep.charAt(0);
    } // setRepetitionSeparator
 
     /**
     * @param repetitionSeparator the repetitionSeparator to set
     */
    public void setRepetitionSeparator(int repetitionSep) {
-      this.repetitionSeparator = repetitionSep;
+      repetitionSeparator = repetitionSep;
    } // setRepetitionSeparator
 
   /**
@@ -321,14 +327,14 @@ public class HL7Encoding {
     * @param subComponentSeparator the subComponentSeparator to set
     */
    public void setSubComponentSeparator(String subComponentSep) {
-      this.subComponentSeparator = subComponentSep.charAt(0);
+      subComponentSeparator = subComponentSep.charAt(0);
    } // setSubComponentSeparator
 
    /**
     * @param subComponentSeparator the subComponentSeparator to set
     */
    public void setSubComponentSeparator(int subComponentSep) {
-      this.subComponentSeparator = subComponentSep;
+      subComponentSeparator = subComponentSep;
    } // setSubComponentSeparator
 
    /**
@@ -339,45 +345,43 @@ public class HL7Encoding {
    } // getEscapeChar
 
    /**
-    * @param escapeChar the escapeChar to set
+    * @param escapeChr the escapeChr to set
     */
-   public void setEscapeChar(String escapeChar) {
-      this.escapeChar = escapeChar.charAt(0);
+   public void setEscapeChar(String escapeChr) {
+      escapeChar = escapeChr.charAt(0);
    } // setEscapeChar
 
 
    /**
-    * @param escapeChar the escapeChar to set
+    * @param escapeChr the escapeChr to set
     */
-   public void setEscapeChar(int  escapeChar) {
-      this.escapeChar = escapeChar;
+   public void setEscapeChar(int  escapeChr) {
+      escapeChar = escapeChr;
    } // setEscapeChar
 
 
    /**
     * Escapes any encoding characters in the argument string.
-    * @param str the argiument string to operate upon.
+    * @param str the argument string to operate upon.
     * @return the argument string with encoding characters escaped
     */
    public String escape(String str) {
-      str = this.escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.FIELD));
-      str = this.escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.COMPONENT));
-      str = this.escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.REPETITION));
-      return  this.escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.SUBCOMPONENT));
+      str = escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.FIELD));
+      str = escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.COMPONENT));
+      str = escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.REPETITION));
+      return  escapeSeparator(str, new HL7ElementLevel(HL7ElementLevel.SUBCOMPONENT));
    } // escape
 
 
-   public int separatorAt(HL7ElementLevel level) {
-      if (level == null) {
-         throw new IllegalArgumentException("Null level.");
-      } // if
+   private int separatorAt(HL7ElementLevel level) {
+      if (level == null) throw new IllegalArgumentException("Null level.");
 
       switch (level.get()) {
-         case HL7ElementLevel.SEGMENT :      return 0x0d;
-         case HL7ElementLevel.FIELD :        return this.fieldSeparator;
-         case HL7ElementLevel.REPETITION :   return this.repetitionSeparator;
-         case HL7ElementLevel.COMPONENT :    return this.componentSeparator;
-         case HL7ElementLevel.SUBCOMPONENT : return this.subComponentSeparator;
+         case HL7ElementLevel.SEGMENT :      return HL7Message.CR;
+         case HL7ElementLevel.FIELD :        return fieldSeparator;
+         case HL7ElementLevel.REPETITION :   return repetitionSeparator;
+         case HL7ElementLevel.COMPONENT :    return componentSeparator;
+         case HL7ElementLevel.SUBCOMPONENT : return subComponentSeparator;
          default : throw new IllegalArgumentException(   "Illegal level:"
                                                       +  Integer.toString(level.get()));
       } // switch
@@ -386,28 +390,26 @@ public class HL7Encoding {
 
    private int nextBreak(String str, int separator) {
       int brk = str.indexOf(separator);
-      if (brk < 0) {
-         return brk;
-      } // if
+      if (brk < 0) return brk;
 
-      if (brk > 0 && str.charAt(brk - 1) == this.escapeChar) {
-         return brk + this.nextBreak(str.substring(brk + 1), separator);
+      if (brk > 0 && str.charAt(brk - 1) == escapeChar) {
+         return brk + nextBreak(str.substring(brk + 1), separator);
       } // if
 
       return brk;
    } // nextToken
 
 
-   public ArrayList<String> hl7Split(String str, HL7ElementLevel level) {
+   ArrayList<String> hl7Split(String str, HL7ElementLevel level) {
       ArrayList<String> retn = new ArrayList<String>();
-      char separator = (char)this.separatorAt(level);
+      char separator = (char)separatorAt(level);
       int brk = 0;
       while (true) {
-         brk = this.nextBreak(str, separator);
+         brk = nextBreak(str, separator);
          if (brk < 0) {
             retn.add(str);
             return retn;
-         }
+         } // if
          
          retn.add(str.substring(0, brk));
          str = str.substring(++brk);
@@ -417,16 +419,15 @@ public class HL7Encoding {
 
    private String hl7Join(ArrayList<String> elements, HL7ElementLevel level, boolean escaped) {
       StringBuilder retnBuffer = new StringBuilder();
-      char separator = (char)this.separatorAt(level);
+      char separator = (char)separatorAt(level);
+      String encoders = toString();
 
       boolean firstTime = true;
       for (String element : elements) {
          if (firstTime) {
             firstTime = false;
          } else {
-            if (escaped) {
-               retnBuffer.append((char)this.escapeChar);
-            } // if
+            if (escaped) retnBuffer.append((char)escapeChar);
             retnBuffer.append(separator);
          } // if
 
@@ -437,13 +438,13 @@ public class HL7Encoding {
    } // hl7Join
 
 
-   public String hl7Join(ArrayList<String> elements, HL7ElementLevel level) {
-      return this.hl7Join(elements, level, false);
+   String hl7Join(ArrayList<String> elements, HL7ElementLevel level) {
+      return hl7Join(elements, level, false);
    } // hl7Join
 
 
    private String escapeSeparator(String str, HL7ElementLevel level) {
-      ArrayList<String> elements = this.hl7Split(str, level);
-      return this.hl7Join(elements, level, true);
+      ArrayList<String> elements = hl7Split(str, level);
+      return hl7Join(elements, level, true);
    } // escapeSeparator
 } // class HL7Encoding

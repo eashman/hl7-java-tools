@@ -27,10 +27,10 @@
 package us.conxio.hl7.hl7message;
 
 /**
- *
+ * Note: This class is currently unused.
  * @author scott
  */
-public class GenericHL7Element extends AbstractHL7Element implements HL7Element {
+class GenericHL7Element extends AbstractHL7Element implements HL7Element {
 
    public GenericHL7Element(HL7ElementLevel level) {
       super(level.get());

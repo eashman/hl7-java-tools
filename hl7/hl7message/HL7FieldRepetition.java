@@ -39,66 +39,54 @@ public class HL7FieldRepetition implements HL7Element {
 
 
    public HL7FieldRepetition() {
-      this.level = new HL7ElementLevel(HL7ElementLevel.REPETITION);
+      level = new HL7ElementLevel(HL7ElementLevel.REPETITION);
    } // HL7FieldRepetition
 
 
    public HL7FieldRepetition(String repetitionStr, HL7Encoding encoders) {
       this();
-      this._set(repetitionStr, encoders);
+      _set(repetitionStr, encoders);
    } // HL7FieldRepetition
 
 
    public boolean hasComponent(int index) {
-      if (  this.components == null
-      ||    index < 0
-      ||    index >= this.components.size()) {
-         return false;
-      } // if
-
-      return true;
+      return hasComponents()
+         &&  index >= 0
+         &&  index < components.size();
    } // hasSubComponent
 
 
    public HL7Component getComponent(int index) {
-      if (this.hasComponent(index)) {
-         return this.components.get(index);
-      } // if
-
+      if (hasComponent(index)) return components.get(index);
       return null;
    } // getComponent
 
 
    public HL7Element getElement(int index) {
-      return this.getComponent(index);
+      return getComponent(index);
    } // getElement
 
    
-   public void setLevel(int level) {
-      this.level.set(level);
-   } // setLevel
-
-
    public int getLevel() {
-      return this.level.get();
+      return level.get();
    } // getLevel
 
 
    public boolean wasTouched() {
-      return this.touched;
+      return touched;
    } // wasTouched
 
 
    private void _set(String msgText, HL7Encoding encoders) {
       HL7ElementLevel nextLevel = new HL7ElementLevel(HL7ElementLevel.COMPONENT);
       ArrayList<String>  elements = encoders.hl7Split(msgText, nextLevel);
-      this.components = new ArrayList<HL7Component>();
+      components = new ArrayList<HL7Component>();
       for (String elementStr : elements) {
          HL7Component element = new HL7Component(elementStr, encoders);
-         this.components.add(element);
+         components.add(element);
       } // for
 
-      this.touched = true;
+      touched = true;
    } // set
 
 
@@ -106,21 +94,17 @@ public class HL7FieldRepetition implements HL7Element {
 
 
    public String toHL7String(HL7Encoding encoders) {
-      if (this.components == null || this.components.isEmpty()) {
-         return "";
-      } // if
+      if (!hasComponents()) return "";
 
-      ArrayList<String> elementStrings = new ArrayList<String>();
-      for (HL7Component element : this.components) {
-         elementStrings.add(element.toHL7String(encoders));
-      } // for
+      ArrayList<String> compStrings = new ArrayList<String>();
+      for (HL7Component comp : components) compStrings.add(comp.toHL7String(encoders));
 
-      return encoders.hl7Join(elementStrings, this.level.next());
+      return encoders.hl7Join(compStrings, level.next());
    } // toString
 
 
    public String toXMLString(int repIndex) {
-      if (!this.hasContent()) return "";
+      if (!hasContent()) return "";
 
       String tag = "Repetition";
       StringBuffer returnBuffer =  new StringBuffer("<")
@@ -129,15 +113,15 @@ public class HL7FieldRepetition implements HL7Element {
               .append(Integer.toString(repIndex))
               .append("\">");
 
-      if (this.hasSimpleContent()) {
-         returnBuffer.append(this.getSimpleContent());
+      if (hasSimpleContent()) {
+         returnBuffer.append(getSimpleContent());
       } else {
-         int componentIndex = 1;
-         for (HL7Component component : this.components) {
+         int componentDesignator = 1;
+         for (HL7Component component : components) {
             if (component.hasContent() ) {
-               returnBuffer.append(component.toXMLString(componentIndex));
+               returnBuffer.append(component.toXMLString(componentDesignator));
             } // if
-            ++componentIndex;
+            ++componentDesignator;
          } // for
       } // if - else
 
@@ -147,12 +131,8 @@ public class HL7FieldRepetition implements HL7Element {
 
 
    public boolean hasContent() {
-      if (this.hasConstituents()) {
-         for (HL7Component comp : this.components) {
-            if (comp.hasContent()) {
-               return true;
-            } // if
-         } // if
+      if (hasComponents()) {
+         for (HL7Component comp : components) if (comp.hasContent()) return true;
       } // if
 
       return false;
@@ -160,8 +140,9 @@ public class HL7FieldRepetition implements HL7Element {
 
 
    public boolean hasSimpleContent() {
-      if (this.hasConstituents() ) {
-         if (this.components.size() < 2 && this.components.get(0).hasSimpleContent()) {
+      if (hasComponents() ) {
+         if (  components.size() < 2
+         &&    components.get(0).hasSimpleContent()) {
             return true;
          } // if
       } // if
@@ -171,68 +152,45 @@ public class HL7FieldRepetition implements HL7Element {
 
 
    public String getSimpleContent() {
-      if (this.hasSimpleContent()) {
-         return this.components.get(0).getSimpleContent();
-      } // if
-
+      if (hasSimpleContent()) return components.get(0).getSimpleContent();
       return "";
    } // if
 
 
-   public boolean hasConstituents() {
-      if (this.components != null && this.components.size() > 0) {
-         return true;
-      } // if
-
-      return false;
-   } // hasConstituents
+   public boolean hasComponents() {
+      return components != null && !components.isEmpty();
+   } // hasComponents
 
 
-   public String getContent() {
-      return null;
-   } // getContent
+   HL7Component pickComponent(int componentIndex, boolean create) {
+      if (!hasComponent(componentIndex)) {
+         if (!create) return null;
 
-
-   HL7Component pickComponent(int component, boolean create) {
-      if (!this.hasComponent(component)) {
-         if (!create) {
-            return null;
-         } // if
-
-         for (int newIndex = this.componentCount(); newIndex <= component; ++newIndex) {
-            this.addComponent();
+         for (int newIndex = componentCount(); newIndex <= componentIndex; ++newIndex) {
+            addComponent();
          } // for
       } // if
 
-      return this.getComponent(component);
+      return getComponent(componentIndex);
    } // pickComponent
 
 
    private int componentCount() {
-      if (this.components == null) {
-         return 0;
-      } // if
-
-      return this.components.size();
+      if (!this.hasComponents()) return 0;
+      return components.size();
    } // componentCount
 
 
    private void addComponent() {
-      if (this.components == null) {
-         this.components = new ArrayList<HL7Component>();
-      } // if
-
-      this.components.add(new HL7Component());
+      if (components == null) components = new ArrayList<HL7Component>();
+      components.add(new HL7Component());
    } // addComponent
 
    public void addComponent(int index) {
-      if (this.hasComponent(index)) return;
+      if (hasComponent(index)) return;
 
-      if (this.components == null) {
-         this.components = new ArrayList<HL7Component>();
-      } // if
-
-      while (index >= this.components.size()) this.addComponent();
+      if (components == null) components = new ArrayList<HL7Component>();
+      while (index >= components.size()) addComponent();
    } // addComponent
 
 } // HL7FieldRepetition
