@@ -25,12 +25,16 @@
 
 package us.conxio.hl7.hl7stream;
 
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 
 import us.conxio.hl7.hl7message.HL7Message;
 
@@ -48,7 +52,7 @@ class HL7ServiceWorker  implements Runnable {
      * The HL7MessageStream to use for incoming HL7 transaction messages.
      * The socket passed to the HL7MessageServiceWorker is bound to this stream.
      */
-    protected HL7SocketStream   inboundStream  = null;
+    protected HL7MLLPStream   inboundStream  = null;
     /**
      * A flag to control use of SSL for network i/o.
      */
@@ -104,7 +108,7 @@ class HL7ServiceWorker  implements Runnable {
       } // if
 
       try {
-          this.inboundStream = new HL7SocketStream(clientSocket, true);
+          this.inboundStream = new HL7MLLPStream(clientSocket, true);
 
           HL7Message inboundMsg = null;
           while ( (inboundMsg = this.inboundStream.read()) != null) {
@@ -141,7 +145,7 @@ public class HL7Server implements Runnable, HL7Stream {
     */
    protected boolean             isStopped;
    /**
-    * A refrence to the currently running thread.
+    * A reference to the currently running thread.
     */
    protected Thread              runningThread;
    /**
@@ -156,21 +160,24 @@ public class HL7Server implements Runnable, HL7Stream {
     * The socket which the server uses to accept connection requests.
     */
    protected ServerSocket        serverSock;
-   private static Logger         logger;
+   private static Logger         logger = null;
    private int                   status;
    
    
-   private HL7Server() {}
+   private HL7Server() {
+      logger = Logger.getLogger(getClass());
+   } // HL7Server constructor
+
    /**
     * Create an instance of the thread pooled server, assuming that the host is localhost.
     * @param port The port no. for the server to listen on for connection requests.
-    * @param poolSize The desired thread pool size
+    * @param poolSizeArg The desired thread pool size
     */
-   public HL7Server(int port, int poolSize) {
-      this.serverPort = port;
-      this.poolSize = (poolSize < 2) ? 2 : poolSize;
-      this.threadPool = Executors.newFixedThreadPool(this.poolSize);
-      HL7Server.logger = Logger.getLogger(this.getClass());
+   public HL7Server(int port, int poolSizeArg) {
+      this();
+      serverPort = port;
+      poolSize = (poolSizeArg < 2) ? 2 : poolSizeArg;
+      threadPool = Executors.newFixedThreadPool(poolSize);
    } // HL7Server constructor
    
    
@@ -182,7 +189,7 @@ public class HL7Server implements Runnable, HL7Stream {
     */
    public HL7Server(int port, int poolSize, HL7MessageHandler handler) {
       this(port, poolSize);
-      this.msgHandler = handler;
+      msgHandler = handler;
    } // HL7Server constructor
 
 
@@ -199,11 +206,10 @@ public class HL7Server implements Runnable, HL7Stream {
                                           + "):Not a valid HL7 server URI.");
       } // if
 
-      this.serverPort = streamURI.getPortNo();
+      serverPort = streamURI.getPortNo();
       int uriPoolSize = streamURI.uriServerPoolSize();
-      this.poolSize = (uriPoolSize < 2) ? 2 : uriPoolSize;
-      this.threadPool = Executors.newFixedThreadPool(this.poolSize);
-      HL7Server.logger = Logger.getLogger(this.getClass());
+      poolSize = (uriPoolSize < 2) ? 2 : uriPoolSize;
+      threadPool = Executors.newFixedThreadPool(poolSize);
    } // HL7Server constructor
 
 
@@ -212,7 +218,7 @@ public class HL7Server implements Runnable, HL7Stream {
     * @param handler
     */
    public void setHandler(HL7MessageHandler handler) {
-      this.msgHandler = handler;
+      msgHandler = handler;
    } // setHandler
 
 
@@ -221,60 +227,54 @@ public class HL7Server implements Runnable, HL7Stream {
     * to HL7ServiceWorker instances in the thread pool.
     */
    public void run() {
-      synchronized(this){
-         this.runningThread = Thread.currentThread();
+      synchronized (this) {
+         runningThread = Thread.currentThread();
       } // synchronized
 
-      String detailedIDString =   "HL7Server(port:"
-                              +   this.serverPort
-                              +   ", poolSize:"
-                              +   this.poolSize
-                              +   ", handler:"
-                              +   this.msgHandler.getClass().getSimpleName()
-                              +   ").run:";
-      this.log(Level.INFO, detailedIDString + " Started.");
+      String detailedIDString = detailedIDString() + ".run:";
+      logger.info(detailedIDString + " Started.");
 
-      while (!this.isStopped) {
-         if (this.serverSock == null || this.serverSock.isClosed() ) {
-            this.openServerSocket();
+      while (!isStopped) {
+         if (serverSock == null || serverSock.isClosed() ) {
+            openServerSocket();
          } // if
 
-         this.status = HL7Stream.OPEN;
+         status = HL7Stream.OPEN;
          Socket clientSocket = null;
          try {
-            clientSocket = this.serverSock.accept();
-         } catch (IOException e) {          
-            if (this.isStopped())  {
-               this.log(Level.INFO, detailedIDString + " Stopped Listening.");
+            clientSocket = serverSock.accept();
+         } catch (IOException ioEx) {
+            if (isStopped())  {
+               logger.info(detailedIDString + " Stopped Listening.");
                return;
             }
 
-            if (!this.serverSock.isClosed() ) {
-               throw new RuntimeException("Error accepting client connection", e);
+            if (!serverSock.isClosed() ) {
+               throw new RuntimeException("Error accepting client connection", ioEx);
             } // if
          } // try - catch
 
          if (clientSocket != null) {
-            this.threadPool.execute(new HL7ServiceWorker(clientSocket, this.msgHandler) );
+            threadPool.execute(new HL7ServiceWorker(clientSocket, msgHandler) );
          } // if
       } // while
       
-      this.threadPool.shutdown();
-      this.log(Level.INFO, detailedIDString + " Server Stopped.");
+      threadPool.shutdown();
+      logger.info(detailedIDString + " Server Stopped.");
    } // run
    
    
     private synchronized boolean isStopped() {
-        return this.isStopped;
+        return isStopped;
     } // isStopped
 
     
     private void openServerSocket() {
       try {
-         this.serverSock = new ServerSocket(this.serverPort);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot open port:" + this.serverPort, e);
-        } // try - catch
+         serverSock = new ServerSocket(serverPort);
+      } catch (IOException ioEx) {
+            throw new RuntimeException("Cannot open port:" + serverPort, ioEx);
+      } // try - catch
     } // openServerSocket
 
     
@@ -282,25 +282,15 @@ public class HL7Server implements Runnable, HL7Stream {
      * A method for stopping the server.
      */
     public synchronized void stop(){
-        this.isStopped = true;
+        isStopped = true;
         try {         
-            this.log(Level.INFO, "Closing serverSock.");
-            this.serverSock.close();
-            this.status = HL7Stream.CLOSED;
-        } catch (IOException e) {
-            throw new RuntimeException("Error closing server", e);
+            logger.info("Closing serverSock.");
+            serverSock.close();
+            status = HL7Stream.CLOSED;
+        } catch (IOException ioEx) {
+            throw new RuntimeException("Error closing server", ioEx);
         } // try - catch
     } // stop
-
-
-    // Logging
-    private void log(Level level, String msg) {
-      if (HL7Server.logger == null) {
-         HL7Server.logger = Logger.getLogger(this.getClass());
-      } // if
-      
-      HL7Server.logger.log(level, msg);
-    } // log
 
 
     /**
@@ -333,17 +323,17 @@ public class HL7Server implements Runnable, HL7Stream {
 
     /**
      * Creates a status string for the context server instantiation.
-     * @return the created ctring.
+     * @return the created string.
      */
     public String description() {
       return "HL7Server(port:"
-         +   this.serverPort
+         +   serverPort
          +   ", poolSize:"
-         +   this.poolSize
+         +   poolSize
          +   ", handler:"
-         +   this.msgHandler.getClass().getSimpleName()
+         +   msgHandler.getClass().getSimpleName()
          +   "):"
-         +   this.statusString();
+         +   statusString();
    } // description
 
 
@@ -352,7 +342,7 @@ public class HL7Server implements Runnable, HL7Stream {
      * @return the status value as an integer.
      */
    public int status() {
-      return this.status;
+      return status;
    } // status
 
 
@@ -361,7 +351,7 @@ public class HL7Server implements Runnable, HL7Stream {
     * @return true if the context server is closed, otherwsie false;
     */
    public boolean isClosed() {
-      return (this.status == HL7Stream.CLOSED);
+      return (status == HL7Stream.CLOSED);
    } // isClosed
 
 
@@ -370,29 +360,29 @@ public class HL7Server implements Runnable, HL7Stream {
     * @return true if the context server is open, otherwsie false;
     */
    public boolean isOpen() {
-      return (this.status == HL7Stream.OPEN);
+      return (status == HL7Stream.OPEN);
    } // isOpen
 
 
    /**
     * Disallowed operation.
     * @param msg
-    * @return Always throws a Innapropriate operation HL7IOException.
+    * @return Always throws a Inappropriate operation HL7IOException.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean write(HL7Message msg) throws HL7IOException {
-      throw new HL7IOException( "HL7Server.write:Innapropriate operation.",
+      throw new HL7IOException( "HL7Server.write:Inappropriate operation.",
                                  HL7IOException.INAPPROPRIATE_OPERATION);
    } // write
 
 
    /**
     * Disallowed operation.
-    * @return Always throws a Innapropriate operation HL7IOException.
+    * @return Always throws a Inappropriate operation HL7IOException.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7Message read() throws HL7IOException {
-      throw new HL7IOException( "HL7Server.read:Innapropriate operation.",
+      throw new HL7IOException( "HL7Server.read:Inappropriate operation.",
                                  HL7IOException.INAPPROPRIATE_OPERATION);
    } // write
 
@@ -403,7 +393,7 @@ public class HL7Server implements Runnable, HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean close() throws HL7IOException {
-      this.stop();
+      stop();
       return true;
    } // close
 
@@ -427,5 +417,17 @@ public class HL7Server implements Runnable, HL7Stream {
    public HL7MessageHandler dispatchHandler() {
       return null;
    } // dispatchHandler
+
+   private String detailedIDString() {
+      return new StringBuilder(getClass().getSimpleName())
+                  .append("(port:")
+                  .append(Integer.toString(serverPort))
+                  .append(", poolSize:")
+                  .append(Integer.toString(poolSize))
+                  .append(", handler:")
+                  .append(msgHandler.getClass().getSimpleName())
+                  .append(")")
+                  .toString();
+   } // detailedIDString
 
 } // HL7Server

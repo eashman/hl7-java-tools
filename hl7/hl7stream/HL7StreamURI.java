@@ -32,8 +32,7 @@ package us.conxio.hl7.hl7stream;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 
 
@@ -44,13 +43,55 @@ import org.apache.commons.lang.StringUtils;
 public class HL7StreamURI {
    private URI   uri;
 
+   public static final String HL7STREAM_URI_SCHEME_FILE_READER          = "file-reader";
+   public static final String HL7STREAM_URI_SCHEME_FILE_WRITER          = "file-writer";
+   public static final String HL7STREAM_URI_SCHEME_FILE_APPENDER        = "file-appender";
+   public static final String HL7STREAM_URI_SCHEME_FILE                 = "file";
+
+   public static final String HL7STREAM_URI_SCHEME_MLLP_WRITER          = "mllp-writer";
+   public static final String HL7STREAM_URI_SCHEME_MLLP_READER          = "mllp-reader";
+   public static final String HL7STREAM_URI_SCHEME_MLLP_CLIENT          = "mllp-client";
+   public static final String HL7STREAM_URI_SCHEME_MLLP_SERVER          = "mllp-server";
+   public static final String HL7STREAM_URI_SCHEME_MLLP                 = "mllp";
+
+   public static final String HL7STREAM_URI_SCHEME_LLP_WRITER           = "llp-writer";
+   public static final String HL7STREAM_URI_SCHEME_LLP_READER           = "llp-reader";
+   public static final String HL7STREAM_URI_SCHEME_LLP_CLIENT           = "llp-client";
+   public static final String HL7STREAM_URI_SCHEME_LLP_SERVER           = "llp-server";
+   public static final String HL7STREAM_URI_SCHEME_LLP                  = "llp";
+
+   public static final String HL7STREAM_URI_SCHEME_HL7_CLIENT           = "hl7-client";
+   public static final String HL7STREAM_URI_SCHEME_HL7_SERVER           = "hl7-server";
+   public static final String HL7STREAM_URI_SCHEME_HL7                  = "hl7";
+
+   public static final String HL7STREAM_URI_SCHEME_SECURE_HL7           = "hl7-ssl";
+   public static final String HL7STREAM_URI_SCHEME_SECURE_HL7_CLIENT    = "hl7-ssl-client";
+   public static final String HL7STREAM_URI_SCHEME_SECURE_HL7_SERVER    = "hl7-ssl-server";
+
+   public static final String HL7STREAM_URI_SCHEME_TCP_CLIENT           = "tcp-client";
+   public static final String HL7STREAM_URI_SCHEME_TCP_SERVER           = "tcp-server";
+   public static final String HL7STREAM_URI_SCHEME_TCP                  = "tcp";
+
+   public static final String HL7STREAM_URI_SCHEME_SECURE               = "ssl";
+   public static final String HL7STREAM_URI_SCHEME_SECURE_CLIENT        = "ssl-client";
+   public static final String HL7STREAM_URI_SCHEME_SECURE_SERVER        = "ssl-server";
+
+   private static final String STRING_SERVER = "server";
+   private static final String STRING_XML    = "xml";
+   private static final String STRING_SSL    = "ssl";
+
+   private static final String URI_SCHEME_TERMINATOR = ":";
+   private static final String URI_AUTH_PREFIX = "//";
+   private static final String URI_PORT_PREFIX = URI_SCHEME_TERMINATOR;
+
+
    private HL7StreamURI() { }
    /**
     * Constructs a new stream URI from the argument URI.
     * @param uri
     */
-   public HL7StreamURI(URI uri) {
-      this.uri = uri;
+   public HL7StreamURI(URI uriArg) {
+      uri = uriArg;
    } // HL7StreamURI
 
 
@@ -61,7 +102,7 @@ public class HL7StreamURI {
     */
    public HL7StreamURI(String uriStr) throws HL7IOException {
       try {
-         this.uri = new URI(uriStr);
+         uri = new URI(uriStr);
       } catch (URISyntaxException uEx) {
          throw new HL7IOException("HL7StreamURI:URISyntaxException", uEx);
       } // try - catch
@@ -70,11 +111,17 @@ public class HL7StreamURI {
    public HL7StreamURI(String host, int port) throws HL7IOException {
       this();
 
-      StringBuilder uriBuilder = new StringBuilder("tcp://");
+      StringBuilder uriBuilder = new StringBuilder(HL7STREAM_URI_SCHEME_TCP)
+                                       .append(URI_SCHEME_TERMINATOR)
+                                       .append(URI_AUTH_PREFIX);
+
       if (StringUtils.isNotEmpty(host)) uriBuilder.append(host);
-      if (port > 0) uriBuilder.append(":").append(Integer.toString(port));
+
+      if (port > 0) uriBuilder.append(URI_PORT_PREFIX)
+                              .append(Integer.toString(port));
+
       try {
-         this.uri = new URI(uriBuilder.toString());
+         uri = new URI(uriBuilder.toString());
       } catch (URISyntaxException uEx) {
          throw new HL7IOException("URISyntaxException", uEx);
       } // try - catch
@@ -86,18 +133,7 @@ public class HL7StreamURI {
     * @return true if the context URI could refer to a server, otherwise false.
     */
    public boolean isServerURI() {
-      String uriScheme = this.uri.getScheme();
-
-      if (uriScheme == null) {
-         return false;
-      } // if
-
-      uriScheme = uriScheme.toLowerCase();
-      if (uriScheme.contains("server")) {
-         return true;
-      } // if
-
-      return false;
+      return schemeHas(STRING_SERVER);
    } // isServerURI
 
 
@@ -106,18 +142,7 @@ public class HL7StreamURI {
     * @return true if the context HL7URI is a XML stream, otherwise false.
     */
    public boolean isXMLURI() {
-      String uriScheme = this.uri.getScheme();
-
-      if (uriScheme == null) {
-         return false;
-      } // if
-
-      uriScheme = uriScheme.toLowerCase();
-      if (uriScheme.contains("xml")) {
-         return true;
-      } // if
-
-      return false;
+      return schemeHas(STRING_XML);
    } // isXMLURI
 
 
@@ -126,51 +151,48 @@ public class HL7StreamURI {
     * @return true if the context URI could refer to a socket, otherwise false.
     */
    public boolean isSocketURI() {
-      String uriScheme = this.uri.getScheme();
-
-      if (uriScheme == null) {
-         return false;
-      } // if
-
-      uriScheme = uriScheme.toLowerCase();
-      if (  uriScheme.contains("tcp")
-         || uriScheme.contains("hl7")
-         || uriScheme.contains("llp") ) {
-         return true;
-      } // if
-
-      return false;
+      return isSimpleSocketURI() || isSecureSocketURI();
    } // isSocketURI
 
 
    /**
+    * Determines whether the context URI refers to an unsecured socket.
+    * @return true if the context URI could refer to an unsecured socket,
+    * otherwise false.
+    */
+    public boolean isSimpleSocketURI() {
+      return schemeHas(HL7STREAM_URI_SCHEME_TCP)
+          || schemeHas(HL7STREAM_URI_SCHEME_HL7)
+          || schemeHas(HL7STREAM_URI_SCHEME_LLP);
+    } // isSocketURI
+
+
+   /**
+    * Determines whether the context URI refers to a secured socket.
+    * @return true if the context URI could refer to a secured socket,
+    * otherwise false.
+    */
+   public boolean isSecureSocketURI() {
+      return schemeHas(STRING_SSL);
+   } // isSocketURI
+
+  /**
     * Determines whether the context URI refers to a file.
     * @return true if the context URI could refer to a file, otherwise false.
     */
    public boolean isFileURI() {
-      String uriScheme = this.uri.getScheme();
-
-      if (uriScheme == null) {
-         return false;
-      } // if
-
-      uriScheme = uriScheme.toLowerCase();
-      if (uriScheme.contains("file")) {
-         return true;
-      } // if
-
-      return false;
+      return schemeHas(HL7STREAM_URI_SCHEME_FILE);
    } // isFileURI
 
 
    /**
-    * Reformulates the context URI to have a shceme of "file".
+    * Reformulates the context URI to have a scheme of "file".
     * @return the URI resulting from the scheme replacement.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public URI fileURIOf() throws HL7IOException {
-      String uriScheme = this.uri.getScheme();
-      String uriString = this.uri.toString();
+      String uriScheme = getScheme();
+      String uriString = uri.toString();
       String replaced = uriString.replaceFirst(uriScheme, "file");
       try {
          return new URI(replaced);
@@ -182,10 +204,10 @@ public class HL7StreamURI {
 
    /**
     * Access to the context URI itself.
-    * @param uri The context URI itself.
+    * @param uriArg The context URI itself.
     */
-   public void setURI(URI uri) {
-      this.uri = uri;
+   public void setURI(URI uriArg) {
+      uri = uriArg;
    } // setURI
 
 
@@ -194,18 +216,7 @@ public class HL7StreamURI {
     * @return true if the context URI refers to a file reader, otherwise false.
     */
    public boolean isFileReaderURI() {
-      String uriScheme = this.uri.getScheme();
-
-      if (uriScheme == null) {
-         return false;
-      } // if
-
-      uriScheme = uriScheme.toLowerCase();
-      if (uriScheme.equals("file-reader") ) {
-         return true;
-      } // if
-
-      return false;
+      return schemeHas(HL7STREAM_URI_SCHEME_FILE_READER);
    } // isFileReaderURI
 
 
@@ -214,34 +225,12 @@ public class HL7StreamURI {
     * @return true if the context URI refers to a file writer, otherwise false.
     */
    public boolean isFileWriterURI() {
-      String uriScheme = this.uri.getScheme();
-
-      if (uriScheme == null) {
-         return false;
-      } // if
-
-      uriScheme = uriScheme.toLowerCase();
-      if (uriScheme.equals("file-writer")) {
-         return true;
-      } // if
-
-      return false;
+      return schemeHas(HL7STREAM_URI_SCHEME_FILE_WRITER);
    } // isFileWriterURI
 
 
     public boolean isFileAppenderURI() {
-      String uriScheme = this.uri.getScheme();
-
-      if (uriScheme == null) {
-         return false;
-      } // if
-
-      uriScheme = uriScheme.toLowerCase();
-      if (uriScheme.equals("file-appender")) {
-         return true;
-      } // if
-
-      return false;
+      return schemeHas(HL7STREAM_URI_SCHEME_FILE_APPENDER);
    } // isFileAppenderURI
 
 
@@ -252,8 +241,8 @@ public class HL7StreamURI {
    public int uriServerPoolSize() {
       int poolSize = 0;
 
-      String queryStr = this.uri.getQuery();
-      if ( queryStr != null && queryStr.length() > 0
+      String queryStr = uri.getQuery();
+      if ( StringUtils.isNotEmpty(queryStr)
       &&   queryStr.toLowerCase().startsWith("pool")) {
          int eqIndex = queryStr.indexOf("=");
          if (eqIndex >= 0) {
@@ -272,11 +261,8 @@ public class HL7StreamURI {
     */
    public int getPortNo() {
       int portNo = 0;
-      if ( (portNo = this.uri.getPort()) < 0) {
-         String schemeStr = uri.getScheme();
-         if (schemeStr.toLowerCase().contains("hl7")) {
-            portNo = 2575;
-         } // if
+      if ( (portNo = uri.getPort()) < 0) {
+         if (schemeHas(HL7STREAM_URI_SCHEME_HL7)) portNo = 2575;
       } // if
 
       return portNo;
@@ -289,14 +275,14 @@ public class HL7StreamURI {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7Stream getHL7StreamReader() throws HL7IOException {
-      if (this.isFileURI() && !this.isFileWriterURI()) {
-         return new HL7FileReader(this.fileURIOf());
-      } else if (this.isServerURI()) {
-         return new HL7Server(this.getPortNo(), this.uriServerPoolSize());
+      if (isFileURI() && !isFileWriterURI()) {
+         return new HL7FileReader(fileURIOf());
+      } else if (isServerURI()) {
+         return new HL7Server(getPortNo(), uriServerPoolSize());
       } // if - else if
 
       throw new HL7IOException(  "HL7StreamURI.getHL7StreamReader():Uninterpreable URI:"
-                                 + this.uri.toString(),
+                                 + uri.toString(),
                                  HL7IOException.UNINTERPERABLE_URI);
    } // getHL7StreamReader
 
@@ -307,12 +293,13 @@ public class HL7StreamURI {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7Stream getHL7StreamWriter() throws HL7IOException {
-      if (this.isFileWriterURI() || this.isFileAppenderURI()) {
-         return new HL7FileWriter(this.uri);
-      } else if (this.isSocketURI()) {
-         return new HL7SocketStream(this.uri.getHost(), this.getPortNo());
-      } else if (this.isXMLURI()) {
-         return new HL7XMLFileWriter(this.uri);
+      if (isFileWriterURI() || isFileAppenderURI()) {
+         return new HL7FileWriter(uri);
+      } else if (isSocketURI()) {
+
+         return new HL7SocketStream(uri.getHost(), getPortNo());
+      } else if (isXMLURI()) {
+         return new HL7XMLFileWriter(uri);
       } // if - else if
 
       throw new HL7IOException(  "HL7StreamURI.getHL7StreamWriter():Uninterpreable URI:"
@@ -321,22 +308,38 @@ public class HL7StreamURI {
    } // getHL7StreamWriter
 
    public String getHostName() {
-      return this.uri.getHost();
+      return uri.getHost();
    } // getHostName
 
    public boolean isValid() {
       // TODO: More comprehehnsive validation.
-      return   this.isFileAppenderURI()
-         ||    this.isFileReaderURI()
-         ||    this.isFileWriterURI()
-         ||    this.isServerURI()
-         ||    this.isSocketURI();
+      return   isFileAppenderURI()
+         ||    isFileReaderURI()
+         ||    isFileWriterURI()
+         ||    isServerURI()
+         ||    isSocketURI();
    } // isValid
 
 
    public URI uri() {
       return uri;
    } // uri
+
+   private boolean hasScheme() {
+      return hasURI() && uri.getScheme() != null;
+   } // hasScheme
+
+   private boolean hasURI() {
+      return uri != null;
+   } // hasURI
+
+   private String getScheme() {
+      return hasScheme() ? uri.getScheme().toLowerCase() : null;
+   } // getScheme
+
+   private boolean schemeHas(String str) {
+      return hasScheme() && getScheme().contains(str);
+   } // schemeHas
 
 
 } // HL7StreamURI

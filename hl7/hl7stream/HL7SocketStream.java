@@ -25,13 +25,15 @@
 
 package us.conxio.hl7.hl7stream;
 
-/**
- *
- * @author scott
- */
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
-import java.io.*;
-import java.net.*;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
@@ -46,7 +48,7 @@ import us.conxio.hl7.hl7message.HL7Message;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
-   private static Logger   logger;
+   private static Logger   logger        = null;
    static final int        STX           = 0x0b,
                            FS            = 0x1c,
                            EOB           = 0x0d;
@@ -78,6 +80,11 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
    BufferedWriter          out;
 
 
+   private HL7SocketStream() {
+      logger = Logger.getLogger(getClass());
+   } // HL7SocketStream constructor
+
+
    /**
     * Constructs a new stream object using the argument socket.
     * @param sock A connected socket resulting from a connection request to a
@@ -85,14 +92,10 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7SocketStream(Socket sock) throws HL7IOException {
-      if (HL7SocketStream.logger == null) {
-         logger = Logger.getLogger(this.getClass());
-         logger.setLevel(Level.TRACE);
-      } // if
-
-      this.socket = sock;
-      this.directive = HL7SocketStream.READER;
-      this.mediaType = HL7SocketStream.SOCKET_TYPE;
+      this();
+      socket = sock;
+      directive = READER;
+      mediaType = SOCKET_TYPE;
    } // HL7SocketStream
 
 
@@ -106,9 +109,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
     */
    public HL7SocketStream(Socket sock, boolean openReq) throws HL7IOException {
       this(sock);
-      if (openReq) {
-         this.openReader();
-      } // if
+      if (openReq) this.openReader();
    } // HL7SocketStream
 
 
@@ -234,7 +235,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
 
 
    private String _readMsg() throws HL7IOException {
-      StringBuffer   hl7Msg = new StringBuffer();
+      StringBuilder  hl7Msg = new StringBuilder();
       int            inData;
       boolean        startFound = false,
                      fsFound = false;
@@ -337,7 +338,7 @@ public class HL7SocketStream extends HL7StreamBase implements HL7Stream {
       HL7SocketStream.logger.trace(traceHeader);
       HL7SocketStream.logger.trace(msg.toHL7String());
 
-      HL7Message ack = msg.Acknowledgment(true, "ok", null, null);
+      HL7Message ack = msg.acknowledgment(true, "ok", null, null);
       traceHeader = new StringBuffer( "read(): Sending acknowledgment [")
                               .append(ack.idString())
                               .append("].[")

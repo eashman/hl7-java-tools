@@ -208,7 +208,7 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
 
 
    /**
-    * this method always throws a INAPPROPRIATE_OPERATION HL7IOException.
+    * This method always throws a INAPPROPRIATE_OPERATION HL7IOException.
     * @return true if the operation succeeded, otherwise false.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */

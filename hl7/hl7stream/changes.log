@@ -134,5 +134,20 @@ instead of toString(), which only gave an object instance reference.
 - HL7SocketStream.read(), .write():More corrections, like last change.
 - HL7Server/HL7ServiceWorker.run():Catch and log all exceptions.
 
-* $Revision$, $Date$, $Author$
+* Revision: 67, Date: 2010-09-28 21:42:29 -0700 (Tue, 28 Sep 2010), Author: scott.herman@unconxio.us
 - HL7SocketStream.read():Corrected send of acknowledgement, which used toString() instead of toHL7String().
+
+* $Revision$, $Date$, $Author$
+- HL7FileReader:Documentation and minor syntactical cleanup.
+- HL7FileWriter:Documentation and minor syntactical cleanup.
+- HL7MLLPStream:Replaced invocation of deprecated HL7Message.Acknowledgement(),
+as well as some minor syntactical cleanup.
+- HL7SocketStream:Replaced invocation of deprecated HL7Message.Acknowledgement(),
+as well as some minor syntactical cleanup.
+- HL7IOException:Documentation and minor syntactical cleanup.
+- HL7MessageHandler:Corrected a misspelling.
+- HL7Server:Documentation and minor syntactical cleanup.
+- HL7Stream:Corrected a misspelling.
+- HL7StreamBase:Documentation and minor syntactical cleanup.
+- HL7StreamURI:Documentation, refactor, and syntactical cleanup.
+- HL7XMLFileWriter:Added support for single file (append) mode.

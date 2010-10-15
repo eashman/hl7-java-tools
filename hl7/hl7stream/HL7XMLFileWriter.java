@@ -26,8 +26,15 @@
 
 package us.conxio.hl7.hl7stream;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 
 import us.conxio.hl7.hl7message.HL7Message;
 
@@ -37,9 +44,10 @@ import us.conxio.hl7.hl7message.HL7Message;
  * @author scott
  */
 public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
-   private boolean   singleFile = false; // single file is one file for all messages
-                                         // Otherwise, each message creates it's own file.
+   private boolean   singleFile = false; // single file is one file for all messages                                        // Otherwise, each message creates it's own file.
    private File      filePath = null;
+
+   private static final String STRING_XML    = "xml";
 
    /**
     * Fundamental parameterless constructor.
@@ -49,9 +57,14 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
    /**
     * Fundamental parameterized constructor.
     * @param path The file path for the delivery destination.
+    * If the path exists and is not a directory then single file mode is assumed
+    * and the XML transactions are appended to the end of the file.
+    * Otherwise the given path is assumed to be a directory and it, and
+    * non-existent parent directories, are created
     */
    public HL7XMLFileWriter(File path) {
-      this.filePath = path;
+      filePath = path;
+      if (filePath.exists() && filePath.isFile()) singleFile = true;
    } // HL7XMLFileWriter constructor
 
 
@@ -60,18 +73,17 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
     * @param uri
     */
    public HL7XMLFileWriter(URI uri) {
-      if (uri == null) {
-         throw new IllegalArgumentException();
-      } // if
+      if (uri == null) throw new IllegalArgumentException();
       
       String uriScheme = uri.getScheme();
 
-      if (uriScheme != null && uriScheme.toLowerCase().contains("xml")) {
+      if (uriScheme != null && uriScheme.toLowerCase().contains(STRING_XML)) {
          String query = uri.getQuery();
          if (query != null && query.toLowerCase().contains("single") ) {
-            this.singleFile = true;
+            singleFile = true;
          } // if
-         this.filePath = new File(uri.getPath());
+
+         filePath = new File(uri.getPath());
       } // if
    } // HL7XMLFileWriter constructor
 
@@ -82,14 +94,9 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
     * @throws HL7IOException
     */
    public boolean open() throws HL7IOException {
-      if (this.singleFile) {
-         throw new HL7IOException("open:", new UnsupportedOperationException("Not supported yet.") );
-      } // if
-
-      // Otherwise its a file per message.
-      this.directive = HL7Stream.WRITER;
-      this.mediaType = HL7Stream.FILE_TYPE;
-      this.statusValue = HL7Stream.OPEN;
+      directive = HL7Stream.WRITER;
+      mediaType = HL7Stream.FILE_TYPE;
+      statusValue = HL7Stream.OPEN;
 
       // For file per message, write actually opens the file.
       // ...so always return true;
@@ -99,14 +106,10 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
 
    /**
     * HL7Stream finalization.
-    * @return
+    * @return true.
     * @throws HL7IOException
     */
    public boolean close() throws HL7IOException {
-      if (this.singleFile) {
-         throw new HL7IOException("close:", new UnsupportedOperationException("Not supported yet.") );
-      } // if
-
       // For file per message, write closes the file.
       // ...so always return true;
       return true;
@@ -115,11 +118,12 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
 
    /**
     * Always throws an HL7IOException exception
-    * @return
+    * @return nothing.
     * @throws HL7IOException
     */
    public HL7Message read() throws HL7IOException {
-      throw new HL7IOException("read:", new UnsupportedOperationException("Not supported yet.") );
+      throw new HL7IOException("read:", 
+                               new UnsupportedOperationException("writer does not read.") );
    } // read
 
 
@@ -130,11 +134,7 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
     * @throws HL7IOException
     */
    public boolean write(HL7Message msg) throws HL7IOException {
-      if (!this.singleFile) {
-         return writeHL7XMLMessageFile(msg);
-      } else {
-         throw new HL7IOException("write/singleFile:", new UnsupportedOperationException("Not supported yet.") );
-      } // if - else
+      return writeHL7XMLMessageFile(msg);
    } // write
 
 
@@ -150,36 +150,28 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
    private String hl7XMLMessageFileName(HL7Message msg) {
       String msgID = msg.controlID();
 
-      if (msgID == null || msgID.isEmpty()) {
+      if (StringUtils.isEmpty(msgID)) {
          String msgTypeCode = msg.get("MSH.9.1");
          String msgEventCode = msg.get("MSH.9.2");
          String msgDateTime = msg.get("MSH.7");
          StringBuilder msgIDBuffer = new StringBuilder();
 
-         if (msgTypeCode != null && !msgTypeCode.isEmpty()) {
-            msgIDBuffer.append(msgTypeCode);
-         } // if
+         if (StringUtils.isNotEmpty(msgTypeCode)) msgIDBuffer.append(msgTypeCode);
 
-         if (msgEventCode != null && !msgEventCode.isEmpty()) {
-            if (msgIDBuffer.length() > 0) {
-               msgIDBuffer.append(".");
-            } // if
-
+         if (StringUtils.isNotEmpty(msgEventCode)) {
+            if (msgIDBuffer.length() > 0) msgIDBuffer.append(".");
             msgIDBuffer.append(msgEventCode);
          } // if
 
-         if (msgDateTime != null && !msgDateTime.isEmpty()) {
-            if (msgIDBuffer.length() > 0) {
-               msgIDBuffer.append(".");
-            } // if
-
+         if (StringUtils.isNotEmpty(msgDateTime)) {
+            if (msgIDBuffer.length() > 0) msgIDBuffer.append(".");
             msgIDBuffer.append(msgDateTime);
          } // if
 
          msgID = msgIDBuffer.toString();
       } // if
 
-      return new StringBuffer(this.filePath.toString())
+      return new StringBuffer(filePath.toString())
                   .append(File.separator)
                   .append(msgID)
                   .append(".hl7.xml").toString();
@@ -194,15 +186,16 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
     * @return true, always.
     */
    private boolean writeHL7XMLMessageFile(HL7Message msg) throws HL7IOException {
-      if (!this.filePath.exists()) {
-         this.filePath.mkdir();
-      } // if
+      if (!filePath.exists()) createPath();
       
-      File xmlFile = new File(this.hl7XMLMessageFileName(msg));
+      
+      File xmlFile   = singleFile
+                     ? filePath
+                     : new File(hl7XMLMessageFileName(msg));
 
       BufferedWriter writer = null;
       try {
-         writer = new BufferedWriter(new FileWriter(xmlFile));
+         writer = new BufferedWriter(new FileWriter(xmlFile, singleFile));
          writer.write(msg.toXMLString());
       } catch (IOException ioEx) {
          throw new HL7IOException("write caught IOException:", ioEx);
@@ -216,5 +209,29 @@ public class HL7XMLFileWriter extends HL7StreamBase implements HL7Stream {
 
       return true;
    } // writeHL7XMLMessageFile
+
+
+   private void createPath() throws HL7IOException {
+      if (singleFile) {
+         File parentPath = filePath.getParentFile();
+         if (!parentPath.exists()) parentPath.mkdirs();
+         if (!filePath.exists()) {
+            try {
+               filePath.createNewFile();
+            } catch (IOException ioEx) {
+               throw new HL7IOException("IOException:", ioEx);
+            } // try - catch
+         } // if
+
+         return;
+      } // if
+
+      if (filePath.exists() ) {
+         if (filePath.isFile()) singleFile = true;
+         return;
+      } // if
+
+      filePath.mkdirs();
+   } // createPath
 
 } // HL7XMLFileWriter

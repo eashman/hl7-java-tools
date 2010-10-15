@@ -37,7 +37,7 @@ import us.conxio.hl7.hl7message.HL7Message;
  */
 public interface HL7MessageHandler {
    /**
-    * The only required method is dispatch, which may utilize the argumnet
+    * The only required method is dispatch, which may utilize the argument
     * HL7Message object in any way.
     * @param msg a reference to the argument HL7Message object.
     * @return a count of 0 or more dispatch occurrences related to the context

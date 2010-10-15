@@ -167,8 +167,8 @@ public class HL7FileReader extends HL7StreamBase implements HL7Stream {
    } // read
 
    private String _readMsg() throws HL7IOException {
-      StringBuffer   hl7Msg = new StringBuffer();
-      StringBuffer   segStart = new StringBuffer();
+      StringBuilder   hl7Msg = new StringBuilder();
+      StringBuilder   segStart = new StringBuilder();
 
       if (this.waiting != null) {
          hl7Msg.append(waiting);
@@ -203,7 +203,7 @@ public class HL7FileReader extends HL7StreamBase implements HL7Stream {
                ||  segStr.startsWith("BHS")
                || segStr.startsWith("BTS")) {
                   // Save it off for the next call.
-                  this.waiting = new String( segStr );
+                  this.waiting = segStr;
                   // return the message we already have.
                   if (hl7Msg.length() > 12) {
                      hl7Msg.append("\r");
@@ -288,7 +288,7 @@ public class HL7FileReader extends HL7StreamBase implements HL7Stream {
 
 
    /**
-    * This method wil always throw a INAPPROPRIATE_OPERATION HL7IOException.
+    * This method will always throw a INAPPROPRIATE_OPERATION HL7IOException.
     * @param msg
     * @return true if the operation succeeded, otherwise false.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException

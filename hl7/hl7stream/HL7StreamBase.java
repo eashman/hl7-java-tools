@@ -34,7 +34,7 @@ import us.conxio.hl7.hl7message.HL7Message;
 
 
 /**
- * A base class of default behaviors for HL7Stream objects.
+ * An abstract base class of basic and default behaviors for HL7Stream objects.
  * @author scott herman <scott.herman@unconxio.us>
  */
 public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
@@ -56,7 +56,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return the current status value of the stream.
     */
    public int status() {
-      return this.statusValue;
+      return statusValue;
    } // status
 
 
@@ -65,7 +65,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return the current directive value of the stream.
     */
    public int directive() {
-      return this.directive;
+      return directive;
    } // directive
 
 
@@ -74,7 +74,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return the current media type value of the stream.
     */
    public int media() {
-      return this.mediaType;
+      return mediaType;
    } // media
 
 
@@ -83,7 +83,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return true if the stream is closed, otherwise false.
     */
    public boolean isClosed() {
-      return (this.statusValue == HL7Stream.CLOSED);
+      return statusValue == HL7Stream.CLOSED;
    } // isClosed
 
 
@@ -92,7 +92,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return true if the stream is open, otherwise false.
     */
    public boolean isOpen() {
-      return (this.statusValue == HL7Stream.OPEN);
+      return statusValue == HL7Stream.OPEN;
    } // isClosed
 
 
@@ -101,7 +101,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return the current status of the stream as a string.
     */
    public String statusString() {
-      switch (this.statusValue) {
+      switch (statusValue) {
          case UNINITIALIZED : return "UNINITIALIZED";
          case CLOSED :        return "CLOSED";
          case OPEN :          return "OPEN";
@@ -116,25 +116,25 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     */
    public String description() {
       StringBuilder retn = new StringBuilder();
-      retn.append(this.statusString());
+      retn.append(statusString());
       retn.append(":");
-      if (this.mediaType == HL7Stream.FILE_TYPE) {
+      if (mediaType == HL7Stream.FILE_TYPE) {
          retn.append("File:");
-      } else if (this.mediaType == HL7Stream.SOCKET_TYPE) {
+      } else if (mediaType == HL7Stream.SOCKET_TYPE) {
          retn.append("Socket:");
-      } else if (this.mediaType == HL7Stream.SECURE_SOCKET_TYPE) {
+      } else if (mediaType == HL7Stream.SECURE_SOCKET_TYPE) {
          retn.append("SSL-Socket:");
-      } else if (this.mediaType == HL7Stream.NO_TYPE) {
+      } else if (mediaType == HL7Stream.NO_TYPE) {
          retn.append("No-Type:");
       } else {
          retn.append("UnknownType:");
       } // if - else if - else
 
-      if (this.directive == HL7Stream.READER) {
+      if (directive == HL7Stream.READER) {
          retn.append("Reader:");
-      } else if (this.directive == HL7Stream.WRITER) {
+      } else if (directive == HL7Stream.WRITER) {
          retn.append("Writer:");
-      } else if (this.directive == HL7Stream.APPENDER) {
+      } else if (directive == HL7Stream.APPENDER) {
          retn.append("Appender:");
       } // if - else if
 
@@ -156,7 +156,7 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public int dispatch(HL7Message msg) throws HL7IOException {
-      return this.write(msg) ? 1 : 0;
+      return write(msg) ? 1 : 0;
    } // dispatch
 
 
@@ -165,12 +165,9 @@ public abstract class HL7StreamBase implements HL7Stream, HL7MessageHandler {
     * @return the stream as a HL7MessageHandler.
     */
    public HL7MessageHandler dispatchHandler() {
-      if (  this.directive == HL7Stream.WRITER
-      ||    this.directive == HL7Stream.APPENDER) {
-         return this;
-      } // if
-
-      return null;
+      return (directive == HL7Stream.WRITER || directive == HL7Stream.APPENDER)
+           ?  this
+           : null;
    } // dispatchHandler
    
 } // HL7Stream

@@ -29,8 +29,7 @@ import us.conxio.hl7.hl7message.HL7Message;
 
 
 /**
- * An abstract class to serve as a base for HL7 message stream classes.
- *
+ * An interface specification for HL7 message stream classes.
  * @author scott herman <scott.herman@unconxio.us>
  */
 public interface HL7Stream {
@@ -39,7 +38,7 @@ public interface HL7Stream {
     */
    final int      NO_TYPE              = 0;
    /**
-    * Unitialized - type is not set.
+    * Uninitialized - type is not set.
     */
    final int      UNINITIALIZED        = 0;
    /**
@@ -90,18 +89,21 @@ public interface HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean open() throws HL7IOException;
+
    /**
     * Closes the context stream.
     * @return true if the operation succeeded, otherwise false.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean close() throws HL7IOException;
+
    /**
     * Reads a HL7 message from the context stream.
     * @return the message read as a HL7Message object.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7Message read() throws HL7IOException;
+
    /**
     * Write a HL7 message to the context stream.
     * @param msg the message to send as a HL7Message object.
@@ -109,31 +111,37 @@ public interface HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean write(HL7Message msg) throws HL7IOException;
+
    /**
     * Access to the current status of the context stream.
     * @return the current status value of the context stream.
     */
    public int status();
+
    /**
     * Determines whether the context stream is closed.
     * @return true if the context stream is closed, otherwise false.
     */
    public boolean isClosed();
+
    /**
     * Determines whether the context stream is open.
     * @return true if the context stream is open, otherwise false.
     */
    public boolean isOpen();
+
    /**
     * Determines whether the context stream is a server.
     * @return true if the context stream is a server, otherwise false.
     */
    public boolean isServer();
+
    /**
     * Creates a description of the current state of the context stream.
     * @return the description as a string.
     */
    public String description();
+
    /**
     * Extracts the HL7MessageHandler from the context stream, if it is valid.
     * @return the HL7MessageHandler, or null if no HL7MessageHandler is available.

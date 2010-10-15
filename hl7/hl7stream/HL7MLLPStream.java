@@ -49,6 +49,9 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
                               EOB           = 0x0d;
    private static Logger      logger = Logger.getLogger(HL7MLLPStream.class);
 
+   private static final String ACK_CODE_OK = HL7Message.ACK_CODE_OK;
+
+
    /**
     * the host name of the destination of the socket, if a writer, or "locahost"
     * if the stream is a reader.
@@ -85,9 +88,9 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7MLLPStream(Socket sock) throws HL7IOException {
-      this.socket = sock;
-      this.directive = HL7MLLPStream.READER;
-      this.mediaType = HL7MLLPStream.SOCKET_TYPE;
+      socket = sock;
+      directive = READER;
+      mediaType = SOCKET_TYPE;
    } // HL7MLLPStream
 
 
@@ -101,9 +104,7 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     */
    public HL7MLLPStream(Socket sock, boolean openReq) throws HL7IOException {
       this(sock);
-      if (openReq) {
-         this.openReader();
-      } // if
+      if (openReq) openReader();
    } // HL7MLLPStream
 
 
@@ -114,11 +115,11 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     * @param port The tcp port number upon which the connection is requested.
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
-   public HL7MLLPStream(String host, int port) throws HL7IOException {
-      this.port = port;
-      this.host = host;
-      this.directive = HL7MLLPStream.WRITER;
-      this.mediaType = HL7MLLPStream.SOCKET_TYPE;
+   public HL7MLLPStream(String hostStr, int portV) throws HL7IOException {
+      port = portV;
+      host = hostStr;
+      directive = WRITER;
+      mediaType = SOCKET_TYPE;
    } // HL7MLLPStream
 
 
@@ -133,24 +134,22 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     */
    public HL7MLLPStream(String host, int port, boolean openReq) throws HL7IOException {
       this(host, port);
-      if (openReq) {
-         this.openWriter();
-      } // if
+      if (openReq) openWriter();
    } // HL7MLLPStream
 
 
 
 
    public boolean open() throws HL7IOException {
-      if (this.isOpen()) return true;
+      if (isOpen()) return true;
 
-      if (this.isWriter()) {
-         return this.openWriter();
-      } else if (this.isReader()) {
-         return this.openReader();
+      if (isWriter()) {
+         return openWriter();
+      } else if (isReader()) {
+         return openReader();
       } // if - else if
 
-      throw new HL7IOException(  "HL7SocketStream.open():Not a reader. Not a writer.",
+      throw new HL7IOException(  "Not a reader. Not a writer.",
                                  HL7IOException.INCONSISTENT_STATE);
    } // open
 
@@ -161,19 +160,15 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean close() throws HL7IOException {
-      if (this.isClosed()) return true;
+      if (isClosed()) return true;
 
       try {
-         if (!this.socket.isClosed()) this.socket.close();
+         if (!socket.isClosed()) socket.close();
       } catch (IOException ioEx) {
-         throw new HL7IOException(  "HL7SocketStream("
-                                 +  this.host
-                                 +  ", "
-                                 +  this.port
-                                 +  ").close:IOException", ioEx);
+         throw new HL7IOException(streamID() + "IOException", ioEx);
       } // try - catch
 
-      this.statusValue = HL7SocketStream.CLOSED;
+      statusValue = CLOSED;
       return true;
    }  // close
 
@@ -197,25 +192,15 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
                continue;
             } // if
 
-            if (inData == EOB && fsFound == true) {
-               return(hl7Msg.toString());
-            } // if
+            if (inData == EOB && fsFound) return(hl7Msg.toString());
 
-            if (startFound == true) {
-               hl7Msg.append( (char)inData);
-            } // if
+            if (startFound) hl7Msg.append( (char)inData);
          } // while
       } catch (IOException ioEx) {
-         throw new HL7IOException(  "HL7SocketStream("
-                                 +  this.host
-                                 +  ", "
-                                 +  this.port
-                                 +  "):IOException", ioEx);
+         throw new HL7IOException(streamID() + "IOException", ioEx);
       } // try - catch
 
-      if (hl7Msg.length() > 0) {
-         return hl7Msg.toString();
-      } // if
+      if (hl7Msg.length() > 0) return hl7Msg.toString();
 
       return null;
    } // _readMsg
@@ -227,35 +212,21 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public String readMsg() throws HL7IOException {
-      if (this.isClosed()) {
-         throw new HL7IOException(  "HL7SocketStream("
-                                 +  this.host
-                                 +  ", "
-                                 +  this.port
-                                 +  ").readMsg:Socket previously closed.", HL7IOException.STREAM_CLOSED);
+      if (isClosed()) {
+         throw new HL7IOException(streamID() + "Socket previously closed.", HL7IOException.STREAM_CLOSED);
       } // if
 
-      if (this.socket.isClosed() || !this.socket.isConnected()) {
-         this.close();
-         throw new HL7IOException(  "HL7SocketStream("
-                                 +  this.host
-                                 +  ", "
-                                 +  this.port
-                                 +  ").readMsg:Socket closed. Closing Stream", HL7IOException.STREAM_CLOSED);
+      if (socket.isClosed() || !socket.isConnected()) {
+         close();
+         throw new HL7IOException(streamID() + "Socket closed. Closing Stream", HL7IOException.STREAM_CLOSED);
       } // if - else if
 
-      String retnStr = this._readMsg();
-      if (retnStr != null && !retnStr.isEmpty()) {
-         return retnStr;
-      } // if
+      String retnStr = _readMsg();
+      if (retnStr != null && !retnStr.isEmpty()) return retnStr;
 
-      if (this.socket.isClosed() || !this.socket.isConnected()) {
-         this.close();
-         throw new HL7IOException(  "HL7SocketStream("
-                                 +  this.host
-                                 +  ", "
-                                 +  this.port
-                                 +  ").readMsg:Socket closed after read. Closing Stream", HL7IOException.STREAM_CLOSED);
+      if (socket.isClosed() || !socket.isConnected()) {
+         close();
+         throw new HL7IOException(streamID() + "Socket closed after read. Closing Stream", HL7IOException.STREAM_CLOSED);
       } // if - else if
 
       return(null);
@@ -268,10 +239,8 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7Message read() throws HL7IOException {
-      String msgStr = this.readMsg();
-      if (msgStr == null || msgStr.isEmpty()) {
-         return null;
-      } // if
+      String msgStr = readMsg();
+      if (msgStr == null || msgStr.isEmpty()) return null;
 
       HL7Message msg = new HL7Message(msgStr);
       String msgCtlID = msg.get("MSH.10");
@@ -283,13 +252,13 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
       logger.trace(traceHeader);
       logger.trace(msg.toString());
 
-      HL7Message ack = msg.Acknowledgment(true, "ok", null, null);
+      HL7Message ack = msg.acknowledgment(true, "ok", null, null);
       traceHeader = new StringBuffer( "read(): Sending acknowledgment [")
                               .append(ack.idString())
                               .append("].[")
                               .append(ack.get("MSH.10"))
                               .append( "]:").toString();
-      this.writeMsgString(ack.toString());
+      writeMsgString(ack.toString());
       logger.trace(traceHeader);
       logger.trace(ack.toString());
 
@@ -304,26 +273,20 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
     */
    public void writeMsgString(String msg) throws HL7IOException {
       if (msg == null) {
-         throw new HL7IOException(  "HL7SocketStream.writeMsg:Null HL7 Msg.",
+         throw new HL7IOException(  "Null HL7 Msg.",
                                     HL7IOException.NULL_MSG);
       } // if
 
-      if (!this.isOpen() || this.out == null) {
-         this.open();
-      } // if
+      if (!isOpen() || out == null) open();
 
       try {
-         this.out.write( (char)HL7SocketStream.STX
-                        + msg
-                        + (char)HL7SocketStream.FS
-                        + (char)HL7SocketStream.EOB);
-         this.out.flush();
+         out.write( (char)STX
+                  + msg
+                  + (char)FS
+                  + (char)EOB);
+         out.flush();
       } catch (IOException ioEx) {
-         throw new HL7IOException(  "HL7SocketStream("
-                                 +  this.host
-                                 +  ", "
-                                 +  this.port
-                                 +  ").writeMsg:IOException", ioEx);
+         throw new HL7IOException(streamID() +  "IOException", ioEx);
       } // try - catch
    } // writeMsgString
 
@@ -340,11 +303,11 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
       String msgCtlID = hl7Msg.controlID();
       String traceHeader = "write(" + hl7Msg.idString() + "):";
       logger.trace(traceHeader + " writing.");
-      this.writeMsgString(hl7Msg.toHL7String());
+      writeMsgString(hl7Msg.toHL7String());
       logger.trace(traceHeader + " wrote.");
 
       String hl7MsgStr;
-      while ( (hl7MsgStr = this.readMsg() ) == null)
+      while ( (hl7MsgStr = readMsg() ) == null)
          ;
 
       // * If sent msg has no encoding characters then the ack will have no encoders either.
@@ -360,8 +323,8 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
                      +  replyCtlID
                      +  ".");
 
-      if (!ackCode.equals("AA")) {
-         HL7IOException hiEx = new HL7IOException( "HL7SocketStream."
+      if (!ackCode.equals(ACK_CODE_OK)) {
+         HL7IOException hiEx = new HL7IOException( streamID()
                                                 +  traceHeader
                                                 +  "NAck ("
                                                 +  ackCode
@@ -391,11 +354,11 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
 
 
    private boolean isWriter() {
-      return this.directive == HL7SocketStream.WRITER;
+      return this.directive == WRITER;
    } // isWriter
 
    private boolean isReader() {
-      return this.directive == HL7SocketStream.READER;
+      return this.directive == READER;
    } // isReader
 
 
@@ -404,10 +367,10 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
          this.out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
          this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
       } catch (IOException ioEx) {
-         throw new HL7IOException("HL7SocketStream(sock):IOException", ioEx);
+         throw new HL7IOException(streamID() + "IOException", ioEx);
       } // try - catch
 
-      this.statusValue = HL7SocketStream.OPEN;
+      this.statusValue = OPEN;
       return true;
    } // openReader
 
@@ -421,18 +384,25 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
          this.out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
          this.in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
       } catch (UnknownHostException uhEx) {
-         throw new HL7IOException(  "HL7SocketStream(" + host + ", " + port + "):UnknownHost.",
-                                    HL7IOException.UNKNOWN_HOST);
+         throw new HL7IOException(streamID() + "UnknownHost.",  HL7IOException.UNKNOWN_HOST);
       } catch (SocketException sEx) {
-         throw new HL7IOException("HL7SocketStream(" + host + ", " + port + "):SocketException", sEx);
+         throw new HL7IOException(streamID() + "SocketException", sEx);
       } catch (IOException ioEx) {
-         throw new HL7IOException("HL7SocketStream(" + host + ", " + port + "):IOException", ioEx);
+         throw new HL7IOException(streamID() + "IOException", ioEx);
       } // try - catch
 
-      this.socket = sock;
-      this.statusValue = HL7SocketStream.OPEN;
+      socket = sock;
+      statusValue = OPEN;
       return true;
    } // openWriter
+
+   private String streamID() {
+      return new StringBuilder("Stream(")
+                  .append(host)
+                  .append(Integer.toString(port))
+                  .append("):")
+                  .toString();
+   } // streamID
 
 
 

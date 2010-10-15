@@ -113,7 +113,7 @@ public class HL7IOException extends IOException {
     */
    public HL7IOException(String msg) {
       super(msg);
-      this.errorType = HL7IOException.UNSPECIFIED_ERROR;
+      errorType = HL7IOException.UNSPECIFIED_ERROR;
    } // HL7IOException
 
 
@@ -125,7 +125,7 @@ public class HL7IOException extends IOException {
     */
    public HL7IOException(String msg, Throwable thrown) {
       super(msg, thrown);
-      this.errorType = HL7IOException.UNSPECIFIED_ERROR;
+      errorType = HL7IOException.UNSPECIFIED_ERROR;
    } // HL7IOException
 
 
@@ -134,9 +134,22 @@ public class HL7IOException extends IOException {
     * @param msg
     * @param errorType
     */
-   public HL7IOException(String msg, int errorType) {
+   public HL7IOException(String msg, int errType) {
       super(msg);
-      this.errorType = errorType;
+      errorType = errType;
+   } // HL7IOException
+
+
+   /**
+    * Creates a new exception having the argument message and error type code,
+    * which is associated with the argument throwable cause.
+    * @param msg
+    * @param errType
+    * @param thrown
+    */
+   public HL7IOException(String msg, int errType, Throwable thrown) {
+      super(msg, thrown);
+      errorType = errType;
    } // HL7IOException
 
 
@@ -145,7 +158,7 @@ public class HL7IOException extends IOException {
     * @return the exception's error type code.
     */
    public int errorType() {
-      return this.errorType;
+      return errorType;
    } // errorType
    
 } // HL7IOException
