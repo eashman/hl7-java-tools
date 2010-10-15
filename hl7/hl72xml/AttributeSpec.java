@@ -64,29 +64,14 @@ class AttributeSpec extends HL72XMLSpecificationItem {
    } // toXMLString
 
    protected String toXMLString(HL7Message msg) {
-      String xtrV = "";
-      if (hasDesignator()) {
-         xtrV = msg.get(designator());
-      } else if (hasValue()) {
-         xtrV = value();
-      } // if - else
-
-      return this.toXMLString(xtrV);
+      return toXMLString(getContent(msg));
    } // toXMLString
 
 
    static AttributeMap attributeMap(ArrayList<AttributeSpec> attributes, HL7Message msg) {
       if (attributes == null || attributes.isEmpty()) return null;
-
       AttributeMap map = new AttributeMap();
-      for (AttributeSpec spec : attributes) {
-         if (spec.hasDesignator()) {
-            map.add(spec.name(), msg.get(spec.designator()));
-         } else if (spec.hasValue()) {
-            map.add(spec.name(), spec.value());
-         } // if - else if
-      } // for
-
+      for (AttributeSpec spec : attributes) map.add(spec.name(), spec.getContent(msg));
       return map;
    } // attributeMap
 

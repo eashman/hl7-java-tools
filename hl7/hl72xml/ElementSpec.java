@@ -93,7 +93,7 @@ class ElementSpec extends HL72XMLSpecificationItem {
    String toXMLString(HL7Message msg) {
       String contentStr = hasSubElements()
                            ? toSubElementalContentString(msg)
-                           : toRawContentString(msg);
+                           : getContent(msg);
 
       AttributeMap attr = hasAttributes()
                            ? AttributeSpec.attributeMap(attributes, msg)
@@ -120,11 +120,5 @@ class ElementSpec extends HL72XMLSpecificationItem {
 
       return contentBuilder.toString();
    } // toSubElementalContentString
-
-   private String toRawContentString(HL7Message msg) {
-      if (hasDesignator()) return msg.get(designator());
-      if (hasValue()) return value();
-      return "";
-   } // toRawContentString
 
 } // ElementSpec

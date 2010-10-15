@@ -26,8 +26,11 @@
 package us.conxio.hl7.hl72xml;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
+import us.conxio.hl7.hl7message.HL7Message;
 
 /**
  *
@@ -71,9 +74,25 @@ abstract class HL72XMLSpecificationItem {
             sourceDesignator = attribNode.getNodeValue();
          } else if (attribName.equalsIgnoreCase(ATTRIBUTE_VALUE)) {
             value = attribNode.getNodeValue();
+         } else {
+            throw new IllegalArgumentException("unexpected attribute:"
+                                             + attribName
+                                             + ":"
+                                             + attribNode.getNodeValue());
          } // if - else if
       } // for
    } // HL72XMLSpecificationItem
+
+
+   String getContent(HL7Message hl7Msg) {
+      if (hasDesignator()) {
+         String hl7Content = hl7Msg.get(designator());
+         if (StringUtils.isNotEmpty(hl7Content)) return hl7Content;
+      } // if
+
+      if (hasValue()) return value();
+      return "";
+   } // getContent
 
 
    boolean hasDesignator() {

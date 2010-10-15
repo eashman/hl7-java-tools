@@ -38,6 +38,54 @@ import us.conxio.hl7.hl7message.HL7Message;
 import us.conxio.hl7.hl7service.HL7Transform;
 
 /**
+ * A translation class for specifying transformation of HL7 transaction message
+ * content to XML. The specification itself is given in XML, and adheres to the
+ * following form:
+ * <p>
+ * The entire specification is contained within a single XML elemental node,
+ * with any legal (XML) name. The sub-elements which specify the form and content
+ * of the resulting XML may have one of two names <b>element</b> or <b>attribute</b>.
+ * <p>
+ * Both items are structured similarly. They are defined by 3 attributes
+ * <ul><li>name (required) The name of the resulting element or attribute.
+ * <li>designator (optional) The HL7 message content item designation that is to
+ * be expressed by the resulting element or attribute.
+ * <br>(see <a href="../hl7message/HL7Designator.html">HL7Designator</a>)
+ * 
+ * <li>value (optional) A &quot;hardcoded&quot; value that is to be expressed by
+ * the resulting element or attribute. Note that is cases where both a designator
+ * and a value are given the value is used only when the designated HL7 message
+ * content item is empty.
+ * </ul>
+ * <p>
+ * An example transform specification is given below:
+ * <p><pre>
+ * {@code
+ *  <specification-element-name>
+ *     <element name="root-element">
+ *        <attribute name="id" value="unknown" designator="MSH.9" />
+ *        <element name="sub-element-name" value="default-value-string" designator="PID.3:2.1" />
+ *     </element>
+ *  </specification-element-name>
+ * }
+ * </pre><p>
+ * This will yield the following XML...
+ * <p><pre>
+ * {@code
+ * <root-element id="43718854"><sub-element-name>94556</sub-element-name></root-element>
+ * }
+ * </pre><p>
+ * When the HL7 transaction message below is applied to it.
+ * <p><pre>
+ * {@code
+ * MSH|^~\&|XDX|SX|DXD|XS|200902100941||ADT^Z08|43718854|P|2.3||
+ * EVN|Z08|||||
+ * ZPD|||3813315^^someh.org^MRN~94556^^someh.org^MPI|3812240|||||||||
+ * PD1||||||||||||
+ * NK1||^^|||||EC|||||||||||||||||||||||^^|||||||
+ * PV1||||||||||||||||||||81||||||||||||||||||||||||||||||||
+ * }
+ * </pre><p>
  *
  * @author scott
  */
@@ -48,7 +96,7 @@ public class HL72XMLTransform {
    private static Logger            logger = Logger.getLogger("us.conxio.hl7");
 
    
-   public static final String NAME_HL7TRANSFORM = "hl7transform";
+   private static final String NAME_HL7TRANSFORM = HL7Transform.NAME_HL7TRANSFORM;
 
 
    /**
