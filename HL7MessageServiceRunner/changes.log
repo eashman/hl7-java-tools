@@ -1,0 +1,15 @@
+* $Id$
+* Id: HL7MessageServiceRunner.java 14 2009-11-20 22:03:44Z scott
+* Origination. Tested and verified.
+*
+* Id: HL7MessageServiceRunner.java 27 2009-11-30 05:32:18Z scott
+* Added appropriate licensing and annotation.
+*
+* Id: HL7MessageServiceRunner.java 62 2009-12-23 15:05:41Z scott
+* Reverted to revision 55.
+
+* $Revision$, $Date$, $Author$
+Consolidated and retooled to use hl7-2.0.
+- HL7MessageService:Adapted from HL7-1.6.
+- Hl7MessageServiceRunner:Adapted.
+

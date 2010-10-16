@@ -1,5 +1,5 @@
 /*
- *  $Id: HL7MessageServiceRunner.java 62 2009-12-23 15:05:41Z scott $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -28,10 +28,11 @@ package us.conxio.HL7MessageServiceRunner;
 
 import java.io.*;
 import java.net.URI;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
 
-import us.conxio.HL7.HL7MessageService.*;
+
 
 
 /**
@@ -39,7 +40,7 @@ import us.conxio.HL7.HL7MessageService.*;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7MessageServiceRunner {
-   static Logger logger = Logger.getLogger("us.conxio.HL7");
+   static Logger logger = Logger.getLogger("us.conxio.hl7");
 
    public HL7MessageServiceRunner() { }
 
@@ -53,9 +54,6 @@ public class HL7MessageServiceRunner {
     public static void main(String[] args) {
       URI               svcURI = null;
       HL7MessageService msgSvc = null;
-      HL7MessageServiceRunner svcRunner = new HL7MessageServiceRunner();
-      
-      BasicConfigurator.configure();
 
       for (int argIndex = 0; argIndex < args.length; ++argIndex) {
          if (args[argIndex].startsWith("-")) {
@@ -77,7 +75,7 @@ public class HL7MessageServiceRunner {
                                                         +    uriEx.toString()
                                                         +    ". on ["
                                                         +    uriArgStr
-                                                        +    "].");
+                                                        +    "].", uriEx);
                      } // try - catch
                   } // if
                   break;
@@ -94,11 +92,11 @@ public class HL7MessageServiceRunner {
          try {         
             msgSvc = new HL7MessageService(svcURI) ;
             msgSvc.dump();
-            msgSvc.open(); // * This runs the service.
+            msgSvc.runService(); // * This runs the service.
          } catch (IOException ioEx) {
-            HL7MessageServiceRunner.logger.info("IOException:" + ioEx.toString() );
+            HL7MessageServiceRunner.logger.info("IOException:", ioEx);
          } catch (Exception ex) {
-            HL7MessageServiceRunner.logger.info("Exception:" + ex.toString() );
+            HL7MessageServiceRunner.logger.info("Exception:", ex);
          } finally {
             msgSvc.close();
          } // try - catch - finally
@@ -107,16 +105,3 @@ public class HL7MessageServiceRunner {
 
 } // HL7MessageServiceRunner
 
-
-/*
- * Revision History
- *
- * Id: HL7MessageServiceRunner.java 14 2009-11-20 22:03:44Z scott
- * Origination. Tested and verified.
- *
- * Id: HL7MessageServiceRunner.java 27 2009-11-30 05:32:18Z scott
- * Added appropriate licensing and annotation.
- *
- * $Id: HL7MessageServiceRunner.java 62 2009-12-23 15:05:41Z scott $
- * Reverted to revision 55.
- */
