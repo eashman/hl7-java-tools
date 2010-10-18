@@ -32,7 +32,7 @@ package us.conxio.hl7.hl7stream;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Locale;
+
 import org.apache.commons.lang.StringUtils;
 
 
@@ -293,11 +293,10 @@ public class HL7StreamURI {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7Stream getHL7StreamWriter() throws HL7IOException {
-      if (isFileWriterURI() || isFileAppenderURI()) {
+      if (canWriteFiles()) {
          return new HL7FileWriter(uri);
-      } else if (isSocketURI()) {
-
-         return new HL7SocketStream(uri.getHost(), getPortNo());
+      } else if (isSimpleSocketURI()) {
+         return new HL7MLLPStream(uri.getHost(), getPortNo());
       } else if (isXMLURI()) {
          return new HL7XMLFileWriter(uri);
       } // if - else if
@@ -340,6 +339,12 @@ public class HL7StreamURI {
    private boolean schemeHas(String str) {
       return hasScheme() && getScheme().contains(str);
    } // schemeHas
+
+   boolean canWriteFiles() {
+      return isFileWriterURI()
+      ||     isFileAppenderURI()
+      ||    (isFileURI() && !isFileReaderURI());
+   } // canWriteFiles
 
 
 } // HL7StreamURI

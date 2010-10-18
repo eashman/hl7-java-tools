@@ -55,7 +55,7 @@ public class HL7IOException extends IOException {
    public static final int    INCONSISTENT_STATE = 503;
    /**
     * The call causing this exception requested an operation which is
-    * inconsistent with the characterisitics of the context stream.
+    * inconsistent with the characteristics of the context stream.
     */
    public static final int    INAPPROPRIATE_OPERATION = 504;
    /**
@@ -71,7 +71,7 @@ public class HL7IOException extends IOException {
     */
    public static final int    WRONG_CTLID = 507;
    /**
-    * An operation was attmepted on a message that was not a valid HL7 message.
+    * An operation was attempted on a message that was not a valid HL7 message.
     */
    public static final int    NOT_VALID_MSG = 508;
    /**
@@ -89,7 +89,7 @@ public class HL7IOException extends IOException {
     */
    public static final int    UNINTERPERABLE_URI = 521;
    /**
-    * The file towards whcih the offending operation was directed, was not found.
+    * The file towards which the offending operation was directed, was not found.
     */
    public static final int    FILE_NOT_FOUND = 701;
    /**

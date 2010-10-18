@@ -163,7 +163,7 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
       if (isClosed()) return true;
 
       try {
-         if (!socket.isClosed()) socket.close();
+         if (socket != null && !socket.isClosed()) socket.close();
       } catch (IOException ioEx) {
          throw new HL7IOException(streamID() + "IOException", ioEx);
       } // try - catch

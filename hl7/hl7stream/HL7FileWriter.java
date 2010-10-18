@@ -78,19 +78,17 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
    public HL7FileWriter(URI fileURI) throws HL7IOException {
       HL7StreamURI streamURI = new HL7StreamURI(fileURI);
 
-      if (!streamURI.isFileURI()
-      ||   streamURI.isFileReaderURI()
-      ||  !(streamURI.isFileWriterURI() || streamURI.isFileAppenderURI() ) ) {
+      if (!streamURI.canWriteFiles()) {
          throw new IllegalArgumentException("HL7FileWriter(" 
                                           + fileURI.toString()
-                                          + "):Not a file writer URI.");
+                                          + "):URI cannot write files.");
       } // if
 
       if (streamURI.isFileAppenderURI()) {
-         this.isAppender = true;
+         isAppender = true;
       } // if
 
-      this.initialize(new File(streamURI.fileURIOf()) );
+      initialize(new File(streamURI.fileURIOf()) );
    } // HL7FileWriter
 
 
@@ -130,18 +128,19 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public boolean open(boolean append) throws HL7IOException {
-      if (this.file == null) {
+      if (file == null) {
          throw new HL7IOException( "HL7FileWriter.open: file name not specified." );
       } // if
 
       try {
-         this.writer = new BufferedWriter(new FileWriter(this.file, append) );
+         if (!file.exists()) createFile(file);
+         writer = new BufferedWriter(new FileWriter(file, append) );
       } catch (IOException ioEx) {
          throw new HL7IOException(  "HL7FileWriter.open:IOException:"
                                  +  ioEx.getMessage(), ioEx);
       } // try - catch
 
-      this.statusValue = HL7Stream.OPEN;
+      statusValue = HL7Stream.OPEN;
       return true;
    } // openWriter
 
@@ -237,5 +236,12 @@ public class HL7FileWriter extends HL7StreamBase implements HL7Stream {
       this.statusValue = HL7FileWriter.CLOSED;
       return true;
    } // close
+
+   private void createFile(File file) throws IOException {
+      if (file.exists()) return;
+      File parent = file.getParentFile();
+      if (!parent.exists()) parent.mkdirs();
+      file.createNewFile();
+   } // createFile
 
 } // HL7FileWriter

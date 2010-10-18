@@ -78,14 +78,18 @@ public class HL7FileReader extends HL7StreamBase implements HL7Stream {
     * @throws us.conxio.HL7.HL7Stream.HL7IOException
     */
    public HL7FileReader(URI fileURI) throws HL7IOException {
-      HL7StreamURI streamURI = new HL7StreamURI(fileURI);
-      
+      this(new HL7StreamURI(fileURI));
+   } // HL7FileReader
+
+   public HL7FileReader(HL7StreamURI streamURI) throws HL7IOException {
       if (  streamURI.isFileWriterURI()
       ||    (!streamURI.isFileReaderURI() && !streamURI.isFileURI())) {
-         throw new IllegalArgumentException("HL7FileReader(" + fileURI.toString() + "):Not a file reader URI.");
+         throw new IllegalArgumentException("HL7FileReader("
+                                          + streamURI.toString()
+                                          + "):Not a file reader URI.");
       } // if
 
-      this.initialize(new File(fileURI) );
+      initialize(new File(streamURI.fileURIOf()) );
    } // HL7FileReader
 
 
