@@ -1,5 +1,5 @@
 /*
- *  $Id: $
+ *  $Id$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -36,6 +36,7 @@ import us.conxio.XMLUtilities.XMLUtils;
 
 import us.conxio.hl7.hl7message.HL7Message;
 import us.conxio.hl7.hl7service.HL7Transform;
+import us.conxio.hl7.hl7system.HL7Logger;
 
 /**
  * A translation class for specifying transformation of HL7 transaction message
@@ -93,7 +94,7 @@ public class HL72XMLTransform {
    private String                   name = null;
    private ArrayList<HL7Transform>  prep = null;
    private ElementSpec              specRoot = null;
-   private static Logger            logger = Logger.getLogger("us.conxio.hl7");
+   private static Logger            logger = HL7Logger.getHL7Logger();
 
    
    private static final String NAME_HL7TRANSFORM = HL7Transform.NAME_HL7TRANSFORM;

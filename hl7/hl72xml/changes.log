@@ -1,10 +1,14 @@
-* Package: us.conxio.hl72xml
-* $Id: changes.log 68 2010-09-29 04:42:48Z scott.herman@unconxio.us $
-* $HeadURL: $
-* $Revision: 63 $, $Date: 2010-09-21 12:51:36 -0700 (Tue, 21 Sep 2010) $, $Author: scott.herman@unconxio.us $
+* Package: us.conxio.hl7.hl72xml
+* $Id$
+* $HeadURL$
+* Revision: 71, Date: 2010-10-10 12:51:36 -0700 (Sun, 10 Oct 2010), Author: scott.herman@unconxio.us
 Creation.
 
-* $Revision: 63 $, $Date: 2010-09-21 12:51:36 -0700 (Tue, 21 Sep 2010) $, $Author: scott.herman@unconxio.us $
+* Revision: 80, Date: 2010-10-14 20:42:48 -0700 (Thu, 14 Oct 2010), Author: scott.herman@unconxio.us
 Documentation and minor refactoring.
 - HL72XMLSpecificationItem.getContent():Added to consolidate HL7 message access in the abstract class.
 - HL72XMLSpecificationItem(Node):Added an IllegalArgumentException for unexpected attributes.
+
+* $Revision$, $Date$, $Author$
+svn properties reset.
+- HL72XMLTransform:Initialize logger from HL7Logger.getHL7Logger().
