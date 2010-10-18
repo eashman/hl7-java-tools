@@ -26,14 +26,19 @@
 
 package us.conxio.HL7MessageAgent;
 
-import java.io.*;
-import java.net.URI;
-import org.apache.log4j.Logger;
-import org.apache.log4j.BasicConfigurator;
+import java.io.File;
 
-import us.conxio.HL7.HL7Message.*;
-import us.conxio.HL7.HL7MessageService.*;
-import us.conxio.HL7.HL7Stream.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.log4j.Logger;
+
+import us.conxio.hl7.hl7message.HL7Message;
+import us.conxio.hl7.hl7service.HL7Route;
+import us.conxio.hl7.hl7stream.HL7IOException;
+import us.conxio.hl7.hl7stream.HL7Stream;
+import us.conxio.hl7.hl7stream.HL7StreamURI;
+import us.conxio.hl7.hl7system.HL7Logger;
 
 
 /**
@@ -41,120 +46,142 @@ import us.conxio.HL7.HL7Stream.*;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7MessageAgent {
-   static Logger logger = Logger.getLogger("us.conxio.HL7");
+   static Logger logger = HL7Logger.getHL7Logger();
 
+   private static void routeHL7(HL7Route hl7Route) {
+      if (hl7Route == null) return;
+
+      hl7Route.dump();
+      try {
+         hl7Route.open();
+      } catch (HL7IOException ioEx) {
+         logger.error("HL7Route:" +  hl7Route.getID(), ioEx);
+      } // try - catch
+      
+      hl7Route.run();
+   } // routeHL7
+
+
+   private static void adHocTransfer(URI sourceURI, URI deliveryURI) {
+      HL7Stream msgReader = null;
+      HL7Stream msgWriter = null;
+      try {
+         msgReader = new HL7StreamURI(sourceURI).getHL7StreamReader();
+         msgWriter = new HL7StreamURI(deliveryURI).getHL7StreamWriter();
+         HL7Message hl7Msg;
+
+         while ( (hl7Msg = msgReader.read() ) != null) {
+            hl7Msg.fresh();
+            msgWriter.write(hl7Msg);
+         } // while
+      } catch (HL7IOException ioEx) {
+         logger.error("HL7MessageAgent: caught HL7IOException on Ad hoc delivery from:"
+                     +  sourceURI.toString()
+                     +  ", to: "
+                     +  deliveryURI.toString(), ioEx);
+      } finally {
+         try {  // close the reader
+            if (msgReader != null) msgReader.close();
+         } catch (HL7IOException ioEx) {
+            logger.error(  "HL7MessageAgent: caught HL7IOException on closure of reader:"
+                        +  sourceURI.toString(), ioEx);
+         } // try - catch
+
+
+         try {  // close the writer
+            if (msgWriter != null) msgWriter.close();
+         } catch (HL7IOException ioEx) {
+            logger.info(  "HL7MessageAgent: caught HL7IOException on closure of writer:"
+                        +  deliveryURI.toString(), ioEx);
+         } // try - catch
+      } // try - catch
+   } // adHocTransfer
+
+   
+   /**
+    * A stand alone HL7 message transfer agent.
+    * @param args<uL>
+    * <li> <b>-f</b>  Specifies a file containing one or more HL7 transaction messages to
+    * be transferred.
+    * <li> <b>-s</b>  Specifies a source URI from which one or more HL7 transaction messages
+    * are to be read and transferred.
+    * <li> <b>-d</b>  Specifies a destination URI to which one or more HL7 transaction messages
+    * are to be transferred.
+    * <li> <b>-r</b>
+    * <li> <b>-t</b> Specifies a route or transform configuration URI from which source,
+    * destination, and transform specification information can be read.
+    * </ul>
+    *
+    */
    public static void main(String[] args) {
       URI      sourceURI = null,
                deliveryURI = null;
       HL7Route hl7Route = null;
 
-      BasicConfigurator.configure();
+      
 
       // * Process command line.
-      try {
-         for (int argIndex = 0; argIndex < args.length; ++argIndex) {
-            if (args[argIndex].startsWith("-")) {
-               switch (args[argIndex].charAt(1)) {
-                  case 'f' : // * native file source
-                     if (args[++argIndex] != null) {
-                        sourceURI = new File(args[argIndex]).toURI();
-                     } // if
-                     break;
+      for (int argIndex = 0; argIndex < args.length; ++argIndex) {
+         if (args[argIndex].startsWith("-")) {
+            switch (args[argIndex].charAt(1)) {
+               case 'f' : // * native file source
+                  if (args[++argIndex] != null) sourceURI = new File(args[argIndex]).toURI();
+                  break;
 
-                  case 's' : // * source URI
-                     if (args[++argIndex] != null) {
-                        sourceURI = new URI(args[argIndex]);
-                     } // if
-                     break;
+               case 's' : // * source URI
+                  if (args[++argIndex] != null) try {
+                     sourceURI = new URI(args[argIndex]);
+                  } catch (URISyntaxException ex) {
+                     logger.error("Bad Source URI:" + args[argIndex], ex);
+                  } // if - try - catch
+                  break;
 
-                  case 'd' : // * destination / delivery URI
-                      if (args[++argIndex] != null) {
-                        deliveryURI = new URI(args[argIndex]);
-                     } // if
-                     break;
+               case 'd' : // * destination / delivery URI
+                  if (args[++argIndex] != null) try {
+                     deliveryURI = new URI(args[argIndex]);
+                  } catch (URISyntaxException ex) {
+                     logger.error("Bad Delivery URI:" + args[argIndex], ex);
+                  } // if - try - catch
+                  break;
 
-                  case 'r' : // * route specification(s) URI
-                  case 't' : // * transform specification(s) URI
-                      if (args[++argIndex] != null) {
-                        hl7Route = new HL7Route(new URI(args[argIndex]) );
-                     } // if
-                     break;
+               case 'r' : // * route specification(s) URI
+               case 't' : // * transform specification(s) URI
+                  if (args[++argIndex] != null) try {
+                     hl7Route = new HL7Route(new URI(args[argIndex]));
+                  } catch (URISyntaxException ex) {
+                     logger.error("Bad Route URI:" + args[argIndex], ex);
+                  } // if - try - catch
+                  break;
 
-                  default :
-                     HL7MessageAgent.logger.info("HL7MessageAgent: unexpected argument:[" + args[argIndex] + "].");
-               } // switch
-            } // if
-         } // for
-      } catch (java.net.URISyntaxException uEx) {
-         HL7MessageAgent.logger.info("HL7MessageAgent: caught URISyntaxException: " + uEx.getMessage());
-      } catch (Exception ex) {
-         HL7MessageAgent.logger.info("HL7MessageAgent: caught Exception: " + ex.getMessage() );
-      } // try - catch
+               default :
+                  logger.info("HL7MessageAgent: unexpected argument:[" + args[argIndex] + "].");
+            } // switch
+         } // if
+      } // for
 
-      // * Route specified.
-      if (hl7Route != null) {
-         hl7Route.dump();
-         try {
-            hl7Route.open();
-         } catch (HL7IOException ioEx) {
-            HL7MessageAgent.logger.info(  "HL7MessageAgent: caught HL7IOException on HL7Route:"
-                                       +  hl7Route.getID()
-                                       +  ": "
-                                       +  ioEx.getMessage() );
-         } // try - catch
-         hl7Route.run();
-      } else if (sourceURI == null) {
-         HL7MessageAgent.logger.info(  "HL7MessageAgent: No source specified.");
-      } else if (deliveryURI == null) {
-         HL7MessageAgent.logger.info(  "HL7MessageAgent: No delivery specified.");
-      } else { // * Ad hoc delivery
-         HL7Stream msgReader = null;
-         HL7Stream msgWriter = null;
-         try {
-            msgReader = new HL7StreamURI(sourceURI).getHL7StreamReader();
-            msgWriter = new HL7StreamURI(deliveryURI).getHL7StreamWriter();
-            HL7Message hl7Msg;
+      if (hl7Route != null) {  // * Route specified.
+         routeHL7(hl7Route);
+         return;
+      } // if
 
-            while ( (hl7Msg = msgReader.read() ) != null) {
-               hl7Msg.fresh();
-               msgWriter.write(hl7Msg);
-            } // while
-         } catch (HL7IOException ioEx) {
-            HL7MessageAgent.logger.info(  "HL7MessageAgent: caught HL7IOException on Ad hoc delivery from:"
-                                       +  sourceURI.toString()
-                                       +  ", to: "
-                                       +  deliveryURI.toString()
-                                       +  ": "
-                                       +  ioEx.toString());
-         } finally {
-            // close the reader
-            try {
-               msgReader.close();
-            } catch (HL7IOException ioEx) {
-               HL7MessageAgent.logger.info(  "HL7MessageAgent: caught HL7IOException on closure of reader:"
-                                          +  sourceURI.toString()
-                                          +  ": "
-                                          +  ioEx.toString());
-            } // try - catch
+      if (sourceURI == null) logger.error("HL7MessageAgent: No source specified.");
+      if (deliveryURI == null) logger.error("HL7MessageAgent: No delivery specified.");
+      if (sourceURI == null || deliveryURI == null) return;
 
-            // close the writer
-            try {
-               msgWriter.close();
-            } catch (HL7IOException ioEx) {
-               HL7MessageAgent.logger.info(  "HL7MessageAgent: caught HL7IOException on closure of writer:"
-                                          +  deliveryURI.toString()
-                                          +  ": "
-                                          +  ioEx.toString());
-            } // try - catch
-         } // try - catch
-      } // if, else if,.. else
+      adHocTransfer(sourceURI, deliveryURI);
    } // main
+
 } // HL7MessageAgent
 
 
 /*
- * Revision History
+ * $Id$
+ * $HeadURL: $
  *
+ * A standalone HL7 message transfer agent.
+ *
+ * Revision History
+ * -------- -------
  * Id: 22
  * Origination. Tested and verified.
  *
@@ -164,8 +191,11 @@ public class HL7MessageAgent {
  * HL7MessageAgent.java 40 2009-12-11 00:41:49Z scott
  * Modified for compatability with the us.conxio.HL7Stream package.
  *
- * $Id$
+ * Id: HL7MessageAgent.java 23 2010-03-14 02:46:06Z scott.herman@unconxio.us
  * Cleaning up HL7Stream closure, and associated exception handling.
-
+ *
+ * $Revision$, $Date$, $Author$
+ * Upgraded to hl7-2.0 (r.90), restructured slightly, and documented.
+ *
  */
 
