@@ -1,3 +1,4 @@
+package us.conxio.hl7.hl7message
 $Id$
 * Revision: 33, Date: 2010-05-18 16:19:52 -0700 (Tue, 18 May 2010), Author: scott.herman@unconxio.us
 Verification test and release.
@@ -31,7 +32,7 @@ and repetition index.
 - HL7Designator.getComponentIndex(), .getSubComponentIndex():Added to clarify bimodal indexing.
 - HL7Designator.pick():Corrected HL7Designator translations.
 
-* $Revision$, $Date$, $Author$
+* Revision: 81, Date: 2010-10-14 18:25:20 -0700 (Thu, 14 Oct 2010), Author: scott.herman@unconxio.us
 Documentation and housekeeping.
 - HL7Designator:Added documentation and some limited syntactical cleanup.
 - HL7Element:removed getLevel() from the interface, as it's not used and is not needed.
@@ -46,3 +47,6 @@ re-scoped to package-private wherever possible, and did some syntactical cleanup
 - HL7SubComponent:Documentation, re-scoping to package-private, wherever possible, and limited syntactical cleanup.
 - HL7SubComponent.toHL7String():Added escape() to escape any un-escaped encoders.
 - HL7Time:Documentation.
+
+* $Revision$, $Date$, $Author$
+- HL7Encoding.getDefaultEncoding():Added to support HL7Properties.

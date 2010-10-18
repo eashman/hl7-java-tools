@@ -261,6 +261,7 @@ public class HL7Encoding {
     * @param fieldSep the field separator value to set
     */
    public void setFieldSeparator(String fieldSep) {
+      if (StringUtils.isEmpty(fieldSep)) return;
       fieldSeparator = fieldSep.charAt(0);
    } // setFieldSeparator
 
@@ -285,6 +286,7 @@ public class HL7Encoding {
     * @param componentSep the component separator value to set
     */
    public void setComponentSeparator(String componentSep) {
+      if (StringUtils.isEmpty(componentSep)) return;
       componentSeparator = componentSep.charAt(0);
    } // setComponentSeparator
 
@@ -306,6 +308,7 @@ public class HL7Encoding {
     * @param repetitionSeparator the repetitionSeparator to set
     */
    public void setRepetitionSeparator(String repetitionSep) {
+      if (StringUtils.isEmpty(repetitionSep)) return;
       repetitionSeparator = repetitionSep.charAt(0);
    } // setRepetitionSeparator
 
@@ -327,6 +330,7 @@ public class HL7Encoding {
     * @param subComponentSeparator the subComponentSeparator to set
     */
    public void setSubComponentSeparator(String subComponentSep) {
+      if (StringUtils.isEmpty(subComponentSep)) return;
       subComponentSeparator = subComponentSep.charAt(0);
    } // setSubComponentSeparator
 
@@ -348,6 +352,7 @@ public class HL7Encoding {
     * @param escapeChr the escapeChr to set
     */
    public void setEscapeChar(String escapeChr) {
+      if (StringUtils.isEmpty(escapeChr)) return;
       escapeChar = escapeChr.charAt(0);
    } // setEscapeChar
 
@@ -447,4 +452,10 @@ public class HL7Encoding {
       ArrayList<String> elements = hl7Split(str, level);
       return hl7Join(elements, level, true);
    } // escapeSeparator
+
+
+   public static HL7Encoding getDefaultEncoding() {
+      return new HL7Encoding('|', '^', '~', '\\', '&');
+   } // getDefaultEncoding
+
 } // class HL7Encoding
