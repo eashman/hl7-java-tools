@@ -42,9 +42,12 @@ package us.conxio.XMLUtilities;
 
 
 import java.net.URLEncoder;
+
 import java.io.UnsupportedEncodingException;
+
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
+
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -53,30 +56,6 @@ import java.util.regex.Matcher;
 /**
  Convenience methods for escaping special characters related to HTML, XML,
  and regular expressions.
-
- <P>To keep you safe by default, WEB4J goes to some effort to escape
- characters in your data when appropriate, such that you <em>usually</em>
- don't need to think too much about escaping special characters. Thus, you
-  shouldn't need to <em>directly</em> use the services of this class very often.
-
- <P><span class='highlight'>For Model Objects containing free form user input,
- it is highly recommended that you use {@link SafeText}, not <tt>String</tt></span>.
- Free form user input is open to malicious use, such as
- <a href='http://www.owasp.org/index.php/Cross_Site_Scripting'>Cross Site Scripting</a>
- attacks.
- Using <tt>SafeText</tt> will protect you from such attacks, by always escaping
- special characters automatically in its <tt>toString()</tt> method.
-
- <P>The following WEB4J classes will automatically escape special characters
- for you, when needed :
- <ul>
- <li>the {@link SafeText} class, used as a building block class for your
- application's Model Objects, for modeling all free form user input
- <li>the {@link Populate} tag used with forms
- <li>the {@link Report} class used for creating quick reports
- <li>the {@link Text}, {@link TextFlow}, and {@link Tooltips} custom tags used
- for translation
- </ul>
 */
 public final class EscapeChars {
 
@@ -132,118 +111,52 @@ public final class EscapeChars {
     five</em> of the above characters.
    */
    public static String forHTML(String aText){
-     final StringBuilder result = new StringBuilder();
-     final StringCharacterIterator iterator = new StringCharacterIterator(aText);
-     char character =  iterator.current();
-     while (character != CharacterIterator.DONE ){
-       if (character == '<') {
-         result.append("&lt;");
-       }
-       else if (character == '>') {
-         result.append("&gt;");
-       }
-       else if (character == '&') {
-         result.append("&amp;");
-      }
-       else if (character == '\"') {
-         result.append("&quot;");
-       }
-       else if (character == '\t') {
-         addCharEntity(9, result);
-       }
-       else if (character == '!') {
-         addCharEntity(33, result);
-       }
-       else if (character == '#') {
-         addCharEntity(35, result);
-       }
-       else if (character == '$') {
-         addCharEntity(36, result);
-       }
-       else if (character == '%') {
-         addCharEntity(37, result);
-       }
-       else if (character == '\'') {
-         addCharEntity(39, result);
-       }
-       else if (character == '(') {
-         addCharEntity(40, result);
-       }
-       else if (character == ')') {
-         addCharEntity(41, result);
-       }
-       else if (character == '*') {
-         addCharEntity(42, result);
-       }
-       else if (character == '+') {
-         addCharEntity(43, result);
-       }
-       else if (character == ',') {
-         addCharEntity(44, result);
-       }
-       else if (character == '-') {
-         addCharEntity(45, result);
-       }
-       else if (character == '.') {
-         addCharEntity(46, result);
-       }
-       else if (character == '/') {
-         addCharEntity(47, result);
-       }
-       else if (character == ':') {
-         addCharEntity(58, result);
-       }
-       else if (character == ';') {
-         addCharEntity(59, result);
-       }
-       else if (character == '=') {
-         addCharEntity(61, result);
-       }
-       else if (character == '?') {
-         addCharEntity(63, result);
-       }
-       else if (character == '@') {
-         addCharEntity(64, result);
-       }
-       else if (character == '[') {
-         addCharEntity(91, result);
-       }
-       else if (character == '\\') {
-         addCharEntity(92, result);
-       }
-       else if (character == ']') {
-         addCharEntity(93, result);
-       }
-       else if (character == '^') {
-         addCharEntity(94, result);
-       }
-       else if (character == '_') {
-         addCharEntity(95, result);
-       }
-       else if (character == '`') {
-         addCharEntity(96, result);
-       }
-       else if (character == '{') {
-         addCharEntity(123, result);
-       }
-       else if (character == '|') {
-         addCharEntity(124, result);
-       }
-       else if (character == '}') {
-         addCharEntity(125, result);
-       }
-       else if (character == '~') {
-         addCharEntity(126, result);
-       }
-       else {
-         //the char is not a special one
-         //add it to the result as is
-         result.append(character);
-       }
+      final StringBuilder result = new StringBuilder();
+      final StringCharacterIterator iterator = new StringCharacterIterator(aText);
+      char character =  iterator.current();
+      while (character != CharacterIterator.DONE) {
+         switch (character) {
+            case '<' :  result.append("&lt;");  break;
+            case '>' :  result.append("&gt;");  break;
+            case '&' :  result.append("&amp;");  break;
+            case '\"' : result.append("&quot;");  break;
+            case '\t' : addCharEntity(9, result);  break;
+            case '!' :  addCharEntity(33, result);  break;
+            case '#' :  addCharEntity(35, result);  break;
+            case '$' :  addCharEntity(36, result);  break;
+            case '%' :  addCharEntity(37, result);  break;
+            case '\'' : addCharEntity(39, result);  break;
+            case '(' :  addCharEntity(40, result);  break;
+            case ')' :  addCharEntity(41, result);  break;
+            case '*' :  addCharEntity(42, result);  break;
+            case '+' :  addCharEntity(43, result);  break;
+            case ',' :  addCharEntity(44, result);  break;
+            case '-' :  addCharEntity(45, result);  break;
+            case '.' :  addCharEntity(46, result);  break;
+            case '/' :  addCharEntity(47, result);  break;
+            case ':' :  addCharEntity(58, result);  break;
+            case ';' :  addCharEntity(59, result);  break;
+            case '=' :  addCharEntity(61, result);  break;
+            case '?' :  addCharEntity(63, result);  break;
+            case '@' :  addCharEntity(64, result);  break;
+            case '[' :  addCharEntity(91, result);  break;
+            case '\\' : addCharEntity(92, result);  break;
+            case ']' :  addCharEntity(93, result);  break;
+            case '^' :  addCharEntity(94, result);  break;
+            case '_' :  addCharEntity(95, result);  break;
+            case '`' :  addCharEntity(96, result);  break;
+            case '{' :  addCharEntity(123, result);  break;
+            case '|' :  addCharEntity(124, result);  break;
+            case '}' :  addCharEntity(125, result);  break;
+            case '~' :  addCharEntity(126, result);  break;
+            default  :  result.append(character);
+         } // switch
+
        character = iterator.next();
-     }
+     } // while
+
      return result.toString();
-  }
+  } // forHTML
 
 
   /**
@@ -266,7 +179,7 @@ public final class EscapeChars {
   */
   public static String forHrefAmpersand(String aURL){
     return aURL.replace("&", "&amp;");
-  }
+  } // forHrefAmpersand
 
   /**
     Synonym for <tt>URLEncoder.encode(String, "UTF-8")</tt>.
@@ -283,12 +196,12 @@ public final class EscapeChars {
      String result = null;
      try {
        result = URLEncoder.encode(aURLFragment, "UTF-8");
-     }
-     catch (UnsupportedEncodingException ex){
+     } catch (UnsupportedEncodingException ex){
        throw new RuntimeException("UTF-8 not supported", ex);
-     }
+     } // try - catch
+
      return result;
-   }
+   } // forURL
 
   /**
    Escape characters for text appearing as XML data, between tags.
@@ -313,30 +226,20 @@ public final class EscapeChars {
     final StringCharacterIterator iterator = new StringCharacterIterator(aText);
     char character =  iterator.current();
     while (character != CharacterIterator.DONE ){
-      if (character == '<') {
-        result.append("&lt;");
-      }
-      else if (character == '>') {
-        result.append("&gt;");
-      }
-      else if (character == '\"') {
-        result.append("&quot;");
-      }
-      else if (character == '\'') {
-        result.append("&#039;");
-      }
-      else if (character == '&') {
-         result.append("&amp;");
-      }
-      else {
-        //the char is not a special one
-        //add it to the result as is
-        result.append(character);
-      }
+      switch (character) {
+         case '<' :  result.append("&lt;");  break;
+         case '>' :  result.append("&gt;");  break;
+         case '\"' : result.append("&quot;");  break;
+         case '\'' : result.append("&#039;");  break;
+         case '&' :  result.append("&amp;");  break;
+         default  :  result.append(character);
+      } // switch
+
       character = iterator.next();
-    }
+    } // while
+
     return result.toString();
-  }
+  } // forXML
 
   /**
    Escapes characters for text appearing as data in the
@@ -365,37 +268,29 @@ public final class EscapeChars {
     while (character != StringCharacterIterator.DONE){
       if( character == '\"' ){
         result.append("\\\"");
-      }
-      else if(character == '\\'){
+      } else if(character == '\\') {
         result.append("\\\\");
-      }
-      else if(character == '/'){
+      } else if(character == '/') {
         result.append("\\/");
-      }
-      else if(character == '\b'){
+      } else if(character == '\b') {
         result.append("\\b");
-      }
-      else if(character == '\f'){
+      } else if(character == '\f') {
         result.append("\\f");
-      }
-      else if(character == '\n'){
+      } else if(character == '\n') {
         result.append("\\n");
-      }
-      else if(character == '\r'){
+      } else if(character == '\r') {
         result.append("\\r");
-      }
-      else if(character == '\t'){
+      } else if(character == '\t') {
         result.append("\\t");
-      }
-      else {
+      } else {
         //the char is not a special one
         //add it to the result as is
         result.append(character);
-      }
+      } // if -else if - else
       character = iterator.next();
-    }
+    } // while
     return result.toString();
-  }
+  } // forJSON
 
   /**
    Return <tt>aText</tt> with all <tt>'<'</tt> and <tt>'>'</tt> characters
@@ -408,19 +303,19 @@ public final class EscapeChars {
     while (character != CharacterIterator.DONE ){
       if (character == '<') {
         result.append("&lt;");
-      }
-      else if (character == '>') {
+      } else if (character == '>') {
         result.append("&gt;");
-      }
-      else {
+      } else {
         //the char is not a special one
         //add it to the result as is
         result.append(character);
-      }
+      } // if - else if - else
+
       character = iterator.next();
-    }
+    } // while
+
     return result.toString();
-  }
+  } // toDisableTags
 
 
   /**
@@ -443,68 +338,53 @@ public final class EscapeChars {
   public static String forRegex(String aRegexFragment){
     final StringBuilder result = new StringBuilder();
 
-    final StringCharacterIterator iterator =
-      new StringCharacterIterator(aRegexFragment)
-    ;
+    final StringCharacterIterator iterator = new StringCharacterIterator(aRegexFragment);
     char character =  iterator.current();
-    while (character != CharacterIterator.DONE ){
+    while (character != CharacterIterator.DONE) {
       /*
        All literals need to have backslashes doubled.
       */
       if (character == '.') {
         result.append("\\.");
-      }
-      else if (character == '\\') {
+      } else if (character == '\\') {
         result.append("\\\\");
-      }
-      else if (character == '?') {
+      } else if (character == '?') {
         result.append("\\?");
-      }
-      else if (character == '*') {
+      } else if (character == '*') {
         result.append("\\*");
-      }
-      else if (character == '+') {
+      } else if (character == '+') {
         result.append("\\+");
-      }
-      else if (character == '&') {
+      } else if (character == '&') {
         result.append("\\&");
-      }
-      else if (character == ':') {
+      } else if (character == ':') {
         result.append("\\:");
-      }
-      else if (character == '{') {
+      } else if (character == '{') {
         result.append("\\{");
-      }
-      else if (character == '}') {
+      } else if (character == '}') {
         result.append("\\}");
-      }
-      else if (character == '[') {
+      } else if (character == '[') {
         result.append("\\[");
-      }
-      else if (character == ']') {
+      } else if (character == ']') {
         result.append("\\]");
-      }
-      else if (character == '(') {
+      } else if (character == '(') {
         result.append("\\(");
-      }
-      else if (character == ')') {
+      } else if (character == ')') {
         result.append("\\)");
-      }
-      else if (character == '^') {
+      } else if (character == '^') {
         result.append("\\^");
-      }
-      else if (character == '$') {
+      } else if (character == '$') {
         result.append("\\$");
-      }
-      else {
+      } else {
         //the char is not a special one
         //add it to the result as is
         result.append(character);
-      }
+      } // if - else if - else
+
       character = iterator.next();
-    }
+    } // while
+
     return result.toString();
-  }
+  } // forRegex
 
   /**
    Escape <tt>'$'</tt> and <tt>'\'</tt> characters in replacement strings.
@@ -525,7 +405,7 @@ public final class EscapeChars {
   */
   public static String forReplacementString(String aInput){
     return Matcher.quoteReplacement(aInput);
-  }
+  } // forReplacementString
 
   /**
    Disable all <tt><SCRIPT></tt> tags in <tt>aText</tt>.
@@ -539,34 +419,29 @@ public final class EscapeChars {
     matcher = SCRIPT_END.matcher(result);
     result = matcher.replaceAll("&lt;/SCRIPT>");
     return result;
-  }
+  } // forScriptTagsOnly
 
   // PRIVATE //
 
-  private EscapeChars(){
+  private EscapeChars() {
     //empty - prevent construction
   }
 
-  private static final Pattern SCRIPT = Pattern.compile(
-    "<SCRIPT>", Pattern.CASE_INSENSITIVE
-   );
-  private static final Pattern SCRIPT_END = Pattern.compile(
-    "</SCRIPT>", Pattern.CASE_INSENSITIVE
-  );
+  private static final Pattern SCRIPT = Pattern.compile( "<SCRIPT>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern SCRIPT_END = Pattern.compile("</SCRIPT>", Pattern.CASE_INSENSITIVE);
 
   private static void addCharEntity(Integer aIdx, StringBuilder aBuilder){
     String padding = "";
-    if( aIdx <= 9 ){
+    if (aIdx <= 9) {
        padding = "00";
-    }
-    else if( aIdx <= 99 ){
+    } else if (aIdx <= 99) {
       padding = "0";
-    }
-    else {
+    } else {
       //no prefix
-    }
+    } // if - else if - else
+
     String number = padding + aIdx.toString();
-    aBuilder.append("&#" + number + ";");
+    aBuilder.append("&#").append(number).append(";");
   } // addCharEntity
 
 } // EscapeChars

@@ -53,5 +53,10 @@ Replaced XMLUtils.forXML() with the entire EscapeChars class.
 - AttributeMap.isEmpty(), .isNotEmpty(): Added for convenience.
 - XMLUtils.elementString(): modified to handle null attribute map.
 
+* Revision: 60, Date: 2010-08-25 16:18:03 -0700 (Wed, 25 Aug 2010), Author: scott.herman@unconxio.us
+- XMLUtils.extractXML():Corrected returned string length.
+
 * $Revision$, $Date$, $Author$
-- XMLUtils.extractXML():Corrected returned string length. 
+- AttributeMap:Documentation.
+- EscapeChars:Documentation and code optimization.
+- XMLUtils.readXML(InputStream):Corrected exception handling.

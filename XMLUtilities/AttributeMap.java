@@ -49,17 +49,15 @@ public class AttributeMap {
    } // AttributeMap constructor
 
 
+   /**
+    * Construct an AttributeMap from an argument org.w3c.dom.Node
+    * @param node The node from which to construct the AttrtibuteMap.
+    */
    public AttributeMap(Node node) {
       this();
       this._getAttributes(node);
    } // AttributeMap constructor
 
-   /**
-    * Add a name value attribute pair to the map.
-    * @param name   The name of the attribute to be added.
-    * @param value  The value, as a String, of the added attribute.
-    * @return       The attribute map to which the argument name value pair was added.
-    */
    private AttributeMap _add(String name, String value) {
       if (name == null) return this;
       this.attributeMap.put(name.toLowerCase(), value);
@@ -67,6 +65,12 @@ public class AttributeMap {
    } // _add
 
 
+   /**
+    * Add a name value attribute pair to the map.
+    * @param name   The name of the attribute to be added.
+    * @param value  The value, as a String, of the added attribute.
+    * @return       The attribute map to which the argument name value pair was added.
+    */
    public AttributeMap add(String name, String value) { return _add(name, value); }
 
    /**
@@ -125,6 +129,12 @@ public class AttributeMap {
    } // _getAttributes
 
 
+   /**
+    * A static org.w3c.dom.Node extraction constructor.
+    * @param node The node from which to construct the returned AttributeMap.
+    * @param allowed A String array of allowed attribute names.
+    * @return The resulting AttributeMap, or null, if the operation fails.
+    */
    public static AttributeMap getAttributes(Node node, String[] allowed) {
       if (node == null) return null;
       if (!node.hasAttributes()) return null;
@@ -141,14 +151,17 @@ public class AttributeMap {
          } // if
       } // for
 
-      if (newMap.entryCount() > 0) {
-         return newMap;
-      } // if
+      if (newMap.entryCount() > 0) return newMap;
 
       return null;
    } // getAttributes
 
 
+   /**
+    * A static org.w3c.dom.Node extraction constructor.
+    * @param node The node from which to construct the returned AttributeMap
+    * @return The resulting AttributeMap, or null, if the operation fails.
+    */
    public static AttributeMap getAttributes(Node node) {
       if (node == null) return null;
       if (!node.hasAttributes()) return null;
@@ -160,12 +173,21 @@ public class AttributeMap {
    } // getAttributes
 
 
+   /**
+    * Determines whether the context AttributeMap contains the argument key.
+    * @param key A String representation of the argument key.
+    * @return true if the AttributyeMap contains the argument key, otherwise false.
+    */
    public boolean hasKey(String key) {
       if (key == null) return false;
       return this.attributeMap.containsKey(key.toLowerCase());
    } // hasKey
 
 
+   /**
+    * Removes the entry associated with the argument key.
+    * @param key The key associated with the entry to be removed.
+    */
    public void remove(String key) {
       if (key == null) return;
       this.attributeMap.remove(key.toLowerCase());
