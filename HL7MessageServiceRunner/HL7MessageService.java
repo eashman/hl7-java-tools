@@ -1,6 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and runService the template in the editor.
+ *  $Id$
+ *
+ *  This code is derived from public domain sources. Commercial use is allowed.
+ *  However, all rights remain permanently assigned to the public domain.
+ *
+ *  HL7MessageService.java : A HL7 message service specification class.
+ *
+ *  Copyright (c) 2009, 2010  Scott Herman
+ *
+ *  This is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This code is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this code.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package us.conxio.HL7MessageServiceRunner;
@@ -227,6 +247,4 @@ public class HL7MessageService extends HL7ServiceElement implements HL7MessageHa
       for (HL7Route route : routes) route.dump();
    } // dump
 
-   // * TBD:
-   // *  - Monitoring/Status reporting
 } // Hl7MessageService

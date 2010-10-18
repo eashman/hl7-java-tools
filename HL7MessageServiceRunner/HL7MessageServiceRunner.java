@@ -26,11 +26,14 @@
 
 package us.conxio.HL7MessageServiceRunner;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.BasicConfigurator;
+
+import us.conxio.hl7.hl7system.HL7Logger;
 
 
 
@@ -40,7 +43,7 @@ import org.apache.log4j.BasicConfigurator;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7MessageServiceRunner {
-   static Logger logger = Logger.getLogger("us.conxio.hl7");
+   static Logger logger = HL7Logger.getHL7Logger();
 
    public HL7MessageServiceRunner() { }
 
@@ -71,34 +74,34 @@ public class HL7MessageServiceRunner {
                      try {
                         svcURI = new URI(uriArgStr);
                      } catch (java.net.URISyntaxException uriEx) {
-                        HL7MessageServiceRunner.logger.info( "URISyntaxException:"
-                                                        +    uriEx.toString()
-                                                        +    ". on ["
-                                                        +    uriArgStr
-                                                        +    "].", uriEx);
+                        logger.error("URISyntaxException:"
+                                +    uriEx.toString()
+                                +    ". on ["
+                                +    uriArgStr
+                                +    "].", uriEx);
                      } // try - catch
                   } // if
                   break;
                   
                default: 
-                  HL7MessageServiceRunner.logger.info("Unexpected option:" + args[argIndex]);
+                  logger.info("Unexpected option:" + args[argIndex]);
             } // switch
          } // if
       } // for
 
       if (svcURI == null) {
-         HL7MessageServiceRunner.logger.info("No service specified.");
+         logger.error("No service specified.");
       } else {
          try {         
             msgSvc = new HL7MessageService(svcURI) ;
             msgSvc.dump();
             msgSvc.runService(); // * This runs the service.
          } catch (IOException ioEx) {
-            HL7MessageServiceRunner.logger.info("IOException:", ioEx);
+            logger.error("IOException:", ioEx);
          } catch (Exception ex) {
-            HL7MessageServiceRunner.logger.info("Exception:", ex);
+            logger.error("Exception:", ex);
          } finally {
-            msgSvc.close();
+            if (msgSvc != null) msgSvc.close();
          } // try - catch - finally
       } // if - else
     } // main

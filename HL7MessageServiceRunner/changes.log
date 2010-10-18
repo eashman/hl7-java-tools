@@ -10,6 +10,10 @@
 
 * $Revision$, $Date$, $Author$
 Consolidated and retooled to use hl7-2.0.
+Repackaged service class and runner in a single consolidated package.
 - HL7MessageService:Adapted from HL7-1.6.
 - Hl7MessageServiceRunner:Adapted.
 
+* $Revision$, $Date$, $Author$
+- HL7MessageService:Minor debug corrections, to avoid null pointer exceptions, and added a file header.
+- HL7MessageServiceRunner:Minor debug corrections, to avoid null pointer exceptions, and to exception handling.
