@@ -12,6 +12,13 @@ Created this package for hl7-2.0.
 * Revision: 70, Date: 2010-10-10 00:35:55 -0700 (Sun, 10 Oct 2010), Author: scott.herman@unconxio.us
 - HL7Transform:removed unused imports.
 
-* $Revision$, $Date$, $Author$
+* Revision: 84, Date: 2010-10-14 18:50:52 -0700 (Thu, 14 Oct 2010), Author: scott.herman@unconxio.us
 - HL7MessageTransformOperation:Documentation and minor refactoring.
 - HL7Transform.NAME_HL7TRANSFORM:Added this public reference declaration of the item name.
+
+* $Revision$, $Date$, $Author$
+ - HL7ServiceElement:Changed service endpoint URIs to HL7StreamURIs.
+Made logger package private.
+ - HL7Route:Changed service endpoint URIs to HL7StreamURIs.
+ Removed local logger to use super's logger.
+ - HL7MessageTransformOperation:Initialize logger from HL7Logger.getHL7Logger().

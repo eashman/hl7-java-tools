@@ -35,9 +35,11 @@ package us.conxio.hl7.hl7service;
 
 
 import java.io.InputStream;
-import java.net.URISyntaxException;
+
 import java.util.ArrayList;
+
 import java.net.URI;
+
 import org.apache.commons.lang.StringUtils;
 
 import org.w3c.dom.Node;
@@ -56,23 +58,22 @@ import us.conxio.hl7.hl7stream.HL7StreamURI;
  * @author scott herman
  */
 public class HL7Route extends HL7ServiceElement {
-   private URI                      hl7SourceURI;
-   private ArrayList<URI>           hl7DeliveryURIs;
+   private HL7StreamURI             hl7SourceURI;
+   private ArrayList<HL7StreamURI>  hl7DeliveryURIs;
    private ArrayList<HL7Transform>  transforms;
    private HL7Stream                hl7StreamIn;
    private ArrayList<HL7Stream>     hl7StreamsOut;
-   private static Logger            logger = HL7ServiceElement.getLogger();
 
 
     public HL7Route(String xmlStr)  {
-      this.initialize("HL7Route", xmlStr);
-      initializeHL7Route(this.root);
+      initialize("HL7Route", xmlStr);
+      initializeHL7Route(root);
    } // HL7Route (Constructor)
 
 
    public HL7Route(InputStream inStream) {
-      this.initialize("HL7Route", inStream);
-      initializeHL7Route(this.root);
+      initialize("HL7Route", inStream);
+      initializeHL7Route(root);
    } // HL7Route (Constructor)
 
 
@@ -83,8 +84,8 @@ public class HL7Route extends HL7ServiceElement {
     * Note that if the URI contains more that one HL7Route specification, only the first is returned.
     */
    public HL7Route(URI uri) {
-      this.initialize("HL7Route", uri);
-      initializeHL7Route(this.root);
+      initialize("HL7Route", uri);
+      initializeHL7Route(root);
    } // HL7Route (Constructor)
 
    /**
@@ -105,18 +106,18 @@ public class HL7Route extends HL7ServiceElement {
    } // initializeHL7Route
    
    
-   public URI getHL7SourceURI() {
-      return this.hl7SourceURI;
+   public HL7StreamURI getHL7SourceURI() {
+      return hl7SourceURI;
    } // getHL7SourceURI
 
 
-   public void setHL7SourceURI(URI uri) {
-      this.hl7SourceURI = uri;
+   public void setHL7SourceURI(HL7StreamURI uri) {
+      hl7SourceURI = uri;
    } // setHL7SourceURI
 
 
    private ArrayList<HL7Transform> readHL7Transforms() {
-      ArrayList<Node> xForms = this.getElements("HL7Transform");
+      ArrayList<Node> xForms = getElements("HL7Transform");
       if (xForms == null) return(null);
       ArrayList<HL7Transform> retnXForms = new ArrayList<HL7Transform>();
 
@@ -124,8 +125,8 @@ public class HL7Route extends HL7ServiceElement {
       return retnXForms;            
    } // readHL7Transforms
    
-   private ArrayList<URI> extractURIs(String uriTagName) {
-      ArrayList<Node> uriNodes = this.getElements(uriTagName);
+   private ArrayList<HL7StreamURI> extractURIs(String uriTagName) {
+      ArrayList<Node> uriNodes = getElements(uriTagName);
 
       if (uriNodes == null || uriNodes.size() < 1) {
          logger.debug( "extractURIs("
@@ -134,16 +135,16 @@ public class HL7Route extends HL7ServiceElement {
          return null;
       } // if
 
-      ArrayList<URI> uriList = new ArrayList<URI>();
+      ArrayList<HL7StreamURI> uriList = new ArrayList<HL7StreamURI>();
 
       for (Node node : uriNodes) {
-         String uriStr = this.getAttribute(node, "uri");
+         String uriStr = getAttribute(node, "uri");
          if (StringUtils.isEmpty(uriStr)) uriStr = this.getAttribute(node, "URI");
 
          if (StringUtils.isNotEmpty(uriStr)) {
             try {
-               uriList.add(new URI(uriStr));
-            } catch (URISyntaxException ex) {
+               uriList.add(new HL7StreamURI(uriStr));
+            } catch (HL7IOException ex) {
                logger.error("URI String:" + uriStr, ex);
             } // try - catch
          } // if
@@ -153,19 +154,17 @@ public class HL7Route extends HL7ServiceElement {
    } // extractURIs
    
 
-   private URI extractURI(String uriTagName)  {
-      Node node = this.getElement(uriTagName);
-      String uriStr = this.getAttribute(node, "uri");
-      if (uriStr == null) {
-         uriStr = this.getAttribute(node, "URI");
-      } // if
+   private HL7StreamURI extractURI(String uriTagName)  {
+      Node node = getElement(uriTagName);
+      String uriStr = getAttribute(node, "uri");
+      if (uriStr == null) uriStr = getAttribute(node, "URI");
 
       if (StringUtils.isEmpty(uriStr)) return null;
 
-      URI uri = null;
+      HL7StreamURI uri = null;
       try {
-         uri = new URI(uriStr);
-      } catch (URISyntaxException ex) {
+         uri = new HL7StreamURI(uriStr);
+      } catch (HL7IOException ex) {
          logger.error("URI String:" + uriStr, ex);
       } // try - catch
 
@@ -180,7 +179,7 @@ public class HL7Route extends HL7ServiceElement {
     * Note that the message will not qualify if the route contains no HL7Transforms
     */
    public boolean isQualified(HL7Message msg) {
-      for (HL7Transform xForm : this.transforms) if (xForm.isQualified(msg)) return true;
+      for (HL7Transform xForm : transforms) if (xForm.isQualified(msg)) return true;
       return false;
    } // isQualified
    
@@ -202,13 +201,13 @@ public class HL7Route extends HL7ServiceElement {
    } // render
    
 
-   private HL7Stream openDelivery(URI uri) throws HL7IOException {
+   private HL7Stream openDelivery(HL7StreamURI uri) throws HL7IOException {
       if (uri == null) return null;
 
       logger.trace("constructing outbound HL7Stream("
                     +  uri.toString()
                     +  ").");
-      HL7Stream stream =  new HL7StreamURI(uri).getHL7StreamWriter();
+      HL7Stream stream =  uri.getHL7StreamWriter();
       stream.open();
       return stream;
    } // openDelivery
@@ -219,22 +218,22 @@ public class HL7Route extends HL7ServiceElement {
     * @throws HL7IOException
     */ 
    public void open() throws HL7IOException {
-      if (!this.hasDeliveryURIs()) {
+      if (!hasDeliveryURIs()) {
          throw new HL7IOException(  "No outbound stream specified.",
                                     HL7IOException.NULL_STREAM);
       } // if
 
-      if (this.hl7StreamsOut == null) this.hl7StreamsOut = new ArrayList<HL7Stream>();
+      if (hl7StreamsOut == null) hl7StreamsOut = new ArrayList<HL7Stream>();
 
-      for (URI uri : this.hl7DeliveryURIs) {
-         HL7Stream hl7Stream = this.openDelivery(uri);
+      for (HL7StreamURI uri : hl7DeliveryURIs) {
+         HL7Stream hl7Stream = openDelivery(uri);
          if (!isOpen(hl7Stream)) throw new HL7IOException(  "Cannot open Outbound HL7Stream:"
                                                          +  uri.toString()
                                                          +  ".",
                                                          HL7IOException.NULL_STREAM);
          hl7StreamsOut.add(hl7Stream);
          logger.trace("hl7Stream["
-                     + Integer.toString(this.hl7StreamsOut.size() - 1)
+                     + Integer.toString(hl7StreamsOut.size() - 1)
                      + "]:"
                      + hl7Stream.description() );
       } // for
@@ -250,7 +249,7 @@ public class HL7Route extends HL7ServiceElement {
     */ 
    public void close() throws HL7IOException  {
       if (!isClosedInput()) hl7StreamIn.close();
-      if (!this.hasOutputStreams()) return;
+      if (!hasOutputStreams()) return;
       for (HL7Stream hl7Stream : hl7StreamsOut) if (isNotClosed(hl7Stream)) hl7Stream.close();
    } // close
 
@@ -274,13 +273,13 @@ public class HL7Route extends HL7ServiceElement {
       if (msg == null) return false;
       boolean wrote = false;
 
-      if (this.isQualified(msg) ) {
-         HL7Message msgOut = this.render(msg);
+      if (isQualified(msg) ) {
+         HL7Message msgOut = render(msg);
          if (!isOpen()) open();
          if (!hasOutputStreams()) return false;
 
 
-         for (HL7Stream hl7Stream : this.hl7StreamsOut) {
+         for (HL7Stream hl7Stream : hl7StreamsOut) {
             if (isOpen(hl7Stream)) {
                hl7Stream.write(msgOut);
                wrote = true;
@@ -296,7 +295,7 @@ public class HL7Route extends HL7ServiceElement {
     * A generic "run" method for a thread manifestation of the context HL7Route.
     */
    public void run() {
-      if (this.hl7SourceURI == null) {
+      if (hl7SourceURI == null) {
          logger.error("No HL7 source specified.");
          return;
       } // if
@@ -305,7 +304,7 @@ public class HL7Route extends HL7ServiceElement {
          if (!hasOpenInputStream()) open();
 
          HL7Message inboundMsg = null;
-         while ( (inboundMsg = this.hl7StreamIn.read()) != null) route(inboundMsg);
+         while ( (inboundMsg = hl7StreamIn.read()) != null) route(inboundMsg);
       } catch (HL7IOException ex) {
          logger.error(null, ex);
       } // try - catch
@@ -317,12 +316,12 @@ public class HL7Route extends HL7ServiceElement {
    */
    public void dump() {
       logger.debug("HL7Route.idString:" + this.idString);
-      if (this.documentURI != null) {
-         logger.debug("HL7Route.documentURI:" + this.documentURI.toString());
+      if (getDocumentURI() != null) {
+         logger.debug("HL7Route.documentURI:" + this.getDocumentURI().toString());
       } // if
 
-      if (this.hl7DeliveryURIs != null && !this.hl7DeliveryURIs.isEmpty()) {
-         for (URI uri : this.hl7DeliveryURIs) {
+      if (hl7DeliveryURIs != null && !hl7DeliveryURIs.isEmpty()) {
+         for (HL7StreamURI uri : hl7DeliveryURIs) {
             logger.debug("HL7Route.hl7DeliveryURI:" + uri.toString());
          } // for
       } // if
@@ -355,8 +354,8 @@ public class HL7Route extends HL7ServiceElement {
    } // isNotClosed
 
    public void addDeliveryURI(HL7StreamURI deliveryURI) {
-      if (hl7DeliveryURIs == null) hl7DeliveryURIs = new ArrayList<URI>();
-      hl7DeliveryURIs.add(deliveryURI.uri());
+      if (hl7DeliveryURIs == null) hl7DeliveryURIs = new ArrayList<HL7StreamURI>();
+      hl7DeliveryURIs.add(deliveryURI);
    } // addDeliveryURI
 
 } // class HL7Route

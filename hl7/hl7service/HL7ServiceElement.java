@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import java.net.URI;
+import org.apache.commons.lang.StringUtils;
 
 import org.w3c.dom.*;
 
@@ -42,6 +43,7 @@ import org.apache.log4j.Logger;
 import us.conxio.XMLUtilities.AttributeMap;
 
 import us.conxio.XMLUtilities.XMLUtils;
+import us.conxio.hl7.hl7system.HL7Logger;
 
 /**
  *
@@ -53,34 +55,32 @@ import us.conxio.XMLUtilities.XMLUtils;
  * @author scott herman <scott.herman@unconxio.us>
  */
 public class HL7ServiceElement {
-   private static Logger   logger = Logger.getLogger("us.conxio.hl7");
-   String                  elementName = null,
-                           idString = null;
-   Node                    root = null;
-   Document                document = null;
-   URI                     documentURI = null;
-   int                     verbosity = 0;
+   static Logger   logger = HL7Logger.getHL7Logger();
+   String          elementName = null,
+                   idString = null;
+   Node            root = null;
+   Document        document = null;
+   private URI     documentURI = null;
+   int             verbosity = 0;
 
 
-   void initialize(String name, String xmlString) {
-      Node node = XMLUtils.readXML(xmlString);
-      if (node.getNodeName().equalsIgnoreCase(name)) {
-         this.initialize(name, node);
-      } else {
-         Node child = XMLUtils.findChild(name, node);
-         if (child != null) this.initialize(name, child);
-      } // if - else
+   protected void initialize(String name, String xmlString) {
+      if (StringUtils.isEmpty(name)) throw new IllegalArgumentException("Empty name.");
+      if (StringUtils.isEmpty(xmlString)) throw new IllegalArgumentException("Empty xml.");
+
+      Node node = findNode(name, XMLUtils.readXML(xmlString));
+      if (node == null) throw new IllegalArgumentException(name + " not found.");
+      initialize(name, node);
    } // initialize
 
 
-   void initialize(String name, InputStream inStream) {
-      Node node = XMLUtils.readXML(inStream);
-      if (node.getNodeName().equalsIgnoreCase(name)) {
-         this.initialize(name, node);
-      } else {
-         Node child = XMLUtils.findChild(name, node);
-         if (child != null) this.initialize(name, child);
-      } // if - else
+   protected void initialize(String name, InputStream inStream) {
+      if (StringUtils.isEmpty(name)) throw new IllegalArgumentException("Empty name.");
+      if (inStream == null) throw new IllegalArgumentException("Null InputStream.");
+
+      Node node = findNode(name, XMLUtils.readXML(inStream));
+      if (node == null) throw new IllegalArgumentException(name + " not found.");
+      initialize(name, node);
    } // initialize
 
 
@@ -90,15 +90,14 @@ public class HL7ServiceElement {
     * @param uri The URI of the source document.
     * @throws java.lang.Exception
     */
-   void initialize(String name, URI uri) {
-      this.documentURI = uri;
-      Node node = XMLUtils.readXML(uri);
-      if (node.getNodeName().equalsIgnoreCase(name)) {
-         this.initialize(name, node);
-      } else {
-         Node child = XMLUtils.findChild(name, node);
-         if (child != null) this.initialize(name, child);
-      } // if - else
+   protected void initialize(String name, URI uri) {
+      if (StringUtils.isEmpty(name)) throw new IllegalArgumentException("Empty name.");
+      if (uri == null) throw new IllegalArgumentException("Null URI.");
+
+      Node node = findNode(name, XMLUtils.readXML(uri));
+      if (node == null) throw new IllegalArgumentException(name + " not found.");
+      documentURI = uri;
+      initialize(name, node);
    } // initialize
 
   
@@ -108,27 +107,27 @@ public class HL7ServiceElement {
     * @param node The root element node of the Node level HL7 specification XML item.
     * @throws java.lang.Exception
     */
-   void initialize(String name, Node node) throws IllegalArgumentException  {
+   protected void initialize(String name, Node node) {
       String nodeNameStr = node.getNodeName();
-      if (nodeNameStr.equalsIgnoreCase(name)) {
-         this.root = node;
-         this.elementName = name;
-         this.setID();
-      } else {
-         throw new IllegalArgumentException("Incorrect node: expected:[" + name + "] got:[" + nodeNameStr + "].");
-      } // if - else
+      if (!nodeNameStr.equalsIgnoreCase(name)) {
+         throw new IllegalArgumentException( "Incorrect node: expected:["
+                                          +  name
+                                          +  "] got:["
+                                          +  nodeNameStr
+                                          +  "].");
+      } // if
+
+      root = node;
+      elementName = name;
+      setID();
    } // initialize
 
 
-   public String loggerName(String name) {
-      String nameStr = this.getClass().getPackage().toString();
-      if (nameStr != null && nameStr.startsWith("package ")) {
-         nameStr = nameStr.substring(8);
-      } // if
-
-      return new StringBuffer(nameStr).append(".").append(name).toString();
-   } // loggerName
-
+   private Node findNode(String name, Node node) {
+      return node.getNodeName().equalsIgnoreCase(name)
+           ?   node
+           : XMLUtils.findChild(name, node);
+   } // findNode
 
    /**
     * Acquires the context HL7 specification XML item's specified unique identification attribute, or generates
@@ -218,8 +217,8 @@ public class HL7ServiceElement {
    /**
     * Finds and returns all of the subordinate elements of the argument element name.
     * @param elementName The name of the subordinate element to seek.
-    * @return All of the subordinate element nodes of the argument element name, as an ArrayList of nodes 
-    * of type Node
+    * @return All of the subordinate element nodes of the argument element name,
+    * as an ArrayList of nodes of type Node
     * @throws java.lang.Exception
     */
    public ArrayList<Node> getElements(String elementName) {
@@ -249,5 +248,12 @@ public class HL7ServiceElement {
    public static Logger getLogger() {
       return logger;
    } // getLogger
+
+   /**
+    * @return the documentURI
+    */
+   protected URI getDocumentURI() {
+      return documentURI;
+   } // getDocumentURI
 
 } // HL7SpecificationElement

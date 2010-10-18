@@ -48,6 +48,7 @@ import org.w3c.dom.Node;
 import us.conxio.XMLUtilities.AttributeMap;
 import us.conxio.hl7.hl7message.HL7Designator;
 import us.conxio.hl7.hl7message.HL7Message;
+import us.conxio.hl7.hl7system.HL7Logger;
 
 
 
@@ -99,7 +100,7 @@ public class HL7MessageTransformOperation {
    private URI                resourceURI = null;
 
    ArrayList<Operand>         operands = null;
-   private static Logger      logger = Logger.getLogger("us.conxio.hl7");
+   private static Logger      logger = HL7Logger.getHL7Logger();
 
 
    public static final String   OPERAND_TYPE_STRING = "string";
