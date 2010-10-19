@@ -16,9 +16,13 @@ Created this package for hl7-2.0.
 - HL7MessageTransformOperation:Documentation and minor refactoring.
 - HL7Transform.NAME_HL7TRANSFORM:Added this public reference declaration of the item name.
 
-* $Revision$, $Date$, $Author$
+* Revision: 87, Date: 2010-10-18 14:59:30 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
  - HL7ServiceElement:Changed service endpoint URIs to HL7StreamURIs.
 Made logger package private.
  - HL7Route:Changed service endpoint URIs to HL7StreamURIs.
  Removed local logger to use super's logger.
  - HL7MessageTransformOperation:Initialize logger from HL7Logger.getHL7Logger().
+
+* $Revision$, $Date$, $Author$
+Test, Debug:
+- HL7Route.isOpen():Corrected an issue in handling of null sources.

@@ -232,7 +232,7 @@ public class HL7Route extends HL7ServiceElement {
                                                          +  ".",
                                                          HL7IOException.NULL_STREAM);
          hl7StreamsOut.add(hl7Stream);
-         logger.trace("hl7Stream["
+         logger.trace("added hl7Stream["
                      + Integer.toString(hl7StreamsOut.size() - 1)
                      + "]:"
                      + hl7Stream.description() );
@@ -255,9 +255,9 @@ public class HL7Route extends HL7ServiceElement {
 
 
    public boolean isOpen() {
-      if (!hasOpenInputStream()) return false;
+      if (hasSourceURI() && !hasOpenInputStream()) return false;
       if (!hasOutputStreams()) return false;
-      for (HL7Stream hl7Stream : this.hl7StreamsOut) if (!isOpen(hl7Stream)) return false;
+      for (HL7Stream hl7Stream : hl7StreamsOut) if (!isOpen(hl7Stream)) return false;
       // fall through
       return true;
    } // isOpen
@@ -338,7 +338,7 @@ public class HL7Route extends HL7ServiceElement {
    } // hasDeliveryURIs
 
    public boolean hasOutputStreams() {
-      return this.hl7StreamsOut != null && !this.hl7StreamsOut.isEmpty();
+      return hl7StreamsOut != null && !hl7StreamsOut.isEmpty();
    } // hasOutputStreams
 
    public boolean isOpen(HL7Stream stream) {
@@ -346,7 +346,7 @@ public class HL7Route extends HL7ServiceElement {
    } // isOpen
 
    public boolean isClosedInput() {
-      return this.hl7StreamIn != null && this.hl7StreamIn.isClosed();
+      return hl7StreamIn != null && hl7StreamIn.isClosed();
    } // isClosedInput
 
    public boolean isNotClosed(HL7Stream hl7Stream) {
@@ -357,5 +357,9 @@ public class HL7Route extends HL7ServiceElement {
       if (hl7DeliveryURIs == null) hl7DeliveryURIs = new ArrayList<HL7StreamURI>();
       hl7DeliveryURIs.add(deliveryURI);
    } // addDeliveryURI
+
+   private boolean hasSourceURI() {
+      return hl7SourceURI != null;
+   } // hasSourceURI
 
 } // class HL7Route
