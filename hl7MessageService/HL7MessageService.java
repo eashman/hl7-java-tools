@@ -23,7 +23,7 @@
  *
  */
 
-package us.conxio.HL7MessageServiceRunner;
+package us.conxio.hl7MessageService;
 
 import java.net.URI;
 

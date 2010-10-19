@@ -24,7 +24,7 @@
  *
  */
 
-package us.conxio.HL7MessageServiceRunner;
+package us.conxio.hl7MessageService;
 
 import java.io.File;
 import java.io.IOException;

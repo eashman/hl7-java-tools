@@ -8,12 +8,15 @@
 * Id: HL7MessageServiceRunner.java 62 2009-12-23 15:05:41Z scott
 * Reverted to revision 55.
 
-* $Revision$, $Date$, $Author$
+* Revision: 85, Date: 2010-10-15 20:00:25 -0700 (Fri, 15 Oct 2010), Author: scott.herman@unconxio.us
 Consolidated and retooled to use hl7-2.0.
 Repackaged service class and runner in a single consolidated package.
 - HL7MessageService:Adapted from HL7-1.6.
 - Hl7MessageServiceRunner:Adapted.
 
-* $Revision$, $Date$, $Author$
+* Revision: 93, Date: 2010-10-18 16:38:38 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
 - HL7MessageService:Minor debug corrections, to avoid null pointer exceptions, and added a file header.
 - HL7MessageServiceRunner:Minor debug corrections, to avoid null pointer exceptions, and to exception handling.
+
+* $Revision$, $Date$, $Author$
+- Renamed, to avoid collision, and corrected package declarations.
