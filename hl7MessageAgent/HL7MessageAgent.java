@@ -24,7 +24,7 @@
  *
  */
 
-package us.conxio.HL7MessageAgent;
+package us.conxio.hl7MessageAgent;
 
 import java.io.File;
 
@@ -194,8 +194,11 @@ public class HL7MessageAgent {
  * Id: HL7MessageAgent.java 23 2010-03-14 02:46:06Z scott.herman@unconxio.us
  * Cleaning up HL7Stream closure, and associated exception handling.
  *
- * $Revision$, $Date$, $Author$
+ * Revision: 92, Date: 2010-10-18 16:21:25 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
  * Upgraded to hl7-2.0 (r.90), restructured slightly, and documented.
+ *
+ * $Revision$, $Date$, $Author$
+ * Renamed, to avoid collision, and corrected package declaration.
  *
  */
 
