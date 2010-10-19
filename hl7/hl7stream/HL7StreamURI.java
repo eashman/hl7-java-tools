@@ -347,4 +347,8 @@ public class HL7StreamURI {
    } // canWriteFiles
 
 
+   @Override
+   public String toString() {
+      return uri.toString();
+   } // toString
 } // HL7StreamURI

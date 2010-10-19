@@ -152,7 +152,7 @@ as well as some minor syntactical cleanup.
 - HL7StreamURI:Documentation, refactor, and syntactical cleanup.
 - HL7XMLFileWriter:Added support for single file (append) mode.
 
-* $Revision$, $Date$, $Author$
+* Revision: 88, Date: 2010-10-18 15:00:31 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
 - HL7FileReader:Changed endpoint URIs to HL7StreamURIs.
 - HL7IOException:Corrected some spelling errors.
 - HL7StreamURI.getHL7StreamWriter():Modified to initialize simple socket URIs as
@@ -160,3 +160,8 @@ HL7MLLPStream instead of HL7SocketStream.
 - HL7StreamURI.canWriteFiles():Added to correct URI capability determinations.
 - HL7FileWriter.open():Modified to use HL7StreamURI.canWrite() to correctly determine
 URI capabilities.
+
+* $Revision$, $Date$, $Author$
+Test, Debug:
+- HL7Server:Updated and corrected logging configuration.
+- HL7StreamURI.toString():Added to provide a legible representation.

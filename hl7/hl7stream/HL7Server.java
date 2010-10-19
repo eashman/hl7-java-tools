@@ -37,6 +37,7 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 import us.conxio.hl7.hl7message.HL7Message;
+import us.conxio.hl7.hl7system.HL7Logger;
 
 
 class HL7ServiceWorker  implements Runnable {
@@ -56,7 +57,7 @@ class HL7ServiceWorker  implements Runnable {
     /**
      * A flag to control use of SSL for network i/o.
      */
-    private static Logger        logger         = null;
+    private static Logger        logger         = HL7Logger.getHL7Logger();
     private int                  msgCount       = 0;
     private String               currentMsgID   = null;
     private String               threadID       = null;
@@ -73,18 +74,7 @@ class HL7ServiceWorker  implements Runnable {
     public HL7ServiceWorker(Socket clientSocket, HL7MessageHandler svc) {
         this.clientSocket = clientSocket;
         this.msgHandler   = svc;
-        if (HL7ServiceWorker.logger == null) {
-           HL7ServiceWorker.logger = Logger.getLogger(this.getClass());
-        } // if
     } // constructor
-
-
-    private String logHeader() {
-      StringBuilder headerBuffer = new StringBuilder();
-      headerBuffer.append(this.getClass().getName());
-      headerBuffer.append("(").append(this.threadID).append("): ");
-      return headerBuffer.toString();
-    } // logHeader
 
 
     /**
@@ -99,26 +89,26 @@ class HL7ServiceWorker  implements Runnable {
    public void run() {
       synchronized(this){
          long threadIDNumber = Thread.currentThread().getId();
-         this.threadID = Long.toHexString(threadIDNumber);
+         threadID = Long.toHexString(threadIDNumber);
       } // synchronized
 
       if (clientSocket == null) {
-         logger.error(this.logHeader() + "null client socket.");
+         logger.error("null client socket.");
          return;
       } // if
 
       try {
-          this.inboundStream = new HL7MLLPStream(clientSocket, true);
+          inboundStream = new HL7MLLPStream(clientSocket, true);
 
           HL7Message inboundMsg = null;
           while ( (inboundMsg = this.inboundStream.read()) != null) {
-            this.currentMsgID = inboundMsg.idString();
-            if (this.msgHandler.dispatch(inboundMsg) > 0) {
-               ++this.msgCount;
+            currentMsgID = inboundMsg.idString();
+            if (msgHandler.dispatch(inboundMsg) > 0) {
+               ++msgCount;
             } // if
           } // while
       } catch (Exception ex) {
-          logger.error(this.logHeader() + "Exception: ", ex);
+          logger.error("Exception: ", ex);
       } // try - catch
    } // run
 
@@ -160,12 +150,11 @@ public class HL7Server implements Runnable, HL7Stream {
     * The socket which the server uses to accept connection requests.
     */
    protected ServerSocket        serverSock;
-   private static Logger         logger = null;
+   private static Logger         logger = HL7Logger.getHL7Logger();
    private int                   status;
    
    
    private HL7Server() {
-      logger = Logger.getLogger(getClass());
    } // HL7Server constructor
 
    /**
@@ -312,7 +301,7 @@ public class HL7Server implements Runnable, HL7Stream {
 
 
     private String statusString() {
-      switch (this.status) {
+      switch (status) {
          case HL7Stream.UNINITIALIZED : return "UNINITIALIZED";
          case HL7Stream.CLOSED :        return "CLOSED";
          case HL7Stream.OPEN :          return "OPEN";
