@@ -472,17 +472,22 @@ public class HL7Properties extends Properties {
    } // getHL7Encoding
 
    public static String getProcessId() {
-       String nameStr = ManagementFactory.getRuntimeMXBean().getName();
-       StringBuilder pidBuffer = new StringBuilder();
-       for (int index = 0, len = nameStr.length(); index < len; ++index) {
-           if (Character.isDigit(nameStr.charAt(index))) {
-               pidBuffer.append(nameStr.charAt(index));
-           } else if (pidBuffer.length() > 0) {
-               break;
-           } // if
-       } // for
+      String nameStr = ManagementFactory.getRuntimeMXBean().getName();
+      logger.trace("process name:" + nameStr);
 
-       return pidBuffer.toString();
+      // pattern is [0-9]+\@
+      int endIndex = nameStr.lastIndexOf("@");
+      if (endIndex <= 0) return "";
+
+      int index = endIndex;
+      while (index > 0) {
+         if (!Character.isDigit(nameStr.charAt(--index))) {
+            ++index;
+            break;
+         } // if
+      } // while
+
+      return nameStr.substring(index, endIndex);
    } // getProcessId
 
 
@@ -492,6 +497,7 @@ public class HL7Properties extends Properties {
       String pidStr = getProcessId();
       if (StringUtils.isEmpty(pidStr)) return;
 
+      logger.trace(procName + " pidStr:" + pidStr);
       File file = new File("/var/run/" + procName + ".pid");
       if (!file.exists()) file.createNewFile();
 

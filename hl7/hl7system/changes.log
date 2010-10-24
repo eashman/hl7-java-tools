@@ -4,5 +4,8 @@
 * Revision: 89, Date: 2010-10-18 15:01:38 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
 Created for HL7Logger and HL7Properties.
 
-* $Revision$, $Date$, $Author$
+* Revision: 103, Date: 2010-10-23 20:36:07 -0700 (Sat, 23 Oct 2010), Author: scott.herman@unconxio.us
 - HL7Properties.getProcessId(), registerProcessID():Added to support services running under init.d.
+
+* $Revision$, $Date$, $Author$
+- HL7Properties.getProcessId():Modified to work properly with goofy GNU libgcj.
