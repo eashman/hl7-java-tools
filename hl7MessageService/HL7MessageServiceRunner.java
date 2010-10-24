@@ -34,6 +34,7 @@ import java.net.URI;
 import org.apache.log4j.Logger;
 
 import us.conxio.hl7.hl7system.HL7Logger;
+import us.conxio.hl7.hl7system.HL7Properties;
 
 
 
@@ -94,6 +95,7 @@ public class HL7MessageServiceRunner {
       } else {
          try {         
             msgSvc = new HL7MessageService(svcURI) ;
+            HL7Properties.registerProcessID(msgSvc.id());
             msgSvc.dump();
             msgSvc.runService(); // * This runs the service.
          } catch (IOException ioEx) {
