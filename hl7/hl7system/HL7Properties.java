@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -125,7 +126,7 @@ public class HL7Properties extends Properties {
    } // searchSourceFilePaths
 
 
-   private void saveTo(String fileName) {
+   public void saveTo(String fileName) {
       FileOutputStream out = null;
       try {
          out = new FileOutputStream(new File(fileName));
@@ -424,23 +425,23 @@ public class HL7Properties extends Properties {
    } // loadDefaultHL7Property
 
 
-   private boolean hasHL7Property(String propID) {
+   public boolean hasHL7Property(String propID) {
       return StringUtils.isNotEmpty(getProperty(buildHL7PropName(propID)));
    } // hasHL7Property
 
 
-   private boolean hasDefaultHL7Property(String propID) {
+   public boolean hasDefaultHL7Property(String propID) {
       return StringUtils.isNotEmpty(getProperty(buildDefaultHL7PropName(propID)));
    } // hasDefaultHL7Property
 
 
-   private void setDefaultHL7Property(String propID, String value) {
+   public void setDefaultHL7Property(String propID, String value) {
       if (StringUtils.isEmpty(propID) || StringUtils.isEmpty(value)) return;
       setProperty(buildDefaultHL7PropName(propID), value);
    } // setDefaultHL7Property
 
 
-   private void setHL7Property(String propID, String value) {
+   public void setHL7Property(String propID, String value) {
       if (StringUtils.isEmpty(propID) || StringUtils.isEmpty(value)) return;
       setProperty(buildHL7PropName(propID), value);
    } // setHL7Property
@@ -456,18 +457,48 @@ public class HL7Properties extends Properties {
    } // loadPropertyFromSystem
 
 
-   private boolean hasEncoding() {
+   public boolean hasEncoding() {
       return getProperty(buildHL7PropName(HL7_PROPERTY_ENCODING)) != null;
    } // hasEncoding
 
 
-   private boolean hasDefaultEncoding() {
+   public boolean hasDefaultEncoding() {
       return getProperty(buildDefaultHL7PropName(HL7_PROPERTY_ENCODING)) != null;
    } // hasDefaultEncoding
 
-   private HL7Encoding getHL7Encoding() {
+   public HL7Encoding getHL7Encoding() {
       if (!hasEncoding()) return null;
       return new HL7Encoding(getProperty(buildHL7PropName(HL7_PROPERTY_ENCODING)));
    } // getHL7Encoding
+
+   public static String getProcessId() {
+       String nameStr = ManagementFactory.getRuntimeMXBean().getName();
+       StringBuilder pidBuffer = new StringBuilder();
+       for (int index = 0, len = nameStr.length(); index < len; ++index) {
+           if (Character.isDigit(nameStr.charAt(index))) {
+               pidBuffer.append(nameStr.charAt(index));
+           } else if (pidBuffer.length() > 0) {
+               break;
+           } // if
+       } // for
+
+       return pidBuffer.toString();
+   } // getProcessId
+
+
+   public static void registerProcessID(String procName) throws IOException {
+      if (StringUtils.isEmpty(procName)) return;
+
+      String pidStr = getProcessId();
+      if (StringUtils.isEmpty(pidStr)) return;
+
+      File file = new File("/var/run/" + procName + ".pid");
+      if (!file.exists()) file.createNewFile();
+
+      FileOutputStream outStream = new FileOutputStream(file);
+      outStream.write(pidStr.getBytes());
+      outStream.close();
+   } // registerProcessID
+
 
 } // HL7Properties
