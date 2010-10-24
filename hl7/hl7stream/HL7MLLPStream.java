@@ -399,8 +399,9 @@ public class HL7MLLPStream extends HL7StreamBase implements HL7Stream {
    private String streamID() {
       return new StringBuilder("Stream(")
                   .append(host)
+                  .append(":")
                   .append(Integer.toString(port))
-                  .append("):")
+                  .append(")")
                   .toString();
    } // streamID
 

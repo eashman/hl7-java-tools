@@ -161,7 +161,10 @@ HL7MLLPStream instead of HL7SocketStream.
 - HL7FileWriter.open():Modified to use HL7StreamURI.canWrite() to correctly determine
 URI capabilities.
 
-* $Revision$, $Date$, $Author$
+* Revision: 96, Date: 2010-10-19 10:41:32 -0700 (Tue, 19 Oct 2010), Author: scott.herman@unconxio.us
 Test, Debug:
 - HL7Server:Updated and corrected logging configuration.
 - HL7StreamURI.toString():Added to provide a legible representation.
+
+* $Revision$, $Date$, $Author$
+- HL7MLLPStream.streamID():Corrected a small format omission.
