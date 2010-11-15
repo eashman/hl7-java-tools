@@ -27,7 +27,6 @@
 package us.conxio.XMLUtilities;
 
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
@@ -213,7 +212,7 @@ public class AttributeMap {
    } // isEmpty
 
 
-   static AttributeMap newInstance(AttributeMap oldInstance) {
+   public static AttributeMap newInstance(AttributeMap oldInstance) {
       AttributeMap retn = new AttributeMap();
       Set<String> keySet = oldInstance.attributeMap.keySet();
 

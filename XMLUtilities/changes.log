@@ -61,7 +61,10 @@ Replaced XMLUtils.forXML() with the entire EscapeChars class.
 - EscapeChars:Documentation and code optimization.
 - XMLUtils.readXML(InputStream):Corrected exception handling.
 
-* $Revision$, $Date$, $Author$
+* Revision: 106, Date: 2010-11-15 11:10:06 -0800 (Mon, 15 Nov 2010), Author: scott.herman@unconxio.us
 - AttributeMap.newInstance():Added this static method to create a duplicate instance of an AttributeMap.
 - AttributeMap.remove():Modified this method to return the context AttributeMap instance, in order to enable
 inline usage, similarly to the add() method.
+
+* $Revision$, $Date$, $Author$
+- AttributeMap.newInstance():Oops forgot to make it public.
