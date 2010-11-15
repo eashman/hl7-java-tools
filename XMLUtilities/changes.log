@@ -56,7 +56,12 @@ Replaced XMLUtils.forXML() with the entire EscapeChars class.
 * Revision: 60, Date: 2010-08-25 16:18:03 -0700 (Wed, 25 Aug 2010), Author: scott.herman@unconxio.us
 - XMLUtils.extractXML():Corrected returned string length.
 
-* $Revision$, $Date$, $Author$
+* Revision: 91, Date: 2010-10-18 15:16:03 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
 - AttributeMap:Documentation.
 - EscapeChars:Documentation and code optimization.
 - XMLUtils.readXML(InputStream):Corrected exception handling.
+
+* $Revision$, $Date$, $Author$
+- AttributeMap.newInstance():Added this static method to create a duplicate instance of an AttributeMap.
+- AttributeMap.remove():Modified this method to return the context AttributeMap instance, in order to enable
+inline usage, similarly to the add() method.

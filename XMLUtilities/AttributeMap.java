@@ -27,6 +27,7 @@
 package us.conxio.XMLUtilities;
 
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
@@ -39,13 +40,13 @@ import org.w3c.dom.Node;
  * @author scott
  */
 public class AttributeMap {
-   private HashMap attributeMap = null;
+   private HashMap<String, String> attributeMap = null;
 
    /**
     * Simple constructor.
     */
    public AttributeMap() {
-      this.attributeMap = new HashMap();
+      attributeMap = new HashMap();
    } // AttributeMap constructor
 
 
@@ -55,12 +56,12 @@ public class AttributeMap {
     */
    public AttributeMap(Node node) {
       this();
-      this._getAttributes(node);
+      _getAttributes(node);
    } // AttributeMap constructor
 
    private AttributeMap _add(String name, String value) {
       if (name == null) return this;
-      this.attributeMap.put(name.toLowerCase(), value);
+      attributeMap.put(name.toLowerCase(), value);
       return this;
    } // _add
 
@@ -80,7 +81,7 @@ public class AttributeMap {
     */
    public String get(String name) {
       if (name == null) return null;
-      return (String)this.attributeMap.get(name.toLowerCase());
+      return (String) attributeMap.get(name.toLowerCase());
    } // get
 
 
@@ -124,7 +125,7 @@ public class AttributeMap {
       for (int index = 0;index < attribCount; ++index) {
          Node attribNode = attribs.item(index);
          String attribName = attribNode.getNodeName().toLowerCase();
-         this._add(attribName, attribNode.getNodeValue());
+         _add(attribName, attribNode.getNodeValue());
       } // for
    } // _getAttributes
 
@@ -180,7 +181,7 @@ public class AttributeMap {
     */
    public boolean hasKey(String key) {
       if (key == null) return false;
-      return this.attributeMap.containsKey(key.toLowerCase());
+      return attributeMap.containsKey(key.toLowerCase());
    } // hasKey
 
 
@@ -188,9 +189,10 @@ public class AttributeMap {
     * Removes the entry associated with the argument key.
     * @param key The key associated with the entry to be removed.
     */
-   public void remove(String key) {
-      if (key == null) return;
-      this.attributeMap.remove(key.toLowerCase());
+   public AttributeMap remove(String key) {
+      if (key == null) return this;
+      attributeMap.remove(key.toLowerCase());
+      return this;
    } // remove
    
 
@@ -199,7 +201,7 @@ public class AttributeMap {
     * @return the number of attribute entries in the map.
     */
    public int entryCount() {
-      return this.attributeMap.size();
+      return attributeMap.size();
    } // entryCount
 
    boolean isNotEmpty() {
@@ -209,5 +211,13 @@ public class AttributeMap {
    boolean isEmpty() {
       return entryCount() < 1;
    } // isEmpty
-   
+
+
+   static AttributeMap newInstance(AttributeMap oldInstance) {
+      AttributeMap retn = new AttributeMap();
+      Set<String> keySet = oldInstance.attributeMap.keySet();
+
+      for (String key : keySet) retn.add(key, oldInstance.get(key));
+      return retn;
+   } // newInstance
 } // AttributeMap
