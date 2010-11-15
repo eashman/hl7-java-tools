@@ -190,6 +190,7 @@ public class AttributeMap {
     */
    public AttributeMap remove(String key) {
       if (key == null) return this;
+      if (!hasKey(key)) return this;
       attributeMap.remove(key.toLowerCase());
       return this;
    } // remove
