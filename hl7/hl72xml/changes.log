@@ -9,6 +9,13 @@ Documentation and minor refactoring.
 - HL72XMLSpecificationItem.getContent():Added to consolidate HL7 message access in the abstract class.
 - HL72XMLSpecificationItem(Node):Added an IllegalArgumentException for unexpected attributes.
 
-* $Revision$, $Date$, $Author$
+* Revision: 90, Date: 2010-10-18 15:02:56 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
 svn properties reset.
 - HL72XMLTransform:Initialize logger from HL7Logger.getHL7Logger().
+
+* $Revision$, $Date$, $Author$
+- AttributeSpec refactored to AttributeSpecification, and added license and header.
+- ElementSpec refactored to ElementSpecification, and added some header information.
+- HL72XMLSpecificationItem:just added some header info.
+- HL72XMLTransform.prepare():made public and refactored to prepareHL7Message().
+    .transformPreparedHL7Message():Added this public method to provide message transformation.

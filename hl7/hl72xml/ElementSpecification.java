@@ -1,10 +1,11 @@
 /*
  *  $Id$
+ *  $HeadURL$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
  *
- *  ElementSpec.java : A HL72XML specification component class.
+ *  ElementSpecification.java : A HL72XML specification component class.
  *
  *  Copyright (c) 2010  Scott Herman
  *
@@ -39,15 +40,15 @@ import us.conxio.hl7.hl7message.HL7Message;
  *
  * @author scott
  */
-class ElementSpec extends HL72XMLSpecificationItem {
-   ArrayList<AttributeSpec>   attributes;
-   ArrayList<ElementSpec>     subElements;
+class ElementSpecification extends HL72XMLSpecificationItem {
+   ArrayList<AttributeSpecification>   attributes;
+   ArrayList<ElementSpecification>     subElements;
 
-   ElementSpec(String desginatorStr, String nameStr, String valueStr) {
+   ElementSpecification(String desginatorStr, String nameStr, String valueStr) {
       super(desginatorStr, nameStr, valueStr);
-   } // ElementSpec constructor
+   } // ElementSpecification constructor
 
-   ElementSpec(Node node) {
+   ElementSpecification(Node node) {
       super(node);
 
       if (node.hasChildNodes()) {
@@ -55,7 +56,7 @@ class ElementSpec extends HL72XMLSpecificationItem {
          int numKids = kids.getLength();
          for (int index = 0; index < numKids; ++index) parseChildNode(kids.item(index));
       } // if
-   } // ElementSpec constructor
+   } // ElementSpecification constructor
 
 
    private void parseChildNode(Node node) {
@@ -64,23 +65,23 @@ class ElementSpec extends HL72XMLSpecificationItem {
       String nodeName = node.getNodeName();
 
       if (nodeName.equalsIgnoreCase(HL72XMLSpecificationItem.NAME_ELEMENT)) {
-         addSubElement(new ElementSpec(node));
+         addSubElement(new ElementSpecification(node));
       } else if (nodeName.equalsIgnoreCase(HL72XMLSpecificationItem.NAME_ATTRIBUTE)) {
-         addAttribute(new AttributeSpec(node));
+         addAttribute(new AttributeSpecification(node));
       } // if - else if
    } // parseChildNode
 
 
-   private void addSubElement(ElementSpec elementSpec) {
+   private void addSubElement(ElementSpecification elementSpec) {
       if (elementSpec == null) return;
-      if (subElements == null) subElements = new ArrayList<ElementSpec>();
+      if (subElements == null) subElements = new ArrayList<ElementSpecification>();
       subElements.add(elementSpec);
    } // addSubElement
 
 
-   private void addAttribute(AttributeSpec attributeSpec) {
+   private void addAttribute(AttributeSpecification attributeSpec) {
       if (attributeSpec == null) return;
-      if (attributes == null) attributes = new ArrayList<AttributeSpec>();
+      if (attributes == null) attributes = new ArrayList<AttributeSpecification>();
       attributes.add(attributeSpec);
    } // addAttribute
 
@@ -96,7 +97,7 @@ class ElementSpec extends HL72XMLSpecificationItem {
                            : getContent(msg);
 
       AttributeMap attr = hasAttributes()
-                           ? AttributeSpec.attributeMap(attributes, msg)
+                           ? AttributeSpecification.attributeMap(attributes, msg)
                            : null;
       return toXMLString(contentStr, attr);
    } // toXMLString
@@ -114,11 +115,11 @@ class ElementSpec extends HL72XMLSpecificationItem {
       if (!hasSubElements()) return "";
 
       StringBuilder contentBuilder = new StringBuilder();
-      for (ElementSpec element : subElements) {
+      for (ElementSpecification element : subElements) {
          contentBuilder.append(element.toXMLString(msg));
       } // for
 
       return contentBuilder.toString();
    } // toSubElementalContentString
 
-} // ElementSpec
+} // ElementSpecification

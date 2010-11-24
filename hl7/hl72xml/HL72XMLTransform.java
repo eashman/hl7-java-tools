@@ -1,5 +1,6 @@
 /*
  *  $Id$
+ *  $HeadURL$
  *
  *  This code is derived from public domain sources. Commercial use is allowed.
  *  However, all rights remain permanently assigned to the public domain.
@@ -93,7 +94,7 @@ import us.conxio.hl7.hl7system.HL7Logger;
 public class HL72XMLTransform {
    private String                   name = null;
    private ArrayList<HL7Transform>  prep = null;
-   private ElementSpec              specRoot = null;
+   private ElementSpecification     specRoot = null;
    private static Logger            logger = HL7Logger.getHL7Logger();
 
    
@@ -139,7 +140,7 @@ public class HL72XMLTransform {
     * transaction message to a XML String.
     * @param node The document node containing the transform specification.
     */
-   HL72XMLTransform(Node node) {
+   public HL72XMLTransform(Node node) {
       if (node == null) throw new IllegalArgumentException("null argument.");
 
       name = node.getNodeName();
@@ -157,7 +158,7 @@ public class HL72XMLTransform {
       String nodeName = node.getNodeName();
 
       if (nodeName.equalsIgnoreCase(HL72XMLSpecificationItem.NAME_ELEMENT)) {
-         specRoot = new ElementSpec(node);
+         specRoot = new ElementSpecification(node);
       } else if (nodeName.equalsIgnoreCase(NAME_HL7TRANSFORM)) {
          addPreparatoryHL7Transform(node);
       } else {
@@ -186,7 +187,7 @@ public class HL72XMLTransform {
    public String transform(HL7Message hl7Msg) {
       if (!isQualified(hl7Msg)) return "";
 
-      HL7Message preparedMsg = prepare(hl7Msg);
+      HL7Message preparedMsg = prepareHL7Message(hl7Msg);
       return specRoot.toXMLString(preparedMsg);
    } // transform
 
@@ -205,7 +206,7 @@ public class HL72XMLTransform {
    } // transform
 
    
-   private HL7Message prepare(HL7Message hl7Msg) {
+   public HL7Message prepareHL7Message(HL7Message hl7Msg) {
       if (hl7Msg == null) return null;
       if (!hasPrep()) return hl7Msg;
 
@@ -214,7 +215,12 @@ public class HL72XMLTransform {
       } // for
 
       return hl7Msg;
-   } // prepare
+   } // prepareHL7Message
+
+
+   public String transformPreparedHL7Message(HL7Message hl7Msg) {
+      return specRoot.toXMLString(hl7Msg);
+   } // transformPreparedHL7Message
 
 
    private boolean hasPrep() {
