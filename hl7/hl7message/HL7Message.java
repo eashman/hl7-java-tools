@@ -406,7 +406,7 @@ public class HL7Message {
       if (hasSegment(SEGID_MSH)) {
          msgCtlID = get("MSH.10");
       } else if (hasSegment("BHS")) {
-         msgCtlID = this.get("BHS.11");
+         msgCtlID = get("BHS.11");
       } else if (hasSegment("BTS")) {
          msgCtlID = "";
       } // if - else if
@@ -597,36 +597,53 @@ public class HL7Message {
       String   sendingApplication   = null,
                sendingFacility      = null,
                receivingApplication = null,
-               receivingFacility    = null;
+               receivingFacility    = null,
+               versionID            = null;
 
       if (this.hasSegment(SEGID_MSH)) {
          sendingApplication   = get("MSH.3");
          sendingFacility      = get("MSH.4");
          receivingApplication = get("MSH.5");
          receivingFacility    = get("MSH.6");
+         versionID            = get("MSH.12");
       } else if (hasSegment(SEGID_BHS)) {
          sendingApplication   = get("BHS.3");
          sendingFacility      = get("BHS.4");
          receivingApplication = get("BHS.5");
          receivingFacility    = get("BHS.6");
+         versionID            = "";
       } else if (hasSegment(SEGID_BTS)) {
          sendingApplication   = "";
          sendingFacility      = "";
          receivingApplication = "";
          receivingFacility    = "";
+         versionID            = "";
       } // if - else if
 
       return new StringBuilder(SEGID_MSH)
                   .append(encoders.toString())
-                  .append(encoders.getFieldSeparator())
+                  .append(encoders.getFieldSeparator())  // MSH.3
                   .append(receivingApplication)
-                  .append(encoders.getFieldSeparator())
+                  .append(encoders.getFieldSeparator())  // MSH.4
                   .append(receivingFacility)
-                  .append(encoders.getFieldSeparator())
+                  .append(encoders.getFieldSeparator())  // MSH.5
                   .append(sendingApplication)
-                  .append(encoders.getFieldSeparator())
+                  .append(encoders.getFieldSeparator())  // MSH.6
                   .append(sendingFacility)
-                  .append(encoders.getFieldSeparator())
+                  .append(encoders.getFieldSeparator())  // MSH.7
+                  .append(encoders.getFieldSeparator())  // MSH.8
+                  .append(encoders.getFieldSeparator())  // MSH.9
+                  .append(encoders.getFieldSeparator())  // MSH.10
+                  .append(encoders.getFieldSeparator())  // MSH.11
+                  .append(encoders.getFieldSeparator())  // MSH.12
+                  .append(versionID)
+                  .append(encoders.getFieldSeparator())  // MSH.13
+                  .append(encoders.getFieldSeparator())  // MSH.14
+                  .append(encoders.getFieldSeparator())  // MSH.15
+                  .append(encoders.getFieldSeparator())  // MSH.16
+                  .append(encoders.getFieldSeparator())  // MSH.17
+                  .append(encoders.getFieldSeparator())  // MSH.18
+                  .append(encoders.getFieldSeparator())  // MSH.19
                   .toString();
    } // ackMSHSegmentString
 
