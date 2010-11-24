@@ -1,5 +1,6 @@
 /*
  *  $Id$
+ *  $HeadURL$
  *
  *  This code is derived from public domain sources.
  *  Commercial use is allowed.
@@ -204,7 +205,9 @@ public class HL7Message {
    private HL7Segment pickSegment(String segID, int segIndex, boolean create) {
       ArrayList<HL7Segment> segs = segmentMap.get(segID);
 
-      if (create && segs == null) {
+      if (segs == null) {
+         if (!create) return null;
+
          HL7Segment seg = new HL7Segment(segID, encoders);
          addSegment(seg);
          return seg;

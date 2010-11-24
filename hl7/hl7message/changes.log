@@ -1,5 +1,6 @@
 package us.conxio.hl7.hl7message
 $Id$
+$HeadURL$
 * Revision: 33, Date: 2010-05-18 16:19:52 -0700 (Tue, 18 May 2010), Author: scott.herman@unconxio.us
 Verification test and release.
 
@@ -48,5 +49,9 @@ re-scoped to package-private wherever possible, and did some syntactical cleanup
 - HL7SubComponent.toHL7String():Added escape() to escape any un-escaped encoders.
 - HL7Time:Documentation.
 
-* $Revision$, $Date$, $Author$
+* Revision: 86, Date: 2010-10-18 14:58:33 -0700 (Mon, 18 Oct 2010), Author: scott.herman@unconxio.us
 - HL7Encoding.getDefaultEncoding():Added to support HL7Properties.
+
+* $Revision$, $Date$, $Author$
+- HL7Message.pickSegment():Modified to avoid null pointer exceptions.
+
