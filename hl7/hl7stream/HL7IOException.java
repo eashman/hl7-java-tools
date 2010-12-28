@@ -26,6 +26,7 @@
 package us.conxio.hl7.hl7stream;
 
 import java.io.IOException;
+import java.net.SocketException;
 
 /**
  * An exception class for HL7 message streams.
@@ -160,5 +161,16 @@ public class HL7IOException extends IOException {
    public int errorType() {
       return errorType;
    } // errorType
+
+
+   public boolean isNetworkProblem() {
+      return isSocketProblem(getCause());
+   } // isNetworkProblem
+
+   private static boolean isSocketProblem(Throwable cause) {
+      if (cause == null) return false;
+      if (cause instanceof SocketException) return true;
+      return (isSocketProblem(cause.getCause()));
+   } // isSocketProblem
    
 } // HL7IOException
