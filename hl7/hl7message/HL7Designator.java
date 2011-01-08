@@ -9,7 +9,7 @@
  *  HL7Designator.java : An interpreted string class representing the lexical
  *                       location of an item in an HL7 message.
  *
- *  Copyright (c) 2009, 2010  Scott Herman
+ *  Copyright (c) 2009, 2010, 2011  Scott Herman. All Rights Reserved.
  *
  *  This is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -167,7 +167,8 @@ public class HL7Designator {
       subComponentIndex = UNSPECIFIED;
 
       if (elementDesignations[0].length() > 3) {   // a segment index is specified
-         segIndex = indexValueOf(elementDesignations[0]);
+         segIndex = indexValueOf(elementDesignations[0]) - 1;
+         if (segIndex < 0) segIndex = 0;
       } // if
 
       // Segment ID is the first three characters.
@@ -242,7 +243,7 @@ public class HL7Designator {
       builder.append(segID);
       
       if (segIndex > 0) {
-         builder.append(COLON).append(Integer.toString(segIndex));
+         builder.append(COLON).append(Integer.toString(segIndex + 1));
       } else if (segIndex == ALL) {
          builder.append(COLON).append(WILDCARD);
       } else if (segIndex < ALL) {      
@@ -286,7 +287,7 @@ public class HL7Designator {
 
       builder.append(segID);
       
-      if (segIndex >= 0) builder.append(COLON).append(Integer.toString(segIndex));
+      if (segIndex >= 0) builder.append(COLON).append(Integer.toString(segIndex + 1));
       
       if (sequence >= 0) {
          builder.append(SEPARATOR).append(Integer.toString(sequence));
@@ -504,5 +505,16 @@ public class HL7Designator {
    public void setSegIndex(int value) {
       segIndex = value;
    } // setSegIndex
+
+
+   public void setSegmentSetID(int value) {
+      if (value > 0) --value;
+      setSegIndex(value);
+   } // setSegmentSetID
+
+
+   public int getSegmentSetID() {
+      return segIndex + 1;
+   } // getSegmentSetID
 
 } // HL7Designator

@@ -55,5 +55,9 @@ re-scoped to package-private wherever possible, and did some syntactical cleanup
 * Revision: 109, Date: 2010-11-23 16:20:52 -0800 (Tue, 23 Nov 2010), Author: scott.herman@unconxio.us
 - HL7Message.pickSegment():Modified to avoid null pointer exceptions.
 
+* Revision: 111, Date: 2010-11-23 17:04:30 -0800 (Tue, 23 Nov 2010), Author: scott.herman@unconxio.us
+- HL7Message.ackMSHSegmentString():Modified to include the hl7 version ID.
+
 * $Revision$, $Date$, $Author$
-- Hl7Message.ackMSHSegmentString():Modified to include the hl7 version ID.
+- HL7Designator.parse(),.toString(),.toXMLString():Modified to handle the specified segment set index as an
+ordinal value for consistency with HL7 segment set ID notation.
