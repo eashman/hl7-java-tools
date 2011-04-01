@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.HashMap;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -91,22 +92,17 @@ public class AttributeMap {
     */
    @Override
    public String toString() {
-      if (this.attributeMap.isEmpty()) {
-         return "";
-      } // if
+      if (attributeMap.isEmpty()) return "";
 
       StringBuilder buildBuffer = new StringBuilder();
-      Set attributeSet = this.attributeMap.entrySet();
-      Iterator attributeIterator = attributeSet.iterator();
+      Iterator attributeIterator = attributeMap.entrySet().iterator();
       while(attributeIterator.hasNext()) {
          Map.Entry attributeEntry = (Map.Entry)attributeIterator.next();
          String attributeKey = (String)attributeEntry.getKey();
          String attributeValue = (String)attributeEntry.getValue();
          if (attributeKey != null && !attributeKey.isEmpty()) {
             buildBuffer.append(" ").append(attributeKey).append("=\"");
-            if (attributeValue != null) {
-               buildBuffer.append(attributeValue);
-            } // if
+            if (attributeValue != null) buildBuffer.append(StringEscapeUtils.escapeXml(attributeValue));
             buildBuffer.append("\"");
          } // if
       } // while

@@ -69,6 +69,10 @@ inline usage, similarly to the add() method.
 * Revision: 107, Date: 2010-11-15 11:18:15 -0800 (Mon, 15 Nov 2010), Author: scott.herman@unconxio.us
 - AttributeMap.newInstance():Oops forgot to make it public.
 
-* $Revision$, $Date$, $Author$
+* Revision: 108, Date: 2010-11-15 14:17:49 -0800 (Mon, 15 Nov 2010), Author: scott.herman@unconxio.us
 Removed the EscapeChars class in favor of org.apache.commons.lang.StringEscapeUtils.
 - AttributeMap.remove():Modified to check for the argument key before attempting to remove it.
+
+* $Revision$, $Date$, $Author$
+- XMLUtils.isElement():Added.
+- AttributeMap.toString():Escape attribute content for XML.

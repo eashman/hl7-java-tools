@@ -370,4 +370,8 @@ public class XMLUtils {
       return null;
    } // findChild
 
+   public static boolean isElement(Node node) {
+      return node.getNodeType() == Node.ELEMENT_NODE;
+   } // isElement
+
 } // XMLUtils
