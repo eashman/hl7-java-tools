@@ -73,6 +73,9 @@ inline usage, similarly to the add() method.
 Removed the EscapeChars class in favor of org.apache.commons.lang.StringEscapeUtils.
 - AttributeMap.remove():Modified to check for the argument key before attempting to remove it.
 
-* $Revision$, $Date$, $Author$
+* Revision: 114, Date: 2011-04-01 15:28:39 -0700 (Fri, 01 Apr 2011), Author: scott.herman@unconxio.us
 - XMLUtils.isElement():Added.
 - AttributeMap.toString():Escape attribute content for XML.
+
+* $Revision$, $Date$, $Author$
+- AttributeMap.toString():Corrected escape of attribute content for XML.

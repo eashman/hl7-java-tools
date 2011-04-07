@@ -102,7 +102,8 @@ public class AttributeMap {
          String attributeValue = (String)attributeEntry.getValue();
          if (attributeKey != null && !attributeKey.isEmpty()) {
             buildBuffer.append(" ").append(attributeKey).append("=\"");
-            if (attributeValue != null) buildBuffer.append(StringEscapeUtils.escapeXml(attributeValue));
+            String unescaped = StringEscapeUtils.unescapeHtml(attributeValue);
+            if (attributeValue != null) buildBuffer.append(StringEscapeUtils.escapeXml(unescaped));
             buildBuffer.append("\"");
          } // if
       } // while
