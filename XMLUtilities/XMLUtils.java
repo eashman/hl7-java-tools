@@ -39,6 +39,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -58,7 +60,7 @@ import org.xml.sax.SAXException;
  * @author scott
  */
 public class XMLUtils {
-
+   public static final boolean NO_HEADER = false;
    /**
     * Reads the argument XML input stream.
     * @param inStream An input stream carrying the only subject XML
@@ -129,13 +131,14 @@ public class XMLUtils {
     * @return A String representation of the DOM hierarchy rooted at the
     * argument Node, or null if the operation fails.
     */
-   public static String toXMLString(Node node) {
+   public static String toXMLString(Node node, boolean header) {
       try {
          Source source = new DOMSource(node);
          StringWriter stringWriter = new StringWriter();
          Result result = new StreamResult(stringWriter);
          TransformerFactory factory = TransformerFactory.newInstance();
          Transformer transformer = factory.newTransformer();
+         if (!header) transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
          transformer.transform(source, result);
          return stringWriter.getBuffer().toString();
       } catch (TransformerConfigurationException e) {
@@ -145,6 +148,11 @@ public class XMLUtils {
       } // try - catch
 
       return null;
+   } // toXMLString
+
+
+   public static String toXMLString(Node node) {
+      return toXMLString(node, true);
    } // toXMLString
 
 
