@@ -80,6 +80,9 @@ Removed the EscapeChars class in favor of org.apache.commons.lang.StringEscapeUt
 * Revision: 115, Date: 2011-04-06 21:03:58 -0700 (Wed, 06 Apr 2011), Author: scott.herman@unconxio.us
 - AttributeMap.toString():Corrected escape of attribute content for XML.
 
-* $Revision$, $Date$, $Author$
+* Revision: 116, Date: 2011-07-08 13:51:14 -0700 (Fri, 08 Jul 2011), Author: scott.herman@unconxio.us
 - XMLUtils.toXMLString():Modified to optionally remove xml header.
+
+* $Revision$, $Date$, $Author$
+- AttributeMap.keys():Added to provide access to the key set.
 

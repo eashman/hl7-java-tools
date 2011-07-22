@@ -217,4 +217,9 @@ public class AttributeMap {
       for (String key : keySet) retn.add(key, oldInstance.get(key));
       return retn;
    } // newInstance
+   
+   public Set<String> keys() {
+      if (isEmpty()) return null;
+      return attributeMap.keySet();
+   } // keys
 } // AttributeMap
