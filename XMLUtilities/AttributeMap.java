@@ -41,6 +41,7 @@ import org.w3c.dom.Node;
  */
 public class AttributeMap {
    private HashMap<String, String> attributeMap = null;
+   private boolean escape = true;
 
    /**
     * Simple constructor.
@@ -102,8 +103,12 @@ public class AttributeMap {
          String attributeValue = (String)attributeEntry.getValue();
          if (attributeKey != null && !attributeKey.isEmpty()) {
             buildBuffer.append(" ").append(attributeKey).append("=\"");
-            String unescaped = StringEscapeUtils.unescapeHtml(attributeValue);
-            if (attributeValue != null) buildBuffer.append(StringEscapeUtils.escapeXml(unescaped));
+            if (escape && attributeValue != null) {
+               String unescaped = StringEscapeUtils.unescapeHtml(attributeValue);
+               attributeValue = StringEscapeUtils.escapeXml(unescaped);
+            } // if
+
+            if (attributeValue != null) buildBuffer.append(attributeValue);
             buildBuffer.append("\"");
          } // if
       } // while
@@ -222,4 +227,10 @@ public class AttributeMap {
       if (isEmpty()) return null;
       return attributeMap.keySet();
    } // keys
+
+   public AttributeMap setRaw() {
+      escape = false;
+      return this;
+   } // setRaw
+   
 } // AttributeMap

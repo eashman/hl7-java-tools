@@ -18,7 +18,7 @@ Revision: 41, Date: 2010-05-27 19:23:40 -0700 (Thu, 27 May 2010), Author: scott.
 Revision: 42, Date: 2010-06-15 12:28:11 -0700 (Tue, 15 Jun 2010), Author: scott.herman@unconxio.us
 Modified XMLUtils.elementString() to check for for empty as well as null arguments.
 
-$Revision$, $Date$, $Author$
+Revision 43
 - AttributeMap : Added getAttributes(), hasKey(), and remove().
 - XMLUtils : Added equalsAny().
 
@@ -83,6 +83,10 @@ Removed the EscapeChars class in favor of org.apache.commons.lang.StringEscapeUt
 * Revision: 116, Date: 2011-07-08 13:51:14 -0700 (Fri, 08 Jul 2011), Author: scott.herman@unconxio.us
 - XMLUtils.toXMLString():Modified to optionally remove xml header.
 
-* $Revision$, $Date$, $Author$
+* Revision: 117, Date: 2011-07-22 11:40:06 -0700 (Fri, 22 Jul 2011), Author: inconscient0@gmail.com
 - AttributeMap.keys():Added to provide access to the key set.
+
+* $Revision$, $Date$, $Author$
+- AttributeMap.setRaw():Added to control HTML/XML escaping of attribute value strings.
+By default, HTML is unescaped and XML is escaped.
 
