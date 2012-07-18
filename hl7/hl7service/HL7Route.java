@@ -44,8 +44,6 @@ import org.apache.commons.lang.StringUtils;
 
 import org.w3c.dom.Node;
 
-import org.apache.log4j.Logger;
-
 import us.conxio.hl7.hl7message.HL7Message;
 import us.conxio.hl7.hl7stream.HL7IOException;
 import us.conxio.hl7.hl7stream.HL7Stream;
@@ -240,6 +238,7 @@ public class HL7Route extends HL7ServiceElement {
 
       if (hl7StreamsOut.isEmpty()) throw new HL7IOException(   "Cannot open any Outbound HL7Stream",
                                                                HL7IOException.NULL_STREAM);
+      if (!hasOpenInputStream()) hl7StreamIn = hl7SourceURI.getHL7StreamReader();
    } // open
    
    
@@ -294,20 +293,16 @@ public class HL7Route extends HL7ServiceElement {
    /**
     * A generic "run" method for a thread manifestation of the context HL7Route.
     */
-   public void run() {
+   public void run() throws HL7IOException {
       if (hl7SourceURI == null) {
          logger.error("No HL7 source specified.");
          return;
       } // if
 
-      try {
-         if (!hasOpenInputStream()) open();
+      if (!hasOpenInputStream()) open();
 
-         HL7Message inboundMsg = null;
-         while ( (inboundMsg = hl7StreamIn.read()) != null) route(inboundMsg);
-      } catch (HL7IOException ex) {
-         logger.error(null, ex);
-      } // try - catch
+      HL7Message inboundMsg = null;
+      while ( (inboundMsg = hl7StreamIn.read()) != null) route(inboundMsg);
    } // run
 
    
@@ -326,7 +321,7 @@ public class HL7Route extends HL7ServiceElement {
          } // for
       } // if
 
-      for (HL7Transform xForm : transforms) xForm.dump();
+      if (hasTransforms()) for (HL7Transform xForm : transforms) xForm.dump();
    } // dump
 
    public boolean hasOpenInputStream() {
@@ -361,5 +356,13 @@ public class HL7Route extends HL7ServiceElement {
    private boolean hasSourceURI() {
       return hl7SourceURI != null;
    } // hasSourceURI
+
+   private boolean hasTransforms() {
+      return transforms != null && !transforms.isEmpty();
+   } // hasTransforms
+
+   public void setInputStream(HL7Stream stream) {
+      hl7StreamIn = stream;
+   } // setInputStream
 
 } // class HL7Route

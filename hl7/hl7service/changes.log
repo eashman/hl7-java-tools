@@ -23,6 +23,16 @@ Made logger package private.
  Removed local logger to use super's logger.
  - HL7MessageTransformOperation:Initialize logger from HL7Logger.getHL7Logger().
 
-* $Revision$, $Date$, $Author$
+* Revision: 97, Date: 2010-10-19 10:42:38 -0700 (Tue, 19 Oct 2010), Author: scott.herman@unconxio.us
 Test, Debug:
 - HL7Route.isOpen():Corrected an issue in handling of null sources.
+
+* $Revision$, $Date$, $Author$
+Modifications to facilitate integration with AMQP.
+- HL7Route.open() modified to open the input stream, if it is not open.
+.run() removed exception handling and added a throws clause, allowing exceptions to bubble up, 
+and be handled appropriately by the caller/supervisor.
+.dump() modified to check for transforms before attempting to dump them, thus avoiding a NPE.
+.setInputStream() Added to allow the route to use externally defined HL7Stream compliant objects
+as input vectors.
+
