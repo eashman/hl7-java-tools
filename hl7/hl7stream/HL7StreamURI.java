@@ -43,6 +43,10 @@ import org.apache.commons.lang.StringUtils;
 public class HL7StreamURI {
    private URI   uri;
 
+   private static final String STRING_SERVER = "server";
+   private static final String STRING_XML    = "xml";
+   private static final String STRING_SSL    = "ssl";
+
    public static final String HL7STREAM_URI_SCHEME_FILE_READER          = "file-reader";
    public static final String HL7STREAM_URI_SCHEME_FILE_WRITER          = "file-writer";
    public static final String HL7STREAM_URI_SCHEME_FILE_APPENDER        = "file-appender";
@@ -51,13 +55,13 @@ public class HL7StreamURI {
    public static final String HL7STREAM_URI_SCHEME_MLLP_WRITER          = "mllp-writer";
    public static final String HL7STREAM_URI_SCHEME_MLLP_READER          = "mllp-reader";
    public static final String HL7STREAM_URI_SCHEME_MLLP_CLIENT          = "mllp-client";
-   public static final String HL7STREAM_URI_SCHEME_MLLP_SERVER          = "mllp-server";
+   public static final String HL7STREAM_URI_SCHEME_MLLP_SERVER          = "mllp-" + STRING_SERVER;
    public static final String HL7STREAM_URI_SCHEME_MLLP                 = "mllp";
 
    public static final String HL7STREAM_URI_SCHEME_LLP_WRITER           = "llp-writer";
    public static final String HL7STREAM_URI_SCHEME_LLP_READER           = "llp-reader";
    public static final String HL7STREAM_URI_SCHEME_LLP_CLIENT           = "llp-client";
-   public static final String HL7STREAM_URI_SCHEME_LLP_SERVER           = "llp-server";
+   public static final String HL7STREAM_URI_SCHEME_LLP_SERVER           = "llp-" + STRING_SERVER;
    public static final String HL7STREAM_URI_SCHEME_LLP                  = "llp";
 
    public static final String HL7STREAM_URI_SCHEME_HL7_CLIENT           = "hl7-client";
@@ -76,14 +80,11 @@ public class HL7StreamURI {
    public static final String HL7STREAM_URI_SCHEME_SECURE_CLIENT        = "ssl-client";
    public static final String HL7STREAM_URI_SCHEME_SECURE_SERVER        = "ssl-server";
 
-   private static final String STRING_SERVER = "server";
-   private static final String STRING_XML    = "xml";
-   private static final String STRING_SSL    = "ssl";
+   public static String HL7STREAM_URI_SCHEME_AMQP_CONSUMER = "amqp-consumer";
 
    private static final String URI_SCHEME_TERMINATOR = ":";
    private static final String URI_AUTH_PREFIX = "//";
    private static final String URI_PORT_PREFIX = URI_SCHEME_TERMINATOR;
-
 
    private HL7StreamURI() { }
    /**
@@ -340,6 +341,11 @@ public class HL7StreamURI {
       return hasScheme() && getScheme().contains(str);
    } // schemeHas
 
+   public String scheme() {
+      return getScheme();
+   } // scheme
+   
+   
    boolean canWriteFiles() {
       return isFileWriterURI()
       ||     isFileAppenderURI()
@@ -351,4 +357,14 @@ public class HL7StreamURI {
    public String toString() {
       return uri.toString();
    } // toString
+
+   public String path() {
+      return uri.getPath();
+   } // path
+
+   public String query() {
+      return uri.getQuery();
+   } // query
+   
+   
 } // HL7StreamURI

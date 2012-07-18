@@ -169,5 +169,11 @@ Test, Debug:
 * Revision: 102, Date: 2010-10-23 20:34:51 -0700 (Sat, 23 Oct 2010), Author: scott.herman@unconxio.us
 - HL7MLLPStream.streamID():Corrected a small format omission.
 
-* $Revision$, $Date$, $Author$
+* Revision: 112, Date: 2010-12-28 12:28:36 -0800 (Tue, 28 Dec 2010), Author: scott.herman@unconxio.us
 - HL7IOException.isNetworkProblem():Added for diagnostic capability.
+
+* $Revision$, $Date$, $Author$
+Modifications to facilitate integration with AMQP.
+- HL7StreamURI.scheme(), .path(), .query() added to provide access to the scheme, path, and query items.
+
+
