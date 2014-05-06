@@ -86,7 +86,9 @@ Removed the EscapeChars class in favor of org.apache.commons.lang.StringEscapeUt
 * Revision: 117, Date: 2011-07-22 11:40:06 -0700 (Fri, 22 Jul 2011), Author: inconscient0@gmail.com
 - AttributeMap.keys():Added to provide access to the key set.
 
-* $Revision$, $Date$, $Author$
+* Revision: 118 $, $Date: 2011-09-27 17:04:52 -0700 (Tue, 27 Sep 2011), Author: inconscient0@gmail.com
 - AttributeMap.setRaw():Added to control HTML/XML escaping of attribute value strings.
 By default, HTML is unescaped and XML is escaped.
+
+* $Revision$, $Date$, $Author$
 

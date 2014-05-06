@@ -31,7 +31,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.HashMap;
-import org.apache.commons.lang.StringEscapeUtils;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -104,7 +106,7 @@ public class AttributeMap {
          if (attributeKey != null && !attributeKey.isEmpty()) {
             buildBuffer.append(" ").append(attributeKey).append("=\"");
             if (escape && attributeValue != null) {
-               String unescaped = StringEscapeUtils.unescapeHtml(attributeValue);
+               String unescaped = StringEscapeUtils.unescapeHtml4(attributeValue);
                attributeValue = StringEscapeUtils.escapeXml(unescaped);
             } // if
 
